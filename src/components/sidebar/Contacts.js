@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Contact from "./Contact";
-import listContact from "../datas/Users.json"
+import listContact from "../../datas/Users.json"
 
 export default class Contacts extends Component {
   render() {

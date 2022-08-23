@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Contacts from './Contacts'
-import '../styles/EndOfSlidebar.css'
+import '../../styles/EndOfSlidebar.css'
 
 export default class EndOfSlidebar extends Component {
   render() {

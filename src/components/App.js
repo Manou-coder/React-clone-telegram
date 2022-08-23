@@ -1,4 +1,4 @@
-import Sidebar from "./Sidebar";
+import Sidebar from "./sidebar/Sidebar";
 
 import React, { Component } from "react";
 
