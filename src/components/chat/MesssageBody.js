@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import MyMessage from "./MyMessage";
+import TimeBadge from "./TimeBadge";
 import UserMessage from "./UserMessage";
 
 export default class MesssageBody extends Component {
@@ -23,12 +24,17 @@ export default class MesssageBody extends Component {
           ></div>
           {/* ------------------------------------MESSAGES-HERE------------------------------------------- */}
 
+          <div>
           {[...newArray].map((e, i) => (
-            <>
+            <div key={`Message-${i}}`}>
               <UserMessage />
+              <TimeBadge />
               <MyMessage />
-            </>
+            </div>
           ))}
+
+
+          
 
           {/* ------------------------------------MESSAGES-HERE------------------------------------------- */}
           {/* <!-- this div is meant to put a space between the message bubbles and the message bar --> */}
@@ -37,7 +43,8 @@ export default class MesssageBody extends Component {
             style={{ padding: "1px 0px" }}
           ></div>
         </div>
-      </div>
+        </div>
+        </div>
     );
   }
 }

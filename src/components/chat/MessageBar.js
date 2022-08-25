@@ -2,29 +2,46 @@ import React, { Component } from "react";
 
 export default class MessageBar extends Component {
   render() {
-    // function autoResizeMessageBar() {
-    //   let textarea = document.querySelector("#autoresizing");
-    //   textarea.addEventListener("input", autoResize, false);
+    let objFunc = {
+      scrollHeight: 0,
+      func1: function autoResize(e) {
+        let event = e.target;
+        event.style.height = "auto";
+        event.style.height = event.scrollHeight + "px";
+        this.scrollHeight = event.scrollHeight;
+        // console.log(objFunc.scrollHeight);
+        return event.scrollHeight;
+      },
+      func2: function autoResizeClassName(event) {
+        console.log(objFunc.scrollHeight);
+        let classNameOfMessageInput =
+          "row bg-white rounded-5 py-1 w-100 w-lg-75 align-items-center";
+        if (this.scrollHeight > 30) {
+          classNameOfMessageInput = classNameOfMessageInput.replace(
+            "align-items-center",
+            "align-items-baseline"
+          );
+        } else {
+          classNameOfMessageInput = classNameOfMessageInput.replace(
+            "align-items-baseline",
+            "align-items-center"
+          );
+        }
+        return classNameOfMessageInput;
+      },
+      func3: function () {
+        return 3;
+      }
+    };
 
-    //   function autoResize() {
-    //     this.style.height = "auto";
-    //     this.style.height = this.scrollHeight + "px";
-    //     let barOfMesssage = textarea.parentElement.parentElement;
-    //     if (this.scrollHeight > 30) {
-    //       barOfMesssage.classNameList.remove("align-items-center");
-    //       barOfMesssage.classNameList.add("align-items-baseline");
-    //     } else {
-    //       barOfMesssage.classNameList.remove("align-items-baseline");
-    //       barOfMesssage.classNameList.add("align-items-center");
-    //     }
-    //   }
-    // }
+    // console.log(objFunc.func2());
 
-    // autoResizeMessageBar();
+    // console.log(objFunc.scrollHeight);
+
     return (
       <div className="row sticky-bottom py-1 bg-light w-100 m-0 p-0">
         <div className="col py-1 d-flex justify-content-center">
-          <div className="row bg-white rounded-5 py-1 w-100 w-lg-75 align-items-center">
+          <div className={objFunc.func2()}>
             <div className="col-1 d-flex justify-content-start">
               <span>
                 <i className="fa-solid fa-face-smile fa-lg"></i>
@@ -38,6 +55,8 @@ export default class MessageBar extends Component {
             <div className="col">
               <textarea
                 id="autoresizing"
+                // eslint-disable-next-line no-restricted-globals
+                onInput={() => objFunc.func1(event)}
                 rows="1"
                 placeholder="Messsage..."
                 style={{
