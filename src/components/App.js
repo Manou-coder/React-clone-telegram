@@ -1,7 +1,8 @@
-import Sidebar from "./sidebar/Sidebar";
+import Sidebar from './sidebar/Sidebar'
 
-import React, { Component } from "react";
-import Chat from "./chat/Chat";
+import React, { Component } from 'react'
+import Chat from './chat/Chat'
+import './sidebar/functionSearch'
 
 export default class App extends Component {
   render() {
@@ -12,6 +13,6 @@ export default class App extends Component {
           <Chat />
         </div>
       </div>
-    );
+    )
   }
 }

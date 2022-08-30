@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import EndOfSlidebar from "./EndOfSlidebar";
-import Navbar from "./Navbar";
-import SlideMenu from "./SlideMenu";
+import React, { Component } from 'react'
+import EndOfSlidebar from './EndOfSlidebar'
+import Navbar from './Navbar'
+import SlideMenu from './SlideMenu'
 
 export default class Sidebar extends Component {
   render() {
@@ -11,6 +11,6 @@ export default class Sidebar extends Component {
         <SlideMenu />
         <EndOfSlidebar />
       </div>
-    );
+    )
   }
 }

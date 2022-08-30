@@ -22,7 +22,7 @@ function NavBar() {
       <div className="col d-flex justify-content-center">
         <div
           className={`row w-100 bg-white border rounded-5 my-2 py-2 align-items-center`}
-          style={{ 'box-shadow': `0px 0px 0px 2px ${shadowColor}` }}
+          style={{ boxShadow: `0px 0px 0px 2px ${shadowColor}` }}
         >
           <div className="col-1">
             <span>
