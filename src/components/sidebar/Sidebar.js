@@ -1,16 +1,20 @@
-import React, { Component } from 'react'
+import { useState } from 'react'
 import EndOfSlidebar from './EndOfSlidebar'
 import Navbar from './Navbar'
 import SlideMenu from './SlideMenu'
 
-export default class Sidebar extends Component {
-  render() {
-    return (
-      <div className="d-none d-lg-flex flex-column col-lg-4 p-0 sidebar vh-100 border-end border-secondary _sidebar">
-        <Navbar />
-        <SlideMenu />
-        <EndOfSlidebar />
-      </div>
-    )
-  }
+function Sidebar() {
+  const [inputLetters, setInputLetters] = useState('')
+  return (
+    <div className="d-none d-lg-flex flex-column col-lg-4 p-0 sidebar vh-100 border-end border-secondary _sidebar">
+      <Navbar inputLetters={inputLetters} setInputLetters={setInputLetters} />
+      <SlideMenu />
+      <EndOfSlidebar
+        inputLetters={inputLetters}
+        setInputLetters={setInputLetters}
+      />
+    </div>
+  )
 }
+
+export default Sidebar

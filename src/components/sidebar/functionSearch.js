@@ -1,33 +1,18 @@
 /* eslint-disable import/no-anonymous-default-export */
-export default function (arr, inputSearch) {
-  return arr.filter(
-    (element) =>
-      element.firstName.includes(inputSearch) ||
-      element.lastName.includes(inputSearch)
-  )
+// export default function (arr, letter) {
+//   letter = 'manou'
+//   letter = letter.toLowerCase()
+//   if (letter === '') return []
+//   return arr.filter(
+//     (element) =>
+//       element.firstName.toLowerCase().includes(letter) ||
+//       element.lastName.toLowerCase().includes(letter)
+//   )
+// }
+
+export default function (arr, letter) {
+  // console.log('arr', arr)
+  letter = letter.toLowerCase()
+  if (letter === '') return arr
+  return arr.filter((element) => element.name.toLowerCase().includes(letter))
 }
-
-// export default function (arr, inputSearch) {
-//   const newArr = []
-//   for (const element of arr) {
-//     if (element.firstName.includes(inputSearch)) {
-//       newArr.push(element)
-//     }
-//   }
-//   console.log(newArr)
-//   return newArr
-// }
-
-// const _ = require('lodash')
-
-// const obj1 = {
-//   foo: 'bar',
-// }
-
-// const obj2 = {
-//   foo: 'bar',
-// }
-
-// const comparateur = _.isEqual(obj1, obj2)
-
-// console.log(comparateur)

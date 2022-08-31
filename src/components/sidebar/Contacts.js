@@ -1,19 +1,44 @@
 import Contact from './Contact'
 import listContact from '../../datas/Users.json'
 import searchContactByInput from './functionSearch'
+import { useState } from 'react'
 
-let newFile = searchContactByInput(listContact, 'broo')
+let inputSearch
+let newFile
 
-function Contacts() {
-  // let newArray = Array(40)
+let coucou = listContact.map((elem) => ({
+  name: `${elem.firstName.toLowerCase()} ${elem.lastName.toLowerCase()}`,
+}))
+
+// console.log('coucou', coucou)
+
+// console.log('newFile', newFile)
+
+function Contacts({ inputLetters, setInputLetters }) {
+  const [spanLetter, setSpanLetter] = useState('a')
+  inputSearch = inputLetters
+
+  // newFile = searchContactByInput(listContact, inputSearch)
+  newFile = searchContactByInput(coucou, inputSearch)
+
+  // console.log('inputLetters', inputLetters)
+  // console.log(newFile)
+
+  // let ContactNameLowerCase = getContactNameLowerCase(listContact)
+  // console.log('ContactNameLowerCase', ContactNameLowerCase)
+
+  // newFile = searchContactByInput(ContactNameLowerCase, inputSearch)
+  // console.log('newFile', newFile)
   return (
     <ul className="p-0" style={{ listStyleType: 'none' }}>
-      <Contact name="Nao France" random="1" />
-      {/* {[...newArray].map((e, i) => ( */}
       {newFile.map((e, i) => (
         <Contact
-          // name={getRandomUser(true)}
-          name={getSearchedUser(true, i)}
+          name1={getSearchedUser(i, inputSearch)[0]}
+          name2={getSearchedUser(i, inputSearch)[1]}
+          name3={getSearchedUser(i, inputSearch)[2]}
+          inputLetters={inputLetters}
+          setInputLetters={setInputLetters}
+          spanLetter={spanLetter}
           random={getRandomNumber()}
           id={i + 1}
           key={i + 2}
@@ -27,20 +52,62 @@ function getRandomNumber() {
   return Math.floor(Math.random() * newFile.length)
 }
 
-function getRandomUser(genderOfName) {
-  let randomUser = newFile[getRandomNumber()]
-  // console.log(randomUser)
-  return genderOfName === false
-    ? randomUser.firstName
-    : `${randomUser.firstName} ${randomUser.lastName}`
+function getSearchedUser(index, inputSearch) {
+  let searchedUser = newFile[index]
+  // let nameOfUser = `${searchedUser.firstName} ${searchedUser.lastName}`
+  let nameOfUser = searchedUser.name
+  if (inputSearch === '') {
+    return [nameOfUser, '', '']
+  }
+  let coucou = new RegExp('^' + inputSearch)
+  console.log(coucou)
+  nameOfUser = nameOfUser.split(coucou)
+  // console.log('nameOfUser', nameOfUser)
+  // console.log('inputSearch', inputSearch)
+  return [nameOfUser[0], inputSearch, nameOfUser[1]]
 }
 
-function getSearchedUser(genderOfName, index) {
-  let searchedUser = newFile[index]
-  // console.log(searchedUser)
-  return genderOfName === false
-    ? searchedUser.firstName
-    : `${searchedUser.firstName} ${searchedUser.lastName}`
+function testZazato() {
+  let za = 'za'
+  // let input = /^za/
+  let input = new RegExp('^' + za)
+  let zazato = 'zazato zazato'
+  return zazato.split(input)
 }
+
+// console.log(testZazato())
+
+function testSidonia() {
+  let za = 'ma'
+  // let input = /^za/
+  let input = new RegExp('^' + za)
+  let zazato = 'sidonia stringman'
+  return zazato.split(input)
+}
+
+// console.log(testSidonia())
+
+function testSidonia2(index, inputSearch) {
+  inputSearch = 'ma'
+  let nameOfUser = 'sidonia stringman'
+  // let nameOfUser = 'manou haouzi'
+  let coucou = new RegExp('^' + inputSearch)
+  console.log(coucou)
+  nameOfUser = nameOfUser.split(coucou)
+  // console.log('nameOfUser', nameOfUser)
+  // console.log('inputSearch', inputSearch)
+  if (nameOfUser[1] === undefined) {
+    nameOfUser[1] = ''
+  }
+  return [nameOfUser[0], inputSearch, nameOfUser[1]]
+}
+
+console.log(testSidonia2())
+// function getContactNameLowerCase(arr) {
+//   return arr.map(
+//     (element) =>
+//       element.firstName.toLowerCase() + ' ' + element.lastName.toLowerCase()
+//   )
+// }
 
 export default Contacts

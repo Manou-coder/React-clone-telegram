@@ -2,7 +2,7 @@ import { useState } from 'react'
 import SearchSideBar from './SearchSideBar'
 import color from '../../utils/style/color'
 
-function NavBar() {
+function NavBar({ inputLetters, setInputLetters }) {
   const [borderColor, setBorderColor] = useState(false)
 
   const shadowColor = !borderColor ? 'transparent' : color.primary
@@ -42,7 +42,11 @@ function NavBar() {
             </span>
           </div>
           <div className="col">
-            <SearchSideBar setBorderColor={setBorderColor} />
+            <SearchSideBar
+              setBorderColor={setBorderColor}
+              inputLetters={inputLetters}
+              setInputLetters={setInputLetters}
+            />
           </div>
         </div>
       </div>

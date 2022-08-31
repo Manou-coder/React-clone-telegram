@@ -1,7 +1,16 @@
 import { useState } from 'react'
 import '../../styles/Contact.css'
+import colors from '../../utils/style/color'
 
-function Contact({ name, random }) {
+function Contact({
+  name,
+  random,
+  spanLetter,
+  name1,
+  name2,
+  name3,
+  inputLetters,
+}) {
   const bgLight = 'w-100 py-2 m-0 rounded'
   const bgPrimary = bgLight + ' bg-white'
 
@@ -39,7 +48,11 @@ function Contact({ name, random }) {
         </div>
         <div className="col">
           <div>
-            <h3 className="mb-0 fs-5 lh-1">{name}</h3>
+            <h3 className="mb-0 fs-5 lh-1">
+              {name1}
+              <span style={{ color: colors.primary }}>{name2}</span>
+              {name3}
+            </h3>
           </div>
           <div>
             <p className="mb-0 fw-light pt-0 lh-1">last seen</p>

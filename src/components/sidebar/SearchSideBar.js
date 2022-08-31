@@ -1,6 +1,6 @@
 import color from '../../utils/style/color'
 
-function SearchSideBar({ setBorderColor }) {
+function SearchSideBar({ setBorderColor, inputLetters, setInputLetters }) {
   return (
     <input
       style={{
@@ -11,6 +11,7 @@ function SearchSideBar({ setBorderColor }) {
       }}
       type="text"
       placeholder="Search"
+      onChange={(e) => setInputLetters(e.target.value)}
       onFocus={() => {
         setBorderColor(true)
       }}
