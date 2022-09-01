@@ -2,7 +2,6 @@ import Sidebar from './sidebar/Sidebar'
 
 import React, { Component } from 'react'
 import Chat from './chat/Chat'
-import './sidebar/functionSearch'
 
 export default class App extends Component {
   render() {
