@@ -1,7 +1,8 @@
 import Contact from './Contact'
 import listContact from '../../datas/Users.json'
 import searchContactByInput from './functionSearch'
-import { useState } from 'react'
+import capitalizeString from '../../utils/functions/capitalizeString'
+const _ = require('lodash')
 
 let inputSearch
 let newFile
@@ -15,20 +16,10 @@ let coucou = listContact.map((elem) => ({
 // console.log('newFile', newFile)
 
 function Contacts({ inputLetters, setInputLetters }) {
-  const [spanLetter, setSpanLetter] = useState('a')
-  inputSearch = inputLetters
+  inputSearch = inputLetters.toLowerCase()
 
-  // newFile = searchContactByInput(listContact, inputSearch)
   newFile = searchContactByInput(coucou, inputSearch)
 
-  // console.log('inputLetters', inputLetters)
-  // console.log(newFile)
-
-  // let ContactNameLowerCase = getContactNameLowerCase(listContact)
-  // console.log('ContactNameLowerCase', ContactNameLowerCase)
-
-  // newFile = searchContactByInput(ContactNameLowerCase, inputSearch)
-  // console.log('newFile', newFile)
   return (
     <ul className="p-0" style={{ listStyleType: 'none' }}>
       {newFile.map((e, i) => (
@@ -36,9 +27,6 @@ function Contacts({ inputLetters, setInputLetters }) {
           name1={getSearchedUser(i, inputSearch)[0]}
           name2={getSearchedUser(i, inputSearch)[1]}
           name3={getSearchedUser(i, inputSearch)[2]}
-          inputLetters={inputLetters}
-          setInputLetters={setInputLetters}
-          spanLetter={spanLetter}
           random={getRandomNumber()}
           id={i + 1}
           key={i + 2}
@@ -52,62 +40,176 @@ function getRandomNumber() {
   return Math.floor(Math.random() * newFile.length)
 }
 
+// function getSearchedUser(index, inputSearch) {
+//   let searchedUser = newFile[index]
+//   let nameOfUser = searchedUser.name
+//   if (inputSearch === '') {
+//     return [nameOfUser, '', '']
+//   }
+
+//   console.log('---nameOfUser---', nameOfUser)
+
+//   let firstOccurence = nameOfUser.indexOf(inputSearch)
+//   console.log('---firstOccurence---', firstOccurence)
+
+//   let inputSearchLength = inputSearch.length
+//   console.log('---inputSearchLength---', inputSearchLength)
+
+//   let firstParty = nameOfUser.slice(0, firstOccurence)
+//   console.log('---firstParty---', firstParty)
+
+//   let secondParty = nameOfUser.slice(firstOccurence + inputSearchLength)
+//   console.log('---secondParty---', secondParty)
+
+//   return [firstParty, inputSearch, secondParty]
+// }
+
 function getSearchedUser(index, inputSearch) {
   let searchedUser = newFile[index]
-  // let nameOfUser = `${searchedUser.firstName} ${searchedUser.lastName}`
   let nameOfUser = searchedUser.name
   if (inputSearch === '') {
-    return [nameOfUser, '', '']
+    return [_.startCase(nameOfUser), '', '']
   }
-  let coucou = new RegExp('^' + inputSearch)
-  console.log(coucou)
-  nameOfUser = nameOfUser.split(coucou)
-  // console.log('nameOfUser', nameOfUser)
-  // console.log('inputSearch', inputSearch)
-  return [nameOfUser[0], inputSearch, nameOfUser[1]]
+
+  console.log('---nameOfUser---', nameOfUser)
+
+  let firstOccurence = nameOfUser.indexOf(inputSearch)
+  console.log('---firstOccurence---', firstOccurence)
+
+  let inputSearchLength = inputSearch.length
+  console.log('---inputSearchLength---', inputSearchLength)
+
+  let firstParty = nameOfUser.slice(0, firstOccurence)
+  console.log('---firstParty---', firstParty)
+
+  let secondParty = nameOfUser.slice(firstOccurence + inputSearchLength)
+  console.log('---secondParty---', secondParty)
+
+  let stringFinal = [firstParty, inputSearch, secondParty]
+  console.log('stringFinal', stringFinal.join(''))
+
+  if (firstParty === '') {
+    inputSearch = capitalizeString(inputSearch)
+  } else {
+    firstParty = capitalizeString(firstParty)
+  }
+
+  // secondParty = _.startCase(secondParty)
+
+  let secondParty2 = secondParty.split(' ')
+
+  console.log('secondParty2.length', secondParty2.length)
+
+  function capitalizeSecondParty() {
+    const newArr = []
+    newArr.push(secondParty2[0])
+    if (secondParty2.length <= 1) {
+      return secondParty2.join()
+    }
+    if (secondParty2.length > 1) {
+      for (let index = 1; index < secondParty2.length; index++) {
+        let word = secondParty2[index]
+        console.log('word', word)
+        word = capitalizeString(word)
+        console.log('word2', word)
+        newArr.push(word)
+      }
+      return newArr.join(' ')
+    }
+  }
+
+  let secondParty3 = capitalizeSecondParty()
+  console.log('secondParty3', secondParty3)
+
+  console.log('secondParty2', secondParty2)
+
+  let firstParty3 = _.startCase(firstParty)
+
+  console.log('firstParty3', firstParty3)
+
+  console.log('_______ ====', nameOfUser[firstOccurence - 1])
+
+  if (nameOfUser[firstOccurence - 1] === ' ') {
+    console.log('=======================================')
+    inputSearch = ' ' + _.startCase(inputSearch)
+  }
+
+  return [firstParty3, inputSearch, secondParty3]
 }
-
-function testZazato() {
-  let za = 'za'
-  // let input = /^za/
-  let input = new RegExp('^' + za)
-  let zazato = 'zazato zazato'
-  return zazato.split(input)
-}
-
-// console.log(testZazato())
-
-function testSidonia() {
-  let za = 'ma'
-  // let input = /^za/
-  let input = new RegExp('^' + za)
-  let zazato = 'sidonia stringman'
-  return zazato.split(input)
-}
-
-// console.log(testSidonia())
 
 function testSidonia2(index, inputSearch) {
-  inputSearch = 'ma'
-  let nameOfUser = 'sidonia stringman'
+  inputSearch = 'at'
+  let nameOfUser = 'zazato zazato alama Kalo'
+
+  // inputSearch = 'h'
   // let nameOfUser = 'manou haouzi'
-  let coucou = new RegExp('^' + inputSearch)
-  console.log(coucou)
-  nameOfUser = nameOfUser.split(coucou)
-  // console.log('nameOfUser', nameOfUser)
-  // console.log('inputSearch', inputSearch)
-  if (nameOfUser[1] === undefined) {
-    nameOfUser[1] = ''
+
+  console.log('---nameOfUser---', nameOfUser)
+
+  let firstOccurence = nameOfUser.indexOf(inputSearch)
+  console.log('---firstOccurence---', firstOccurence)
+
+  let inputSearchLength = inputSearch.length
+  console.log('---inputSearchLength---', inputSearchLength)
+
+  let firstParty = nameOfUser.slice(0, firstOccurence)
+  console.log('---firstParty---', firstParty)
+
+  let secondParty = nameOfUser.slice(firstOccurence + inputSearchLength)
+  console.log('---secondParty---', secondParty)
+
+  let stringFinal = [firstParty, inputSearch, secondParty]
+  console.log('stringFinal', stringFinal.join(''))
+
+  if (firstParty === '') {
+    inputSearch = capitalizeString(inputSearch)
+  } else {
+    firstParty = capitalizeString(firstParty)
   }
-  return [nameOfUser[0], inputSearch, nameOfUser[1]]
+
+  // secondParty = _.startCase(secondParty)
+
+  let secondParty2 = secondParty.split(' ')
+
+  console.log('secondParty2.length', secondParty2.length)
+
+  function capitalizeSecondParty() {
+    const newArr = []
+    newArr.push(secondParty2[0])
+    if (secondParty2.length <= 1) {
+      return secondParty2.join()
+    }
+    if (secondParty2.length > 1) {
+      for (let index = 1; index < secondParty2.length; index++) {
+        let word = secondParty2[index]
+        console.log('word', word)
+        word = capitalizeString(word)
+        console.log('word2', word)
+        newArr.push(word)
+      }
+      return newArr.join(' ')
+    }
+  }
+
+  let secondParty3 = capitalizeSecondParty()
+  console.log('secondParty3', secondParty3)
+
+  console.log('secondParty2', secondParty2)
+
+  let firstParty3 = _.startCase(firstParty)
+
+  console.log('firstParty3', firstParty3)
+
+  console.log('_______ ====', nameOfUser[firstOccurence - 1])
+
+  if (nameOfUser[firstOccurence - 1] === ' ') {
+    console.log('=======================================')
+    inputSearch = _.startCase(inputSearch)
+  }
+
+  return [firstParty3, inputSearch, secondParty3]
 }
 
-console.log(testSidonia2())
-// function getContactNameLowerCase(arr) {
-//   return arr.map(
-//     (element) =>
-//       element.firstName.toLowerCase() + ' ' + element.lastName.toLowerCase()
-//   )
-// }
+console.log('testSidonia2 =', testSidonia2())
 
 export default Contacts

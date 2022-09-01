@@ -1,16 +1,8 @@
 import { useState } from 'react'
-import '../../styles/Contact.css'
 import colors from '../../utils/style/color'
+// import capitalizeString from '../../utils/functions/capitalizeString'
 
-function Contact({
-  name,
-  random,
-  spanLetter,
-  name1,
-  name2,
-  name3,
-  inputLetters,
-}) {
+function Contact({ random, name1, name2, name3 }) {
   const bgLight = 'w-100 py-2 m-0 rounded'
   const bgPrimary = bgLight + ' bg-white'
 
