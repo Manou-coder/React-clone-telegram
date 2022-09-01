@@ -8,7 +8,7 @@ let ContactsListLowerCase = ContactsList.map((elem) => ({
 }))
 
 function Contacts({ inputLetters }) {
-  // inputLetters = inputLetters.toLowerCase()
+  inputLetters = inputLetters.toLowerCase()
 
   let searchedContactList = searchContactByInput(
     ContactsListLowerCase,
