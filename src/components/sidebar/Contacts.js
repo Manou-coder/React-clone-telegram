@@ -3,17 +3,8 @@ import ContactsList from '../../datas/Users.json'
 import searchContactByInput from '../../utils/functions/searchContact'
 import getSearchedUser from '../../utils/functions/getSearchedUser'
 
-let ContactsListLowerCase = ContactsList.map((elem) => ({
-  name: `${elem.firstName.toLowerCase()} ${elem.lastName.toLowerCase()}`,
-}))
-
 function Contacts({ inputLetters }) {
-  inputLetters = inputLetters.toLowerCase()
-
-  let searchedContactList = searchContactByInput(
-    ContactsListLowerCase,
-    inputLetters
-  )
+  let searchedContactList = searchContactByInput(ContactsList, inputLetters)
 
   return (
     <ul className="p-0" style={{ listStyleType: 'none' }}>

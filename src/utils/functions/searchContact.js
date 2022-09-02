@@ -1,32 +1,64 @@
-/* eslint-disable import/no-anonymous-default-export */
-export default function (arr, inputLetters) {
-  // console.log('arr', arr)
-  if (inputLetters.trim() === '') return arr
+/*
+this function is used to filter the contact list according to the 'inputSearch' parameter;
+ the search is case insensitive; 
+ the function returns in a array the contacts who have the 'inputSearch' in this order: 
+ 1) at the beginning of their first name
+ 2) at the beginning of their last name
+ 3) wherever it is 
+ */
 
-  let regex = new RegExp('^' + inputLetters)
-  let regex2 = new RegExp(inputLetters)
+export default function searchContact(arr, inputLetters) {
+  if (inputLetters.trim() === '') {
+    arr = arr.map((e) => JSON.stringify(e))
+    arr = arr.sort()
+    arr = arr.map((e) => JSON.parse(e))
+    return arr
+  }
 
-  let arrStartInput = arr.filter((element) => regex.test(element.name))
+  let regex1 = new RegExp('^' + inputLetters, 'i')
+  let regex2 = new RegExp(inputLetters, 'i')
 
-  let arrInput = arr.filter((element) => regex2.test(element.name))
+  let arrFirstName = arr.filter((element) => regex1.test(element.firstName))
 
-  console.log('arrStartInput', arrStartInput)
+  arrFirstName = arrFirstName.map((e) => JSON.stringify(e))
 
-  console.log('arrInput', arrInput)
+  arrFirstName = arrFirstName.sort()
 
-  // for (let index = 0; index < arrInput.length; index++) {
-  //   const element = arrInput[index]
-  //   for (const iterator of arrStartInput) {
-  //     // console.log(iterator)
-  //     if (iterator !== element) {
-  //       arrInput.push(iterator)
-  //     }
-  //   }
-  // }
+  let arrLastName = arr.filter((element) => regex1.test(element.lastName))
 
-  //  console.log('arrInput', arrInput)
+  arrLastName = arrLastName.map((e) => JSON.stringify(e))
 
-  return arr.filter((element) =>
-    element.name.toLowerCase().includes(inputLetters)
+  arrLastName = arrLastName.sort()
+
+  for (let i = 0; i < arrLastName.length; i++) {
+    const element = arrLastName[i]
+    if (!arrFirstName.includes(element)) {
+      arrFirstName.push(element)
+    }
+  }
+
+  const newArrLastAndFirst = arrFirstName
+
+  let arrInput = arr.filter(
+    (element) => regex2.test(element.lastName) || regex2.test(element.firstName)
   )
+
+  arrInput = arrInput.map((e) => JSON.stringify(e))
+
+  let newArr = []
+
+  for (let i = 0; i < arrInput.length; i++) {
+    const element = arrInput[i]
+    if (!newArrLastAndFirst.includes(element)) {
+      newArr.push(element)
+    }
+  }
+
+  newArr = newArr.sort()
+
+  newArr = [...newArrLastAndFirst, ...newArr]
+
+  newArr = newArr.map((e) => JSON.parse(e))
+
+  return newArr
 }
