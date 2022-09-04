@@ -14,13 +14,14 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={
-          <App>
-            <SideBar />
-            <Chat />
-          </App>
-        }>
-        </Route>
+        <App>
+          <Route path='/' element={
+
+            <><SideBar /><Chat /></>
+
+          }>
+          </Route>
+        </App>
         <Route
           path="*"
           element={
@@ -31,5 +32,5 @@ root.render(
         />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode >
 )
