@@ -4,7 +4,7 @@ import '../../../../utils/style/EndOfSlidebar.css'
 function EndOfSlidebar({ inputLetters, setInputLetters }) {
   return (
     <div
-      className="container-fluid bg-light"
+      className="container-fluid bg-white"
       style={{
         height: 'calc(100vh)',
         overflowY: 'scroll',

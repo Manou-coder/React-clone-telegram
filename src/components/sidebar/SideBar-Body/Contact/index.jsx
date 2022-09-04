@@ -1,28 +1,21 @@
 import { useState } from 'react'
 import colors from '../../../../utils/style/color'
-// import capitalizeString from '../../utils/functions/capitalizeString'
 
 function Contact({ random, name1, name2, name3 }) {
-  const bgLight = 'w-100 py-2 m-0 rounded'
-  const bgPrimary = bgLight + ' bg-white'
 
-  const badgePrimary = 'badge bg-primary rounded-pill'
-  const badgewhite = 'badge bg-light rounded-pill text-primary'
+  const [isActive, setIsActive] = useState(false)
 
-  const [bgInitial, setBgInitial] = useState(bgLight)
-
-  const [badgeInitial, setBadgeInitial] = useState(badgePrimary)
+  const bgContact = isActive ? 'bg-light' : 'bg-white'
+  const bgBadge = isActive ? 'bg-white text-primary' : 'bg-primary'
 
   return (
     <li
-      className={bgInitial}
+      className={`w-100 py-2 m-0 rounded ${bgContact}`}
       onMouseOver={() => {
-        setBgInitial(bgPrimary)
-        setBadgeInitial(badgewhite)
+        setIsActive(true)
       }}
       onMouseOut={() => {
-        setBgInitial(bgLight)
-        setBadgeInitial(badgePrimary)
+        setIsActive(false)
       }}
       style={{ cursor: 'pointer' }}
     >
@@ -51,7 +44,7 @@ function Contact({ random, name1, name2, name3 }) {
           </div>
         </div>
         <div className="col-2 p-0">
-          <span className={badgeInitial}>{random}</span>
+          <span className={`badge rounded-pill ${bgBadge}`}>{random}</span>
         </div>
       </div>
     </li>
