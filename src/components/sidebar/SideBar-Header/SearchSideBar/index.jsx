@@ -1,4 +1,4 @@
-import color from '../../utils/style/color'
+import color from '../../../../utils/style/color'
 
 function SearchSideBar({ setBorderColor, inputLetters, setInputLetters }) {
   return (

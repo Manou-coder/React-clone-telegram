@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import SearchSideBar from './SearchSideBar'
-import color from '../../utils/style/color'
+import SearchSideBar from '../SearchSideBar'
+import color from '../../../../utils/style/color'
 
 function NavBar({ inputLetters, setInputLetters }) {
   const [borderColor, setBorderColor] = useState(false)

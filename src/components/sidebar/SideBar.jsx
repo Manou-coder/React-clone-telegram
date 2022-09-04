@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import EndOfSlidebar from './EndOfSlidebar'
-import Navbar from './Navbar'
-import SlideMenu from './SlideMenu'
+import EndOfSlidebar from '../sidebar/SideBar-Body/EndOfSlidebar'
+import Navbar from '../sidebar/SideBar-Header/NavBar'
+import SlideMenu from '../sidebar/SideBar-Header/SlideMenu'
 
 function Sidebar() {
   const [inputLetters, setInputLetters] = useState('')

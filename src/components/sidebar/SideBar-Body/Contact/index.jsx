@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import colors from '../../utils/style/color'
+import colors from '../../../../utils/style/color'
 // import capitalizeString from '../../utils/functions/capitalizeString'
 
 function Contact({ random, name1, name2, name3 }) {

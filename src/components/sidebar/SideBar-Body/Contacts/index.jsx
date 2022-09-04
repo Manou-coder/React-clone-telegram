@@ -1,7 +1,7 @@
-import Contact from './Contact'
-import ContactsList from '../../datas/Users.json'
-import searchContactByInput from '../../utils/functions/searchContact'
-import getSearchedUser from '../../utils/functions/getSearchedUser'
+import Contact from '../../SideBar-Body/Contact'
+import ContactsList from '../../../../datas/Users.json'
+import searchContactByInput from '../../../../utils/functions/searchContact'
+import getSearchedUser from '../../../../utils/functions/getSearchedUser'
 
 function Contacts({ inputLetters }) {
   let searchedContactList = searchContactByInput(ContactsList, inputLetters)

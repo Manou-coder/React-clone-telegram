@@ -1,5 +1,5 @@
-import Contacts from './Contacts'
-import '../../styles/EndOfSlidebar.css'
+import Contacts from '../Contacts'
+import '../../../../utils/style/EndOfSlidebar.css'
 
 function EndOfSlidebar({ inputLetters, setInputLetters }) {
   return (

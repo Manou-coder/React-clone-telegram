@@ -1,11 +1,11 @@
 /*
 this function is used to filter the contact list according to the 'inputSearch' parameter;
- the search is case insensitive; 
- the function returns in a array the contacts who have the 'inputSearch' in this order: 
- 1) at the beginning of their first name
- 2) at the beginning of their last name
- 3) wherever it is 
- */
+the search is case insensitive; 
+the function returns in a array the contacts who have the 'inputSearch' in this order: 
+  1) at the beginning of their first name
+  2) at the beginning of their last name
+  3) wherever it is 
+*/
 
 export default function searchContact(arr, inputLetters) {
   if (inputLetters.trim() === '') {
