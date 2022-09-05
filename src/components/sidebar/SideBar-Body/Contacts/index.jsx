@@ -6,15 +6,20 @@ import getSearchedUser from '../../../../utils/functions/getSearchedUser'
 function Contacts({ inputLetters }) {
   let searchedContactList = searchContactByInput(ContactsList, inputLetters)
 
+  function contact(element) {
+    return `${element.firstName} ${element.lastName}`
+  }
+
   return (
     <ul className="p-0" style={{ listStyleType: 'none' }}>
       {searchedContactList.map((e, i) => (
         <Contact
+          contact={contact(searchedContactList[i])}
           name1={getSearchedUser(searchedContactList, i, inputLetters)[0]}
           name2={getSearchedUser(searchedContactList, i, inputLetters)[1]}
           name3={getSearchedUser(searchedContactList, i, inputLetters)[2]}
           random={getRandomNumber(searchedContactList)}
-          id={i + 1}
+          id={searchedContactList[i].id}
           key={i + 2}
         />
       ))}

@@ -12,16 +12,27 @@ import SideBar from './components/sidebar/SideBar'
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
+    {/* <App> */}
     <BrowserRouter>
       <Routes>
-        <App>
-          <Route path='/' element={
-
-            <><SideBar /><Chat /></>
-
-          }>
-          </Route>
-        </App>
+        <Route
+          path="/"
+          element={
+            <App>
+              <SideBar />
+              <Chat />
+            </App>
+          }
+        ></Route>
+        <Route
+          path=":name"
+          element={
+            <App>
+              <SideBar />
+              <Chat />
+            </App>
+          }
+        ></Route>
         <Route
           path="*"
           element={
@@ -32,5 +43,6 @@ root.render(
         />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode >
+    {/* </App> */}
+  </React.StrictMode>
 )

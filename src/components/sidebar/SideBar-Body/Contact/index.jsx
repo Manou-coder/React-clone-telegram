@@ -1,12 +1,26 @@
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import colors from '../../../../utils/style/color'
 
-function Contact({ random, name1, name2, name3 }) {
+function Contact({ random, name1, name2, name3, contact, id }) {
+
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const contactName = contact
 
   const [isActive, setIsActive] = useState(false)
 
   const bgContact = isActive ? 'bg-light' : 'bg-white'
   const bgBadge = isActive ? 'bg-white text-primary' : 'bg-primary'
+
+  function nav() {
+    if (location.pathname !== '/') {
+      navigate('../' + contactName)
+    } else {
+      navigate(contactName)
+    }
+  }
 
   return (
     <li
@@ -18,6 +32,7 @@ function Contact({ random, name1, name2, name3 }) {
         setIsActive(false)
       }}
       style={{ cursor: 'pointer' }}
+      onClick={() => nav()}
     >
       <div className="row m-0 align-items-center">
         <div className="col-2">

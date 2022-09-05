@@ -11,7 +11,7 @@ function getSearchedUser(arr, index, inputSearch) {
 
   // this condition is used so that in the case where 'inputSearch' is empty then it returns the entire list of contacts in alphabetical order
   if (inputSearch.trim() === '') {
-    return [nameOfUser, '', '']
+    return [nameOfUser, '', '', '']
   }
 
   let firstOccurence = nameOfUser.search(regex)
@@ -39,7 +39,7 @@ function getSearchedUser(arr, index, inputSearch) {
 
   let thirdParty = nameOfUser.slice(firstOccurence + inputSearchLength)
 
-  return [firstParty, secondParty, thirdParty]
+  return [firstParty, secondParty, thirdParty, searchedUser]
 }
 
 export default getSearchedUser
