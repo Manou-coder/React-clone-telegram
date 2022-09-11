@@ -5,6 +5,7 @@ import Message from '../Message'
 import socket from '../../../../utils/socket.io';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import './MessageBody.css'
 
 
 export default function MesssageBody({ message, }) {
@@ -45,9 +46,9 @@ export default function MesssageBody({ message, }) {
 
   return (
     <div
-      className="col h-100"
+      className="col h-100 wallpapper"
       style={{
-        backgroundImage: 'url(/img/chat-wallpaper.jpg)',
+        // backgroundImage: 'url(/img/chat-wallpaper.jpg)',
         overflowY: 'scroll',
         scrollbarWidth: 'none',
         width: '100%',
