@@ -16,9 +16,9 @@ function Contact({ random, name1, name2, name3, contact, id }) {
 
   function nav() {
     if (location.pathname !== '/') {
-      navigate('../' + contactName)
+      navigate('../:id/' + contactName)
     } else {
-      navigate(contactName)
+      navigate('/:id/' + contactName)
     }
   }
 

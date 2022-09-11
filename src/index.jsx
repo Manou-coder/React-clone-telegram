@@ -8,41 +8,39 @@ import ReactDOM from 'react-dom/client'
 import App from './components/App'
 import Chat from './components/chat/Chat'
 import SideBar from './components/sidebar/SideBar'
+import socket from './utils/socket.io'
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
-  <React.StrictMode>
-    {/* <App> */}
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <App>
-              <SideBar />
-              <Chat />
-            </App>
-          }
-        ></Route>
-        <Route
-          path=":name"
-          element={
-            <App>
-              <SideBar />
-              <Chat />
-            </App>
-          }
-        ></Route>
-        <Route
-          path="*"
-          element={
-            <main style={{ padding: "1rem" }}>
-              <p>There's nothing here!</p>
-            </main>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-    {/* </App> */}
-  </React.StrictMode>
+  <BrowserRouter>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <App>
+            <SideBar />
+            <Chat />
+          </App>
+        }
+      ></Route>
+      <Route
+        path="/:id/:name"
+        element={
+          <App>
+            <SideBar />
+            <Chat />
+          </App>
+        }
+      ></Route>
+      <Route
+        path="*"
+        element={
+          <main style={{ padding: "1rem" }}>
+            <p>There's nothing here!</p>
+          </main>
+        }
+      />
+    </Routes>
+  </BrowserRouter>
 )
