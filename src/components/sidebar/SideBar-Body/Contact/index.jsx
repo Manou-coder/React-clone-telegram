@@ -3,9 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import colors from '../../../../utils/style/color'
 
 function Contact({ random, name1, name2, name3, contact, id }) {
-
   const location = useLocation()
   const navigate = useNavigate()
+
+  // console.log('location', location)
 
   const contactName = contact
 
@@ -15,10 +16,12 @@ function Contact({ random, name1, name2, name3, contact, id }) {
   const bgBadge = isActive ? 'bg-white text-primary' : 'bg-primary'
 
   function nav() {
+    let pathId = location.pathname.split('/')[1]
+    console.log('pathId', pathId)
     if (location.pathname !== '/') {
-      navigate('../:id/' + contactName)
+      navigate(`../${pathId}/${contactName}`)
     } else {
-      navigate('/:id/' + contactName)
+      navigate(`/${pathId}/${contactName}`)
     }
   }
 

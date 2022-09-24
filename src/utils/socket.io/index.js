@@ -7,7 +7,7 @@ let pathname = url.pathname
 let arrPathname = pathname.split('/')
 let userName = arrPathname[1]
 userName = userName.replace('%20', ' ')
-console.log('userName', userName)
+// console.log('userName', userName)
 
 let usersList = []
 
@@ -22,16 +22,16 @@ const socket = io('https://chat-example.michelmoreau.repl.co', {
 })
 
 socket.onAny((event, ...args) => {
-  console.log('onAny', event, args)
+  // console.log('onAny', event, args)
 })
 
 socket.on('new user', (users) => {
-  console.log('users', users)
+  // console.log('users', users)
   usersList = users
 })
 
 socket.on('user disonnected', (users) => {
-  console.log('users', users)
+  // console.log('users', users)
   usersList = users
 })
 

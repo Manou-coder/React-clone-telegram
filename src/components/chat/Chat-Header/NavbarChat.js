@@ -7,7 +7,7 @@ export default function NavbarChat() {
     let chat = document.querySelector('._chat')
     let sidebar = document.querySelector('._sidebar')
     chat.className = 'd-none'
-    sidebar.className = 'd-flex flex-column'
+    sidebar.className = 'd-flex flex-column _sidebar'
     sidebar.style.padding = '0px'
   }
 

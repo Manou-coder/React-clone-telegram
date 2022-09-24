@@ -1,0 +1,14 @@
+.icon-bars {
+  border-radius: 20px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.icon-bars:hover {
+  background-color: #f0f2f5;
+}
+
+.icon-bars-hover {
+  background-color: #f0f2f5;
+}

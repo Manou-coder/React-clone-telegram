@@ -1,21 +1,59 @@
 import { useState } from 'react'
 import SearchSideBar from '../SearchSideBar'
 import color from '../../../../utils/style/color'
+import './style.css'
 
-function NavBar({ inputLetters, setInputLetters }) {
+function NavBar({
+  inputLetters,
+  setInputLetters,
+  setIconBarIsActive,
+  iconBarIsActive,
+}) {
   const [borderColor, setBorderColor] = useState(false)
 
   const shadowColor = !borderColor ? 'transparent' : color.primary
 
   const iconSearchColor = !borderColor ? color.black : color.primary
 
+  const iconGrey = !iconBarIsActive ? '' : 'icon-bars-hover'
+
+  function clickOutside(event) {
+    // console.log('click')
+    let target = event.target
+    const allParentsOfTarget = []
+    while (target) {
+      allParentsOfTarget.unshift(target)
+      target = target.parentElement
+      try {
+        let targetClassName = target.className
+        if (targetClassName.indexOf('settings-menu') >= 0) {
+          return
+        }
+      } catch (error) {}
+    }
+    setIconBarIsActive(false)
+  }
+
+  function iconeBarFunc(element) {
+    if (!iconBarIsActive) {
+      setIconBarIsActive(true)
+      document.addEventListener('click', (e) => {
+        clickOutside(e)
+      })
+    } else {
+      setIconBarIsActive(false)
+    }
+  }
   return (
     <div
       className="row w-100 align-items-center sticky-top m-0 bg-white"
       style={{ height: '58px' }}
     >
-      <div className="col-2 d-flex justify-content-center ">
-        <span>
+      <div className="col-2 d-flex justify-content-center settings-menu">
+        <span
+          onClick={(e) => iconeBarFunc(e.target)}
+          className={`icon-bars d-flex justify-content-center align-items-center ${iconGrey}`}
+        >
           <i className="fa-solid fa-bars fa-lg"></i>
         </span>
       </div>
