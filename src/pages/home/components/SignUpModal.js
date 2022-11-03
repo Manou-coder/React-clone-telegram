@@ -17,7 +17,7 @@ export default function SignUpModal() {
 
   const handleForm = async (e) => {
     e.preventDefault()
-    loadingForm = true
+    setLoadingForm(true)
 
     if (
       (inputs.current[1].value.length || inputs.current[2].value.length) < 6
@@ -48,7 +48,8 @@ export default function SignUpModal() {
     }
   }
 
-  let loadingForm = false
+  //loading states
+  const [loadingForm, setLoadingForm] = useState(false)
 
   return (
     <div className="modal-body">
@@ -97,12 +98,9 @@ export default function SignUpModal() {
         </div>
 
         <button className="btn btn-primary w-100">Submit</button>
-        <div className="row justify-content-center">
+        <div className="row justify-content-center mt-2">
           {loadingForm && (
-            <div
-              className="spinner-border text-primary mt-2"
-              role="status"
-            ></div>
+            <div className="spinner-border text-primary" role="status"></div>
           )}
         </div>
       </form>

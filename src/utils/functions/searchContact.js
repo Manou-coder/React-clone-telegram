@@ -15,50 +15,72 @@ export default function searchContact(arr, inputLetters) {
     return arr
   }
 
+  // console.log('arr', arr)
+  // console.log('inputLetters2', inputLetters)
+
   let regex1 = new RegExp('^' + inputLetters, 'i')
   let regex2 = new RegExp(inputLetters, 'i')
 
-  let arrFirstName = arr.filter((element) => regex1.test(element.firstName))
+  // console.log('regex1', regex1)
+  // console.log('regex2', regex2)
 
-  arrFirstName = arrFirstName.map((e) => JSON.stringify(e))
+  // console.log(arr[0].displayName)
 
-  arrFirstName = arrFirstName.sort()
+  // console.log(regex2.test(arr[0].displayName))
 
-  let arrLastName = arr.filter((element) => regex1.test(element.lastName))
+  let arrRegex1 = arr.filter((element) => regex1.test(element.displayName))
 
-  arrLastName = arrLastName.map((e) => JSON.stringify(e))
+  // console.log('arrRegex1', arrRegex1)
 
-  arrLastName = arrLastName.sort()
+  let arrRegex2 = arr.filter((element) => regex2.test(element.displayName))
 
-  for (let i = 0; i < arrLastName.length; i++) {
-    const element = arrLastName[i]
-    if (!arrFirstName.includes(element)) {
-      arrFirstName.push(element)
-    }
-  }
+  // console.log('arrRegex2', arrRegex2)
 
-  const newArrLastAndFirst = arrFirstName
+  // arrRegex1 = arrRegex1.map((e) => JSON.stringify(e))
 
-  let arrInput = arr.filter(
-    (element) => regex2.test(element.lastName) || regex2.test(element.firstName)
-  )
+  // console.log('arrRegex1', arrRegex1)
 
-  arrInput = arrInput.map((e) => JSON.stringify(e))
+  // arrFirstName = arrFirstName.sort()
 
-  let newArr = []
+  // let arrLastName = arr.filter((element) => regex1.test(element.lastName))
 
-  for (let i = 0; i < arrInput.length; i++) {
-    const element = arrInput[i]
-    if (!newArrLastAndFirst.includes(element)) {
-      newArr.push(element)
-    }
-  }
+  // arrLastName = arrLastName.map((e) => JSON.stringify(e))
 
-  newArr = newArr.sort()
+  // arrLastName = arrLastName.sort()
 
-  newArr = [...newArrLastAndFirst, ...newArr]
+  // for (let i = 0; i < arrLastName.length; i++) {
+  //   const element = arrLastName[i]
+  //   if (!arrFirstName.includes(element)) {
+  //     arrFirstName.push(element)
+  //   }
+  // }
 
-  newArr = newArr.map((e) => JSON.parse(e))
+  // const newArrLastAndFirst = 'arrFirstName'
 
-  return newArr
+  // let arrInput = arr.filter(
+  //   (element) => regex2.test(element.lastName) || regex2.test(element.firstName)
+  // )
+
+  // arrInput = arrInput.map((e) => JSON.stringify(e))
+
+  // let newArr = []
+
+  // for (let i = 0; i < arrInput.length; i++) {
+  //   const element = arrInput[i]
+  //   if (!newArrLastAndFirst.includes(element)) {
+  //     newArr.push(element)
+  //   }
+  // }
+
+  // newArr = newArr.sort()
+
+  // newArr = [...newArrLastAndFirst, ...newArr]
+
+  // newArr = newArr.map((e) => JSON.parse(e))
+
+  // let newArr = [...arrRegex1, arrRegex2]
+
+  // return newArr
+
+  return arrRegex2
 }

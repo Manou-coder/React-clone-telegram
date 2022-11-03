@@ -16,11 +16,16 @@ export default function Home() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (user != null) {
+    if (user) {
       readDoc(user.uid)
         .then((res) => {
-          if (res.isProfileCreated) {
-            navigate(`/${res.userId}`)
+          console.log('res', res)
+          if (res) {
+            if (res.isProfileCreated) {
+              navigate(`/${res.userId}`)
+            } else {
+              navigate('/profile')
+            }
           } else {
             navigate('/profile')
           }
@@ -77,10 +82,10 @@ export default function Home() {
 
     // Sign in with credential from the Google user.
     signInWithCredential(auth, credential)
-      .then((response) => {
-        console.log('res', response)
-        // createUserInDB()
-        // navigate('/profile')
+      .then((res) => {
+        console.log('res', res)
+        createUserInDB(res.user)
+        navigate('/profile')
       })
       .catch((error) => {
         console.dir(error)
@@ -98,7 +103,7 @@ export default function Home() {
   return (
     <div>
       {showHome && (
-        <div className="container-fluid vh-100 p-0">
+        <div className="container-fluid vh-100 p-0 wallpapper-black">
           <div className="row w-100 h-100 m-0">
             <div className="col-12 col-md-6 p-0">
               <div className="d-flex flex-column justify-content-center align-items-center h-100 w-100">

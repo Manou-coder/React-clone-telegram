@@ -1,32 +1,27 @@
 [
   {
     "id": 1,
-    "firstName": "Manou",
-    "lastName": "Haouzi",
-    "email": "cadamkiewicz0@umn.edu"
+    "displayName": "Manou Haouzi",
+    "userName": "@manouHaouzi"
   },
   {
-    "id": 2,
-    "firstName": "Naomi",
-    "lastName": "Saghroun",
-    "email": "mgladdor1@deviantart.com"
+    "id": 1,
+    "displayName": "Naomi Saghroun",
+    "userName": "@naomiSaghroun"
   },
   {
-    "id": 3,
-    "firstName": "Binyamin",
-    "lastName": "Haouzi",
-    "email": "basplin2@cdbaby.com"
+    "id": 1,
+    "displayName": "Esthy Zana",
+    "userName": "@esthyZana"
   },
   {
-    "id": 4,
-    "firstName": "Esthy",
-    "lastName": "Zana",
-    "email": "lcescotti3@toplist.cz"
+    "id": 1,
+    "displayName": "Sarah Elkouby",
+    "userName": "@sarahElkouby"
   },
   {
-    "id": 5,
-    "firstName": "Sarah",
-    "lastName": "Elkouby",
-    "email": "malyoshin4@alibaba.com"
+    "id": 1,
+    "displayName": "Binyamin Haouzi",
+    "userName": "@binyaminHaouzi"
   }
 ]

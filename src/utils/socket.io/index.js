@@ -5,9 +5,9 @@ let str = window.location.href
 let url = new URL(str)
 let pathname = url.pathname
 let arrPathname = pathname.split('/')
-let userName = arrPathname[1]
-userName = userName.replace('%20', ' ')
-// console.log('userName', userName)
+let userId = arrPathname[1]
+userId = userId.replace('%20', ' ')
+console.log('userId', userId)
 
 let usersList = []
 
@@ -17,7 +17,7 @@ const socket = io('https://chat-example.michelmoreau.repl.co', {
     token: '123',
   },
   query: {
-    userName: userName,
+    userId: userId,
   },
 })
 

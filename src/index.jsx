@@ -14,46 +14,59 @@ import Home from './pages/home/Home'
 import Profile from './pages/profile/Profile'
 import Protected from './components/Protected'
 import { AuthContextProvider } from './utils/context/AuthContext'
+import './utils/style/index.css'
+import { ThemeProvider } from './utils/context/ThemeContext'
+import { LanguageProvider } from './utils/context/LanguageContext'
+import { SocketContactProvider } from './utils/context/SocketContact'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <BrowserRouter>
     <AuthContextProvider>
-      <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route
-          path="/profile"
-          element={
-            <Protected>
-              <Profile />
-            </Protected>
-          }
-        ></Route>
-        <Route
-          path="/:id"
-          element={
-            <App>
-              <SideBar />
-              <Chat />
-            </App>
-          }
-        >
-          <Route path="/:id/:name">
-            {/* <App>
+      <LanguageProvider>
+        <ThemeProvider>
+          <SocketContactProvider>
+            <Routes>
+              <Route path="/" element={<Home />}></Route>
+              <Route
+                path="/profile"
+                element={
+                  <Protected>
+                    <Profile />
+                  </Protected>
+                }
+                // element={<Profile />}
+              ></Route>
+              <Route
+                path="/:id"
+                element={
+                  <Protected>
+                    <App>
+                      <SideBar />
+                      <Chat />
+                    </App>
+                  </Protected>
+                }
+              >
+                <Route path="/:id/:name">
+                  {/* <App>
               <SideBar />
               <Chat />
             </App> */}
-          </Route>
-        </Route>
-        <Route
-          path="*"
-          element={
-            <main style={{ padding: '1rem' }}>
-              <p>There's nothing here!</p>
-            </main>
-          }
-        />
-      </Routes>
+                </Route>
+              </Route>
+              <Route
+                path="*"
+                element={
+                  <main style={{ padding: '1rem' }}>
+                    <p>There's nothing here!</p>
+                  </main>
+                }
+              />
+            </Routes>
+          </SocketContactProvider>
+        </ThemeProvider>
+      </LanguageProvider>
     </AuthContextProvider>
   </BrowserRouter>
 )

@@ -4,9 +4,15 @@ in order to be able to return it in <span> and give it a different color */
 
 function getSearchedUser(arr, index, inputSearch) {
   let searchedUser = arr[index]
-  let nameOfUser = `${searchedUser.firstName} ${searchedUser.lastName}`
+  // console.log('searchedUser', searchedUser)
+  let nameOfUser = searchedUser.displayName
+
+  // console.log('nameOfuser', nameOfUser)
+
+  // console.log('inputSearch', inputSearch)
 
   let regex = new RegExp(inputSearch, 'i')
+  // console.log('regex', regex)
   let regexUpperCase = new RegExp(inputSearch.toUpperCase())
 
   // this condition is used so that in the case where 'inputSearch' is empty then it returns the entire list of contacts in alphabetical order
@@ -15,6 +21,15 @@ function getSearchedUser(arr, index, inputSearch) {
   }
 
   let firstOccurence = nameOfUser.search(regex)
+
+  console.log('firstOccurence', firstOccurence)
+
+  let nameOfUserFirstOccurence = nameOfUser[firstOccurence]
+
+  console.log(
+    'nameOfUserFirstOccurence',
+    nameOfUserFirstOccurence.toUpperCase()
+  )
 
   // // this function is used so that in the case of 'Eloisa Sparklin' for example the result of the 'firstOccurence' is not the lowercase 's' but the uppercase 'S'
   let verifyFirstOccurence = () => {

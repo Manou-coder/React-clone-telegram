@@ -1,24 +1,41 @@
 import Contact from '../../SideBar-Body/Contact'
 import ContactsList from '../../../../datas/Users.json'
-import searchContactByInput from '../../../../utils/functions/searchContact'
+import searchContact from '../../../../utils/functions/searchContact'
 import getSearchedUser from '../../../../utils/functions/getSearchedUser'
+import { useEffect, useState } from 'react'
+import { readAllUsers } from '../../../../firebase-config'
+import { UserAuth } from '../../../../utils/context/AuthContext'
 
 function Contacts({ inputLetters }) {
-  let searchedContactList = searchContactByInput(ContactsList, inputLetters)
+  const { user } = UserAuth()
 
-  function contact(element) {
-    return `${element.firstName} ${element.lastName}`
+  //get all users
+
+  const [allUsers, setAllUsers] = useState([])
+
+  useEffect(() => {
+    getAllUsers()
+  }, [])
+
+  async function getAllUsers() {
+    const listOfUsers = await readAllUsers()
+    setAllUsers(listOfUsers.users)
   }
 
+  let searchedContactList = searchContact(allUsers, inputLetters)
+
+  searchedContactList = searchedContactList.filter((e) => e.userId !== user.uid)
+
   return (
-    <ul className="p-0" style={{ listStyleType: 'none' }}>
+    <ul className="p-0 mt-2" style={{ listStyleType: 'none' }}>
       {searchedContactList.map((e, i) => (
         <Contact
-          contact={contact(searchedContactList[i])}
+          contact={searchedContactList[i]}
           name1={getSearchedUser(searchedContactList, i, inputLetters)[0]}
           name2={getSearchedUser(searchedContactList, i, inputLetters)[1]}
           name3={getSearchedUser(searchedContactList, i, inputLetters)[2]}
           random={getRandomNumber(searchedContactList)}
+          photoURL={searchedContactList[i].photoURL}
           id={searchedContactList[i].id}
           key={i + 2}
         />

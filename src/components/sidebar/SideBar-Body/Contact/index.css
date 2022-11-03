@@ -1,0 +1,15 @@
+.li-bg-light:hover {
+  background-color: rgb(231, 233, 235);
+}
+
+/* .li-bg-light:active {
+  background-color: red;
+} */
+
+.li-bg-dark:hover {
+  background-color: #909294;
+}
+
+.li-bg-primary {
+  background-color: rgb(13, 110, 253);
+}

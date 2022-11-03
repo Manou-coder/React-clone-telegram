@@ -5,126 +5,133 @@ import './Profile.css'
 import Avatar from '../../assets/img/avatar4.png'
 import { UserAuth } from '../../utils/context/AuthContext'
 import { camelCase } from 'lodash'
-import { updateProfile } from 'firebase/auth'
 import {
-  auth,
-  db,
   downloadImage,
   readDoc,
-  setUserDB,
+  saveUserInContactsList,
   setUserinDB,
 } from '../../firebase-config'
-import { addDoc, collection, setDoc, updateDoc } from 'firebase/firestore'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { updateDoc } from 'firebase/firestore'
+import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { startsWith } from 'lodash'
+
 import { uploadImage } from '../../firebase-config'
-import { click } from '@testing-library/user-event/dist/click'
-import { async } from '@firebase/util'
 
 export default function Profile() {
+  const navigate = useNavigate()
   const { user, userRef } = UserAuth()
+  //states
   const [userDB, setUserDB] = useState({})
+  const [isProfileAvatar, setisProfileAvatar] = useState(null)
+  //refs
+  const profileName = useRef(null)
+  const profileUserName = useRef(null)
+  const inputAvatar = useRef(null)
 
-  useEffect(() => {
-    if (profileAvatar.current) {
-      baba()
-    }
-  })
+  // console.log('isProfileAvatar', isProfileAvatar)
 
-  async function baba() {
-    const coucou = await readDoc(user.uid)
-    setUserDB(coucou)
-    // console.log('coucou', coucou)
-    // console.log('coucou.photoURL', coucou.photoURL)
-    if (coucou.photoURL !== '') {
-      profileAvatar.current.src = coucou.photoURL
-    }
-  }
-
+  //check if the user has already created a profile and if so, direct referral to the chat page
   useEffect(() => {
     if (user != null) {
       readDoc(user.uid)
         .then((res) => {
-          if (!res.isProfileCreated) {
-            setShowProfile(true)
+          // console.log('res', res)
+          if (res) {
+            if (!res.isProfileCreated) {
+              setShowProfile(true)
+            } else {
+              navigate(`/${res.userId}`)
+            }
           } else {
-            navigate(`/${res.userId}`)
+            setShowProfile(true)
           }
         })
         .catch((err) => console.dir(err))
     }
   }, [user])
 
-  let loadingForm = false
-  const navigate = useNavigate()
+  //if the user has logged in with a google account then the form will be automatically filled with their account information
+  useEffect(() => {
+    if (user !== null && profileName.current !== null) {
+      try {
+        const { displayName, photoURL } = user
+        profileName.current.value = displayName
+        createUserName(displayName)
+        //  !!!!!!!!!!!!!!!! PROBLEME AVEC USER SANS GOOGLE ACCOUNT !!!!!!!!!!!!!!!!!!!!!!!!
+        // probleme peut etre resolum
+        // console.log('photoURL', photoURL)
+        if (photoURL !== '' && photoURL !== null) {
+          isProfileAvatar.src = photoURL
+        } else {
+          isProfileAvatar.src = Avatar
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }, [profileName.current])
 
-  const profileName = useRef(null)
-  const profileAvatar = useRef(null)
-  const profileUserName = useRef(null)
-  const inputAvatar = useRef(null)
+  //waits for the DOM to be fully downloaded and displays the new profile picture
+  useEffect(() => {
+    if (isProfileAvatar !== null) {
+      getProfilePictureInDB()
+    }
+  }, [isProfileAvatar])
 
+  // retrieve the profile picture that was uploaded into the db
+  async function getProfilePictureInDB() {
+    const userDB = await readDoc(user.uid)
+    setUserDB(userDB)
+    console.log('userDB', userDB)
+    if (userDB && userDB.photoURL !== '') {
+      isProfileAvatar.src = userDB.photoURL
+    }
+  }
+
+  //upload a profile picture to the db
+  const uploadAvatar = async (e) => {
+    e.preventDefault()
+    setLoadingAvatar(true)
+    await uploadImage(`profile/${user.uid}`, inputAvatar.current.files[0])
+    const urlAvatar = await downloadImage(`profile/${user.uid}`)
+    await updateDoc(userRef, {
+      photoURL: urlAvatar,
+    })
+    const userDB = await readDoc(user.uid)
+    isProfileAvatar.src = userDB.photoURL
+    setLoadingAvatar(false)
+  }
+
+  //create a profile user in the db
+  async function createProfile(e) {
+    // console.log(userDB)
+    e.preventDefault()
+    setLoadingForm(true)
+
+    await setUserinDB(user.uid, {
+      displayName: profileName.current.value,
+      userName: profileUserName.current.value,
+      photoURL: isProfileAvatar.src,
+      isProfileCreated: true,
+    })
+
+    await saveUserInContactsList(user.uid, {
+      displayName: profileName.current.value,
+      userName: profileUserName.current.value,
+      userId: user.uid,
+      photoURL: isProfileAvatar.src,
+    })
+    console.log('oui')
+    // navigate(`/${user.uid}`)
+  }
+
+  //automatically adds a 'username' with an @ at the beginning of the word and a 'camelCase' structure
   function createUserName(name) {
     name = camelCase(name)
     profileUserName.current.value = '@' + name
   }
 
-  const uploadAvatar = async (e) => {
-    e.preventDefault()
-    // console.log('AVATAR', inputAvatar.current.files[0])
-    setLoadingAvatar(true)
-    const bobo = await uploadImage(
-      `profile/${user.uid}`,
-      inputAvatar.current.files[0]
-    )
-    // console.log('bobo', bobo)
-    const urlAvatar = await downloadImage(`profile/${user.uid}`)
-    // console.log('URL', urlAvatar)
-    // console.log('userRef', userRef)
-    await updateDoc(userRef, {
-      photoURL: urlAvatar,
-    })
-    const userDB = await readDoc(user.uid)
-    // console.log('coco', userDB.photoURL)
-    profileAvatar.current.src = userDB.photoURL
-    setLoadingAvatar(false)
-  }
-
-  // useEffect(() => {
-  //   if (user != null) {
-  //     // console.log(profileName.current)
-  //     try {
-  //       const { displayName, photoURL, uid } = user
-  //       // console.log(profileName)
-  //       if (profileName.current) {
-  //         console.log('value', profileName.current)
-  //         profileName.current.value = displayName
-  //         createUserName(displayName)
-  //         if (profileName.current.src === '') {
-  //           profileAvatar.current.src = photoURL
-  //         } else {
-  //           profileAvatar.current.src = Avatar
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.log(error)
-  //     }
-  //   }
-  // })
-
-  async function createProfile(e) {
-    console.log(userDB)
-    e.preventDefault()
-    loadingForm = true
-
-    setUserinDB(user.uid, {
-      displayName: profileName.current.value,
-      userName: profileUserName.current.value,
-      isProfileCreated: true,
-    })
-    // navigate(`/${user.uid}`)
-  }
-
+  // automatically adds an @ at the beginning of the word
   function addAt(elem) {
     let val = elem.value
     if (!val.match(/^@/)) {
@@ -132,18 +139,20 @@ export default function Profile() {
     }
   }
 
+  //simulates a click on an input type 'file'
   function addFile() {
     inputAvatar.current.click()
   }
 
+  //loading states
+  const [loadingForm, setLoadingForm] = useState(false)
   const [loadingAvatar, setLoadingAvatar] = useState(false)
-
   const [showProfile, setShowProfile] = useState(false)
 
   return (
     <div>
       {showProfile && (
-        <div className="container-fluid vh-100 p-0 d-flex justify-content-center align-items-center">
+        <div className="container-fluid vh-100 p-0 d-flex justify-content-center align-items-center wallpapper-black">
           <div
             className="p-4 bg-white rounded d-flex"
             style={{ width: '300px', minWidth: '250px' }}
@@ -153,7 +162,6 @@ export default function Profile() {
                 <h5 className="text-primary fw-bold">My Profile</h5>
               </div>
               <div className="profile-body d-flex flex-column justify-content-center">
-                {/* <form onSubmit={(e) => createProfile(e)}> */}
                 <form onSubmit={(e) => uploadAvatar(e)}>
                   <div className="position-relative">
                     <div className="picture d-flex justify-content-center mb-4">
@@ -198,7 +206,7 @@ export default function Profile() {
                         </div>
                         <img
                           onClick={() => addFile()}
-                          ref={profileAvatar}
+                          ref={(e) => setisProfileAvatar(e)}
                           style={{
                             height: '175px',
                             width: '175px',

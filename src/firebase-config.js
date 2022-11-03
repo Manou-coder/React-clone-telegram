@@ -6,6 +6,8 @@ import {
   setDoc,
   getDoc,
   onSnapshot,
+  updateDoc,
+  arrayUnion,
 } from 'firebase/firestore'
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 
@@ -71,15 +73,73 @@ export const createUserInDB = async (user) => {
     photoURL: '',
     userId: uid,
     isProfileCreated: false,
-    isDarkMode: false,
   }
-  await setDoc(doc(db, 'users', uid), schemaUserDB)
-    .then(console.log('userDB created: ', schemaUserDB))
+  await readDoc(uid)
+    .then((res) => {
+      if (res) {
+        return console.log('yet saved')
+      } else {
+        setDoc(doc(db, 'users', uid), schemaUserDB)
+          .then(console.log('userDB created: ', schemaUserDB))
+          .catch((err) => console.dir(err))
+      }
+    })
     .catch((err) => console.dir(err))
+}
+
+export const saveUserInContactsList = async (userId, data) => {
+  const docRef = doc(db, 'usersList', 'usersList')
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    const allUsers = docSnap.data()
+    // console.log('Document data &&&&:', allUsers.users)
+    const arrOfUsers = allUsers.users
+    for (let i = 0; i < arrOfUsers.length; i++) {
+      const element = arrOfUsers[i]
+      console.log('element', element.userId)
+      if (element.userId === userId) {
+        console.log('element egal', element + ' ' + i)
+        arrOfUsers[i] = data
+        console.log('arrOfUsers', arrOfUsers)
+        await setDoc(docRef, { users: arrOfUsers })
+        return
+      }
+      await setDoc(
+        docRef,
+        {
+          users: arrayUnion(data),
+        },
+        { merge: true }
+      )
+    }
+  } else {
+    // doc.data() will be undefined in this case
+    console.log('No such document!')
+    await setDoc(
+      docRef,
+      {
+        users: arrayUnion(data),
+      },
+      { merge: true }
+    )
+  }
 }
 
 export const readDoc = async (userId) => {
   const docRef = doc(db, 'users', userId)
+  const docSnap = await getDoc(docRef)
+
+  if (docSnap.exists()) {
+    // console.log('Document data:', docSnap.data())
+    return docSnap.data()
+  } else {
+    console.log('No such document!')
+    return null
+  }
+}
+
+export const readAllUsers = async () => {
+  const docRef = doc(db, 'usersList', 'usersList')
   const docSnap = await getDoc(docRef)
 
   if (docSnap.exists()) {
@@ -100,13 +160,3 @@ export const setUserinDB = async (userId, data) => {
     // console.dir(error)
   }
 }
-
-// export const updateImage= async (userId, data) => {
-//   const docRef = doc(db, 'users', userId)
-//   try {
-//     const docSnap = await setDoc(docRef, data, { merge: true })
-//     // console.log('docSnap', docSnap)
-//   } catch (error) {
-//     // console.dir(error)
-//   }
-// }

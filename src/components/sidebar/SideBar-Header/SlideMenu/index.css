@@ -1,0 +1,14 @@
+.slide-option {
+  background-color: transparent;
+  border: none;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.slide-option-light:hover {
+  background-color: #f0f2f5;
+}
+
+.slide-option-dark:hover {
+  background-color: rgb(43, 43, 43, 1);
+}

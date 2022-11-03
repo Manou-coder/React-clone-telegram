@@ -50,6 +50,17 @@ export const AuthContextProvider = ({ children }) => {
       .catch((err) => console.log(err))
   }
 
+  // const googleSignIn = async () => {
+  //   const provider = new GoogleAuthProvider()
+  //   try {
+  //     const res = await signInWithPopup(auth, provider)
+  //     console.log('manou', res)
+  //     const baba = readDoc(res.user.uid)
+  //     console.log('baba', baba)
+  //   } catch (error) {
+  //     console.dir(error)
+  //   }
+
   const logOut = async () => {
     await signOut(auth)
     navigate('/')

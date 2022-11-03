@@ -5,10 +5,25 @@
   cursor: pointer;
 }
 
-.icon-bars:hover {
+.icon-bars-cursorDefault {
+  border-radius: 20px;
+  width: 40px;
+  height: 40px;
+  cursor: default;
+}
+
+.icon-bars-light:hover {
   background-color: #f0f2f5;
 }
 
-.icon-bars-hover {
+.icon-bars-light-hover {
   background-color: #f0f2f5;
+}
+
+.icon-bars-dark:hover {
+  background-color: rgb(43, 43, 43, 1);
+}
+
+.icon-bars-dark-hover {
+  background-color: rgb(43, 43, 43, 1);
 }
