@@ -24,6 +24,7 @@ export const AuthContextProvider = ({ children }) => {
   function setUser2() {
     if (user !== null) {
       setUserRef(doc(db, 'users', user.uid))
+      sessionStorage.setItem('userID', user.uid)
     }
   }
 

@@ -25,7 +25,7 @@ export default function OffCanvas({ canvasOption }) {
     const divSidebar = document.querySelector('._sidebar')
     // console.log('divSidebar', divSidebar)
 
-    if (divSidebar) {
+    if (divSidebar && offCanvas.current) {
       let widthDivSidebar = divSidebar.offsetWidth
       // console.log('widthDivSidebar', widthDivSidebar)
       offCanvas.current.style.width = `${widthDivSidebar + 1}px`

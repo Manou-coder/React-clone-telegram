@@ -22,7 +22,7 @@ export default function Home() {
           console.log('res', res)
           if (res) {
             if (res.isProfileCreated) {
-              navigate(`/${res.userId}`)
+              navigate(`/chat`)
             } else {
               navigate('/profile')
             }

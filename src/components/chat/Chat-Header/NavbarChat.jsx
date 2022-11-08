@@ -1,8 +1,23 @@
+import { useState } from 'react'
 import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
+import { LanguageContext } from '../../../utils/context/LanguageContext'
 import { SocketContactContext } from '../../../utils/context/SocketContact'
 import { ThemeContext } from '../../../utils/context/ThemeContext'
 import socket from '../../../utils/socket.io'
+import styled from 'styled-components'
+
+const Arrow = styled.span`
+  display: flex;
+  height: 40px;
+  width: 40px;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    background-color: #f0f2f5;
+    border-radius: 20px;
+  }
+`
 
 export default function NavbarChat() {
   const { socketContact, setSocketContact, allUsers } =
@@ -26,14 +41,73 @@ export default function NavbarChat() {
   const iconColor = theme === 'light' ? 'black' : '#909294'
   const iconBars = theme === 'light' ? 'icon-bars-light' : ' icon-bars-dark'
 
-  console.log('papo', socketContact)
+  // console.log('socketContact', socketContact)
+
+  const [isTyping, setIsTyping] = useState(false)
+
+  socket.on('typingResponse', (data) => {
+    console.log('typing', data)
+    if (socketContact.userId === data) {
+      setIsTyping(true)
+    }
+    setTimeout(() => setIsTyping(false), 1000)
+  })
+
+  const connectionStatus = () => {
+    console.log('type of', typeof socketContact.isConnect)
+    if (typeof socketContact.isConnect === 'number') {
+      const date = new Date(socketContact.isConnect)
+      const hoursAndMinutes = date.getHours() + ':' + date.getMinutes()
+      console.log(hoursAndMinutes) // 👉️ 8:33
+      // new Date().toLocaleTimeString()
+      return _lastSeen[language] + ' ' + hoursAndMinutes
+    }
+    if (socketContact.isConnect) {
+      return _online[language]
+    } else {
+      return _offline[language]
+    }
+  }
+
+  // LANGUAGE
+  const { language } = useContext(LanguageContext)
+
+  const _isTyping = {
+    en: 'Is typing...',
+    fr: "En train d'écrire...",
+    il: 'כותב/ת',
+  }
+
+  const _lastSeen = {
+    en: 'Last seen at',
+    fr: 'Dernière vu à',
+    il: 'נראה לאחרונה ב',
+  }
+
+  const _online = {
+    en: 'Online',
+    fr: 'En ligne',
+    il: 'מחובר/ת',
+  }
+
+  const _offline = {
+    en: 'Offline',
+    fr: 'Hors ligne',
+    il: 'לא מקוון',
+  }
+
+  const faArrow = language === 'il' ? 'fa-arrow-right' : 'fa-arrow-left'
 
   return (
     <div className={`row w-100 sticky-top ${bgColor} align-items-center m-0`}>
       <div className="col-1 d-lg-none">
-        <span onClick={() => showSidebar()} style={{ cursor: 'pointer' }}>
+        {/* <span onClick={() => showSidebar()} style={{ cursor: 'pointer' }}>
+          
           <i className="fa-solid fa-arrow-left fa-lg"></i>
-        </span>
+        </span> */}
+        <Arrow role={'button'} onClick={() => showSidebar()}>
+          <i className={`fa-solid ${faArrow} fa-lg offcanvas-button`}></i>
+        </Arrow>
       </div>
       <div className="col-2 col-lg-1 py-1">
         <img
@@ -51,7 +125,7 @@ export default function NavbarChat() {
         </div>
         <div>
           <p className={`mb-0 fw-light pt-0 lh-1 ${colorInfo}`}>
-            {socketContact.isConnect ? 'connected' : 'not connected'}
+            {isTyping ? _isTyping[language] : connectionStatus()}
           </p>
         </div>
       </div>
@@ -87,10 +161,8 @@ export default function NavbarChat() {
           </svg>
         </span>
       </div>
-      <div className="col-1">
-        <span
-          className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
-        >
+      <div className="col-1 d-flex justify-content-center align-items-center">
+        <span className={`icon-bars ${iconBars}`}>
           {/* <i className="fa-solid fa-ellipsis-vertical fa-lg"></i> */}
           <svg
             xmlns="http://www.w3.org/2000/svg"

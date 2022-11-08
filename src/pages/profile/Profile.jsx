@@ -40,7 +40,7 @@ export default function Profile() {
             if (!res.isProfileCreated) {
               setShowProfile(true)
             } else {
-              navigate(`/${res.userId}`)
+              navigate(`/chat`)
             }
           } else {
             setShowProfile(true)
@@ -122,7 +122,6 @@ export default function Profile() {
       photoURL: isProfileAvatar.src,
     })
     console.log('oui')
-    // navigate(`/${user.uid}`)
   }
 
   //automatically adds a 'username' with an @ at the beginning of the word and a 'camelCase' structure

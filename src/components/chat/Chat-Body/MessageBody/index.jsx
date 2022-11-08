@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import Message from '../Message'
 import socket from '../../../../utils/socket.io'
 import { useState } from 'react'
@@ -8,31 +8,38 @@ import { SocketContactContext } from '../../../../utils/context/SocketContact'
 
 export default function MesssageBody({ message }) {
   const [messageDisplay, setMessageDisplay] = useState([])
+  const lastMessageRef = useRef(null)
 
   const { socketContact, setSocketContact } = useContext(SocketContactContext)
 
   socket.on('private message', (msg) => {
-    console.log('msg.from', msg.from)
-    console.log('socketContact.userId', socketContact.userId)
+    // console.log('msg.from', msg.from)
+    // console.log('socketContact.userId', socketContact.userId)
 
     if (msg.from !== socketContact.userId) {
-      console.log('diffffffffffffffffffffffffffffffff')
-      return
+      return console.log('diffffffffffffffffffffffffffffffff')
+    } else {
+      // console.log('lokiyjuhgtreduplokiyjuhgtrf')
+      console.log('msg', msg)
+      setMessageDisplay([
+        ...messageDisplay,
+        ...[
+          {
+            senderIsMe: false,
+            sender: msg.from,
+            message: msg.content,
+          },
+        ],
+      ])
     }
-    console.log('msg', msg)
-    setMessageDisplay([
-      ...messageDisplay,
-      ...[
-        {
-          senderIsMe: false,
-          sender: msg.from,
-          message: msg.content,
-        },
-      ],
-    ])
   })
 
-  console.log('messageDisplay', messageDisplay)
+  // console.log('messageDisplay', messageDisplay)
+
+  useEffect(() => {
+    // 👇️ scroll to bottom every time messages change
+    lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [message, messageDisplay])
 
   useEffect(() => {
     if (message[message.length - 1] === undefined) {
@@ -44,6 +51,7 @@ export default function MesssageBody({ message }) {
         {
           senderIsMe: true,
           message: message[message.length - 1],
+          time: Date.now(),
         },
       ],
     ])
@@ -71,9 +79,12 @@ export default function MesssageBody({ message }) {
           <Message
             messageDisplay={messageDisplay[i].message}
             myMessage={messageDisplay[i].senderIsMe}
+            time={messageDisplay[i].time}
             key={'u' + i}
           />
         ))}
+
+        <div className="mt-4" ref={lastMessageRef}></div>
 
         {/* ------------------------------------MESSAGES-HERE------------------------------------------- */}
         {/* <!-- this div is meant to put a space between the message bubbles and the message bar --> */}

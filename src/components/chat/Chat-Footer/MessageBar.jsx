@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import color from '../../../utils/style/color'
 import socket from '../../../utils/socket.io'
 // eslint-disable-next-line no-unused-vars
@@ -8,6 +8,7 @@ import { usersList } from '../../../utils/socket.io'
 import { ThemeContext } from '../../../utils/context/ThemeContext'
 import { LanguageContext } from '../../../utils/context/LanguageContext'
 import { SocketContactContext } from '../../../utils/context/SocketContact'
+import { UserAuth } from '../../../utils/context/AuthContext'
 
 const arrOfKey = []
 
@@ -17,23 +18,16 @@ export default function MessageBar({
   sendMessage,
   setSendMessage,
 }) {
+  const { user } = UserAuth()
   const { socketContact, setSocketContact } = useContext(SocketContactContext)
 
-  let str = window.location.href
-  let url = new URL(str)
-  let pathname = url.pathname
-  let arrPathname = pathname.split('/')
-  let myId = arrPathname[1]
+  let myId = user.uid
   // console.log('myId', myId)
 
   // console.log('socketContact', socketContact)
 
   const alignCenter =
     'row bg-white rounded-5 py-1 w-100 w-lg-75 align-items-center'
-  const alignBaseline = alignCenter.replace(
-    'align-items-center',
-    'align-items-baseline'
-  )
 
   const [classNameBar, setClassNameBar] = useState(alignCenter)
 
@@ -48,13 +42,20 @@ export default function MessageBar({
     socket.emit('private message', { content: msg, to: receiver, sender: myId })
   }
 
-  function autoResizeBar(event) {
-    event.style.height = 'auto'
-    event.style.height = event.scrollHeight + 'px'
-    if (event.scrollHeight > 30) {
-      setClassNameBar(alignBaseline)
-    } else {
-      setClassNameBar(alignCenter)
+  let textareaRef = useRef()
+
+  function autoResizeBar() {
+    // event.style.height = 'auto'
+    // event.style.height = event.scrollHeight + 'px'
+    if (textareaRef.current) {
+      console.log('textareaRef', textareaRef.current.style.height)
+      textareaRef.current.style.height = 'auto'
+      if (textareaRef.current.scrollHeight < 200) {
+        textareaRef.current.style.height =
+          textareaRef.current.scrollHeight + 'px'
+      } else {
+        textareaRef.current.style.height = 200 + 'px'
+      }
     }
   }
 
@@ -63,15 +64,15 @@ export default function MessageBar({
     if (messageInput.trim() === '') {
       return
     }
-    // setMessage([...message, [messageInput]])
-    // socketEmitPrivateMessage(messageInput, socketContact.userId)
     writeMessage()
     let textarea = document.getElementById('autoresizing')
     textarea.value = ''
     setMessageInput('')
+    autoResizeBar()
   }
 
   function checkKey(e) {
+    handleTyping()
     if (messageInput.trim() === '') {
       return
     }
@@ -92,6 +93,7 @@ export default function MessageBar({
     writeMessage()
     e.target.value = ''
     setMessageInput('')
+    autoResizeBar()
   }
 
   function writeMessage() {
@@ -130,6 +132,8 @@ export default function MessageBar({
   }
 
   const iconBars = theme === 'light' ? 'icon-bars-light' : ' icon-bars-dark'
+
+  const handleTyping = () => socket.emit('typing', user.uid)
 
   // LANGUAGE
   const { language } = useContext(LanguageContext)
@@ -181,8 +185,12 @@ export default function MessageBar({
           <div className="col">
             <textarea
               id="autoresizing"
+              ref={textareaRef}
               onInput={(e) => autoResizeBar(e.target)}
-              onChange={(e) => setMessageInput(e.target.value)}
+              onChange={(e) => {
+                console.log('e.target.value', e.target.value)
+                setMessageInput(e.target.value)
+              }}
               onKeyDown={(e) => checkKey(e)}
               rows="1"
               placeholder={_message[language]}

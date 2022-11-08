@@ -19,8 +19,10 @@ export default function Chat() {
 
   const wallpaper = theme === 'light' ? 'wallpapper' : 'wallpapper-black'
 
+  console.log('params.username', params.username)
+
   function readParamsAndSetShowCat() {
-    if (params.name !== undefined) {
+    if (params.username !== undefined) {
       setShowChat(true)
     } else {
       setShowChat(false)
@@ -29,7 +31,7 @@ export default function Chat() {
 
   useEffect(() => {
     readParamsAndSetShowCat()
-  }, [params])
+  }, [params.username])
 
   return (
     <div className="col-12 col-lg-8 bg-light p-0 vh-100 d-flex flex-column _chat">

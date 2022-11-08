@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useRef } from 'react'
 import { useContext, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import colors from '../../../../utils/style/color'
 import './index.css'
@@ -11,10 +11,7 @@ import { SocketContactContext } from '../../../../utils/context/SocketContact'
 function Contact({ random, name1, name2, name3, contact, id, info, photoURL }) {
   const { socketContact, setSocketContact } = useContext(SocketContactContext)
 
-  const location = useLocation()
   const navigate = useNavigate()
-
-  const contactName = contact.firstName
 
   const [isHover, setIsHover] = useState(false)
   const [isSelected, setIsSelected] = useState(false)
@@ -22,21 +19,9 @@ function Contact({ random, name1, name2, name3, contact, id, info, photoURL }) {
   const bgBadge = isHover ? 'bg-white text-primary' : 'bg-primary'
 
   function handleClickContact(e) {
-    // setIsSelected(false)
-    // setIsSelected(true)
     offCanvasButton[0].click()
     setSocketContact(contact)
-    nav(contact.userName)
-  }
-
-  function nav(name) {
-    let pathId = location.pathname.split('/')[1]
-    console.log('pathId', pathId)
-    if (location.pathname !== '/') {
-      navigate(`../${pathId}/${name}`)
-    } else {
-      navigate(`/${pathId}/${name}`)
-    }
+    navigate(contact.userName)
   }
 
   // DARK MODE
@@ -68,21 +53,26 @@ function Contact({ random, name1, name2, name3, contact, id, info, photoURL }) {
       className={`w-100 py-2 m-0 rounded ${bgContact()}`}
       style={{ cursor: 'pointer' }}
       onClick={(e) => handleClickContact(e)}
-      // onClick={(e) => coucou(e)}
       ref={listOfContacts}
     >
       <div className="row m-0 align-items-center">
         <div className="col-2">
-          <img
+          <div
             style={{
               height: '50px',
               width: '50px',
             }}
-            // src={`https://picsum.photos/50/50?random=${random}`}
-            src={photoURL ? photoURL : Avatar}
-            className="rounded-circle"
-            alt="..."
-          ></img>
+          >
+            <img
+              style={{
+                height: '50px',
+                width: '50px',
+              }}
+              src={photoURL ? photoURL : Avatar}
+              className="rounded-circle"
+              alt="..."
+            ></img>
+          </div>
         </div>
         <div className="col">
           <div>

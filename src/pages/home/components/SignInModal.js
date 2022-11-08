@@ -28,7 +28,7 @@ export default function SignUpModal() {
       )
       setValidation('')
       console.log('cred', cred)
-      navigate(`/${cred.user.uid}`)
+      navigate(`/chat`)
     } catch {
       setValidation('Wopsy, email and/or password incorrect')
     }

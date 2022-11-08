@@ -29,16 +29,15 @@ root.render(
             <Routes>
               <Route path="/" element={<Home />}></Route>
               <Route
-                path="/profile"
+                path="profile"
                 element={
                   <Protected>
                     <Profile />
                   </Protected>
                 }
-                // element={<Profile />}
               ></Route>
               <Route
-                path="/:id"
+                path="chat"
                 element={
                   <Protected>
                     <App>
@@ -48,12 +47,17 @@ root.render(
                   </Protected>
                 }
               >
-                <Route path="/:id/:name">
-                  {/* <App>
-              <SideBar />
-              <Chat />
-            </App> */}
-                </Route>
+                <Route
+                  path=":username"
+                  element={
+                    <Protected>
+                      <App>
+                        <SideBar />
+                        <Chat />
+                      </App>
+                    </Protected>
+                  }
+                ></Route>
               </Route>
               <Route
                 path="*"

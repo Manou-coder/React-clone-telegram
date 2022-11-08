@@ -5,6 +5,7 @@ import OffCanvas from '../offCanvas/OffCanvas'
 import EndOfSlidebar from '../sidebar/SideBar-Body/EndOfSlidebar'
 import Navbar from '../sidebar/SideBar-Header/NavBar'
 import SlideMenu from '../sidebar/SideBar-Header/SlideMenu'
+import Offline from './SideBar-Header/Offline/Offline'
 import SettingsMenu from './SideBar-Header/SettingsMenu'
 
 function Sidebar() {
@@ -13,6 +14,30 @@ function Sidebar() {
   const [iconBarIsActive, setIconBarIsActive] = useState(false)
   const [canvasOption, setCanvasOption] = useState('profile')
   const [actualFlag, setActualFlag] = useState('')
+
+  //CHECK INTERNET CONNECTION
+
+  const [isOffline, setIsOffline] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      navigator.onLine ? setIsOffline(false) : setIsOffline(true)
+    }, 3000)
+
+    return () => clearInterval(interval)
+  })
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     fetch('https://www.google.com/', {
+  //       mode: 'no-cors',
+  //     })
+  //       .then(() => setIsOffline(false))
+  //       .catch(() => setIsOffline(true))
+  //   }, 3000)
+
+  //   return () => clearInterval(interval)
+  // }, [isOffline])
 
   // LANGUAGE
   const { language } = useContext(LanguageContext)
@@ -43,6 +68,7 @@ function Sidebar() {
         iconBarIsActive={iconBarIsActive}
         setIconBarIsActive={setIconBarIsActive}
       />
+      {isOffline && <Offline />}
       <SlideMenu
         isContactsOpen={isContactsOpen}
         setContactsOpen={setContactsOpen}
