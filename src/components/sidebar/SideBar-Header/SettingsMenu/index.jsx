@@ -62,18 +62,6 @@ export default function SettingsMenu({ canvasOption, setCanvasOption }) {
     }
   }
 
-  // function handleClickDarkMode(e) {
-  //   if (e.target.outerHTML.indexOf('slider') >= 0) {
-  //     return
-  //   }
-  //   toggleTheme()
-  //   if (theme === 'light') {
-  //     inputDarkMode.current.checked = true
-  //   } else {
-  //     inputDarkMode.current.checked = false
-  //   }
-  // }
-
   function handleClickDarkMode(e) {
     e.preventDefault()
     toggleTheme()

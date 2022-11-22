@@ -73,6 +73,7 @@ export const createUserInDB = async (user) => {
     photoURL: '',
     userId: uid,
     isProfileCreated: false,
+    myContacts: [],
   }
   await readDoc(uid)
     .then((res) => {
@@ -88,6 +89,7 @@ export const createUserInDB = async (user) => {
 }
 
 export const saveUserInContactsList = async (userId, data) => {
+  createUsersMessagesDB(userId)
   const docRef = doc(db, 'usersList', 'usersList')
   const docSnap = await getDoc(docRef)
   if (docSnap.exists()) {
@@ -158,5 +160,20 @@ export const setUserinDB = async (userId, data) => {
     // console.log('docSnap', docSnap)
   } catch (error) {
     // console.dir(error)
+  }
+}
+
+const createUsersMessagesDB = async (userId) => {
+  const docRef = doc(db, 'usersMessages', userId)
+  const docSnap = await getDoc(docRef)
+
+  if (docSnap.exists()) {
+    console.log('Document data:', docSnap.data())
+    return
+  } else {
+    console.log('No such document!')
+    await setDoc(docRef, { myId: userId })
+    console.log('docRef cree!')
+    return
   }
 }

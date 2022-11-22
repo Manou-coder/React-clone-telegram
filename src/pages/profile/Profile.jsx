@@ -122,6 +122,7 @@ export default function Profile() {
       photoURL: isProfileAvatar.src,
     })
     console.log('oui')
+    navigate('/chat')
   }
 
   //automatically adds a 'username' with an @ at the beginning of the word and a 'camelCase' structure
@@ -381,12 +382,7 @@ export default function Profile() {
                       id="Username"
                     />
                   </div>
-                  <button
-                    className="btn btn-primary mt-4 w-100"
-                    // onClick={(e) => createProfile(e)}
-                  >
-                    Submit
-                  </button>
+                  <button className="btn btn-primary mt-4 w-100">Submit</button>
                   <div className="row justify-content-center">
                     {loadingForm && (
                       <div

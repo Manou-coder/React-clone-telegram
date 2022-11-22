@@ -1,6 +1,7 @@
 import { useContext, useEffect } from 'react'
 import { useState } from 'react'
 import { LanguageContext } from '../../utils/context/LanguageContext'
+import { ThemeContext } from '../../utils/context/ThemeContext'
 import OffCanvas from '../offCanvas/OffCanvas'
 import EndOfSlidebar from '../sidebar/SideBar-Body/EndOfSlidebar'
 import Navbar from '../sidebar/SideBar-Header/NavBar'
@@ -45,22 +46,19 @@ function Sidebar() {
   const borderRight = language === 'il' ? '' : '1px solid black'
   const borderLeft = language === 'il' ? '1px solid black' : ''
 
+  const { isChatOpen } = useContext(ThemeContext)
+  const displaySidebar = isChatOpen ? 'd-none d-lg-flex' : 'd-flex'
+
   return (
     <div
-      className="d-none d-lg-flex flex-column col-lg-4 p-0 sidebar vh-100 _sidebar"
+      className={`${displaySidebar} flex-column col-lg-4 p-0 sidebar vh-100 _sidebar`}
       style={{
         borderRight: borderRight,
         borderLeft: borderLeft,
         position: 'relative',
       }}
     >
-      {iconBarIsActive && (
-        <SettingsMenu
-          setCanvasOption={setCanvasOption}
-          actualFlag={actualFlag}
-          setActualFlag={setActualFlag}
-        />
-      )}
+      {iconBarIsActive && <SettingsMenu setCanvasOption={setCanvasOption} />}
       <OffCanvas canvasOption={canvasOption} />
       <Navbar
         inputLetters={inputLetters}

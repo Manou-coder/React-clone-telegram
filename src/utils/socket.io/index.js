@@ -54,8 +54,8 @@ const socket = io(SOCKET_URL, {
   autoConnect: false,
 })
 
-// socket.onAny((event, ...args) => {
-//   console.log('onAny ' + event, args)
-// })
+socket.onAny((event, ...args) => {
+  console.log('onAny ' + event, args)
+})
 
 export default socket

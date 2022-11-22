@@ -5,21 +5,21 @@ import { useContext, useState } from 'react'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 import { useParams } from 'react-router-dom'
 import { useEffect } from 'react'
+import ContactMenu from './Chat-Header/ContactMenu'
 
 export default function Chat() {
   let params = useParams()
 
-  const [message, setMessage] = useState([])
-
-  const [sendMessage, setSendMessage] = useState(false)
+  // const [messageSend, setMessageSend] = useState([])
 
   const [showChat, setShowChat] = useState(false)
+  const [iconBarIsActive, setIconBarIsActive] = useState(false)
 
-  const { theme } = useContext(ThemeContext)
+  const { theme, isChatOpen } = useContext(ThemeContext)
 
   const wallpaper = theme === 'light' ? 'wallpapper' : 'wallpapper-black'
 
-  console.log('params.username', params.username)
+  // console.log('params.username', params.username)
 
   function readParamsAndSetShowCat() {
     if (params.username !== undefined) {
@@ -33,25 +33,23 @@ export default function Chat() {
     readParamsAndSetShowCat()
   }, [params.username])
 
+  const displayChat = isChatOpen ? 'd-flex' : 'd-none d-lg-flex'
+
   return (
-    <div className="col-12 col-lg-8 bg-light p-0 vh-100 d-flex flex-column _chat">
+    <div
+      className={`${displayChat} col-12 col-lg-8 p-0 vh-100 flex-column position-relative _chat ${wallpaper}`}
+    >
       {!showChat ? (
-        <div className={`h-100 w-100 ${wallpaper}`}></div>
+        <div className={`h-100 w-100`}></div>
       ) : (
         <>
-          <NavbarChat />
-          <MesssageBody
-            message={message}
-            setMessage={setMessage}
-            sendMessage={sendMessage}
-            setSendMessage={setSendMessage}
+          {iconBarIsActive && <ContactMenu />}
+          <NavbarChat
+            iconBarIsActive={iconBarIsActive}
+            setIconBarIsActive={setIconBarIsActive}
           />
-          <MessageBar
-            message={message}
-            setMessage={setMessage}
-            sendMessage={sendMessage}
-            setSendMessage={setSendMessage}
-          />
+          <MesssageBody />
+          <MessageBar />
         </>
       )}
     </div>

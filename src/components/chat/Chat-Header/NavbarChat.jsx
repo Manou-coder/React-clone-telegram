@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { LanguageContext } from '../../../utils/context/LanguageContext'
@@ -7,28 +7,27 @@ import { ThemeContext } from '../../../utils/context/ThemeContext'
 import socket from '../../../utils/socket.io'
 import styled from 'styled-components'
 
-const Arrow = styled.span`
-  display: flex;
-  height: 40px;
-  width: 40px;
-  align-items: center;
-  justify-content: center;
-  &:hover {
-    background-color: #f0f2f5;
-    border-radius: 20px;
-  }
-`
+// const Arrow = styled.span`
+//   display: flex;
+//   height: 40px;
+//   width: 40px;
+//   align-items: center;
+//   cursor: pointer;
+//   justify-content: center;
+//   &:hover {
+//     background-color: #909294;
+//     border-radius: 20px;
+//   }
+// `
 
-export default function NavbarChat() {
+export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
   const { socketContact, setSocketContact, allUsers } =
     useContext(SocketContactContext)
 
+  const { setIsChatOpen } = useContext(ThemeContext)
+
   function showSidebar() {
-    let chat = document.querySelector('._chat')
-    let sidebar = document.querySelector('._sidebar')
-    chat.className = 'd-none'
-    sidebar.className = 'd-flex flex-column _sidebar'
-    sidebar.style.padding = '0px'
+    setIsChatOpen(false)
   }
 
   // DARK MODE
@@ -46,7 +45,7 @@ export default function NavbarChat() {
   const [isTyping, setIsTyping] = useState(false)
 
   socket.on('typingResponse', (data) => {
-    console.log('typing', data)
+    // console.log('typing', data)
     if (socketContact.userId === data) {
       setIsTyping(true)
     }
@@ -54,11 +53,11 @@ export default function NavbarChat() {
   })
 
   const connectionStatus = () => {
-    console.log('type of', typeof socketContact.isConnect)
+    // console.log('type of', typeof socketContact.isConnect)
     if (typeof socketContact.isConnect === 'number') {
       const date = new Date(socketContact.isConnect)
-      const hoursAndMinutes = date.getHours() + ':' + date.getMinutes()
-      console.log(hoursAndMinutes) // 👉️ 8:33
+      const hoursAndMinutes = date.getHours() + ':' + addZero(date.getMinutes())
+      // console.log(hoursAndMinutes) // 👉️ 8:33
       // new Date().toLocaleTimeString()
       return _lastSeen[language] + ' ' + hoursAndMinutes
     }
@@ -66,6 +65,14 @@ export default function NavbarChat() {
       return _online[language]
     } else {
       return _offline[language]
+    }
+  }
+
+  function addZero(number) {
+    if (number < 10) {
+      return '0' + number
+    } else {
+      return number
     }
   }
 
@@ -96,18 +103,81 @@ export default function NavbarChat() {
     il: 'לא מקוון',
   }
 
-  const faArrow = language === 'il' ? 'fa-arrow-right' : 'fa-arrow-left'
+  function iconeBarFunc(element) {
+    if (!iconBarIsActive) {
+      setIconBarIsActive(true)
+      document.addEventListener('click', (e) => {
+        clickOutside(e)
+      })
+    } else {
+      setIconBarIsActive(false)
+    }
+  }
+
+  function clickOutside(event) {
+    // console.log('click')
+    let target = event.target
+    const allParentsOfTarget = []
+    while (target) {
+      allParentsOfTarget.unshift(target)
+      target = target.parentElement
+      try {
+        let targetClassName = target.className
+        // console.log('targetClassName', targetClassName)
+        if (targetClassName.indexOf('settings-chat') >= 0) {
+          return
+        }
+        if (
+          targetClassName.indexOf('flag-icon') >= 0 ||
+          targetClassName.indexOf('flag-icon2') >= 0
+        ) {
+          return
+        }
+      } catch (error) {}
+    }
+    setIconBarIsActive(false)
+  }
+
+  const arrowHover =
+    theme === 'light' ? 'arrow-hover-light' : 'arrow-hover-dark'
 
   return (
-    <div className={`row w-100 sticky-top ${bgColor} align-items-center m-0`}>
-      <div className="col-1 d-lg-none">
-        {/* <span onClick={() => showSidebar()} style={{ cursor: 'pointer' }}>
-          
-          <i className="fa-solid fa-arrow-left fa-lg"></i>
-        </span> */}
-        <Arrow role={'button'} onClick={() => showSidebar()}>
-          <i className={`fa-solid ${faArrow} fa-lg offcanvas-button`}></i>
-        </Arrow>
+    <div
+      className={`row w-100 sticky-top ${bgColor} align-items-center m-0`}
+      style={{ minHeight: '58px' }}
+    >
+      <div
+        className="col-2 h-100 d-lg-none d-flex align-items-center justify-content-center p-0"
+        onClick={showSidebar}
+      >
+        {/* <Arrow>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 448 512"
+            style={{ fill: iconColor }}
+            height="1.25em"
+          >
+            {language === 'il' ? (
+              <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
+            ) : (
+              <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
+            )}
+          </svg>
+        </Arrow> */}
+        <span className={`arrow ${arrowHover}`}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 448 512"
+            style={{ fill: iconColor }}
+            height="1.25em"
+          >
+            {language === 'il' ? (
+              <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
+            ) : (
+              <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
+            )}
+          </svg>
+        </span>
       </div>
       <div className="col-2 col-lg-1 py-1">
         <img
@@ -161,9 +231,12 @@ export default function NavbarChat() {
           </svg>
         </span>
       </div>
-      <div className="col-1 d-flex justify-content-center align-items-center">
-        <span className={`icon-bars ${iconBars}`}>
-          {/* <i className="fa-solid fa-ellipsis-vertical fa-lg"></i> */}
+      <div
+        className="col-2 col-lg-1 d-flex justify-content-center align-items-center settings-chat"
+        // onClick={() => toggleIconBarIsActive()}
+        onClick={(e) => iconeBarFunc(e.target)}
+      >
+        <span className={`arrow ${arrowHover}`}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 128 512"

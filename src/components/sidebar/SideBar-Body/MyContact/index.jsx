@@ -4,78 +4,49 @@ import { useContext, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import colors from '../../../../utils/style/color'
-import './index.css'
+// import './index.css'
 import Avatar from '../../../../assets/img/avatar4.png'
 import { SocketContactContext } from '../../../../utils/context/SocketContact'
 import { arrayUnion, doc, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../../../../firebase-config'
 import { UserAuth } from '../../../../utils/context/AuthContext'
 
-function Contact({ random, name1, name2, name3, contact, id, info, photoURL }) {
+function MyContact({
+  random,
+  name1,
+  name2,
+  name3,
+  contact,
+  id,
+  info,
+  photoURL,
+}) {
   const { user } = UserAuth()
   const { socketContact, setSocketContact, toggleChange } =
     useContext(SocketContactContext)
-
+  const { setIsChatOpen } = useContext(ThemeContext)
   const navigate = useNavigate()
-
-  const [isHover, setIsHover] = useState(false)
-  const [isSelected, setIsSelected] = useState(false)
-
   const listOfContacts = useRef([])
 
-  const bgBadge = isHover ? 'bg-white text-primary' : 'bg-primary'
+  // console.log('contact', contact)
 
-  function handleClickContact(e) {
-    offCanvasButton[0].click()
+  function handleClickContact() {
     setSocketContact(contact)
     navigate(contact.userName)
-    saveContactInMyContacts(contact)
-  }
-
-  // console.log('listOfContacts', listOfContacts.current.innerText)
-
-  async function saveContactInMyContacts(contact) {
-    const docRef = doc(db, 'users', user.uid)
-    // for (let index = 0; index < array.length; index++) {
-    //   const element = array[index];
-
-    // }
-    if (true === false) {
-      console.log('true === false')
-    } else {
-      if (contact.hasNewMessages !== 0) {
-        contact.hasNewMessages = 0
-      }
-      await updateDoc(docRef, { myContacts: arrayUnion(contact) })
-      toggleChange()
-    }
+    // console.log('mpàlçokijuyhbgtrvfdces')
+    setIsChatOpen(true)
   }
 
   // DARK MODE
   const { theme } = useContext(ThemeContext)
 
-  const bgContact = () => {
-    if (isSelected) {
-      return 'li-bg-primary'
-    }
-    if (!isSelected && theme === 'light') {
-      return 'li-bg-light'
-    } else if (!isSelected && theme !== 'light') {
-      return 'li-bg-dark'
-    }
-  }
-
+  const bgContact = theme === 'light' ? 'li-bg-light' : 'li-bg-dark'
   const colorName = theme === 'light' ? '' : 'text-white'
   const colorInfo = theme === 'light' ? '' : 'text-white-50'
 
-  // console.log('photoURL', photoURL)
-
-  const offCanvasButton = document.getElementsByClassName('offcanvas-button')
-  // console.log('offcanvas-button', offCanvasButton)
-
   return (
     <li
-      className={`w-100 py-2 m-0 rounded ${bgContact()}`}
+      className={`w-100 py-2 m-0 rounded ${bgContact}`}
       style={{ cursor: 'pointer' }}
       onClick={(e) => handleClickContact(e)}
       ref={listOfContacts}
@@ -112,11 +83,13 @@ function Contact({ random, name1, name2, name3, contact, id, info, photoURL }) {
           </div>
         </div>
         <div className="col-2 p-0">
-          <span className={`badge rounded-pill ${bgBadge}`}>{random}</span>
+          <span className={`badge rounded-pill bg-primary`}>
+            {contact.hasNewMessages > 0 && contact.hasNewMessages}
+          </span>
         </div>
       </div>
     </li>
   )
 }
 
-export default Contact
+export default MyContact

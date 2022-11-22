@@ -7,12 +7,6 @@ import socket from '../socket.io'
 
 export const SocketContactContext = createContext()
 
-// const SOCKET_URL = 'https://chat-example.michelmoreau.repl.co'
-
-// const socket = io(SOCKET_URL, {
-//   autoConnect: false
-// })
-
 const startSocket = (userName) => {
   const username = userName
   socket.auth = { username }
@@ -61,20 +55,25 @@ export const SocketContactProvider = ({ children }) => {
 
   const [socketContact, setSocketContact] = useState({})
   const [allUsers, setAllUsers] = useState({})
+  const [isChange, setIsChange] = useState(false)
+
+  const toggleChange = () => (isChange ? setIsChange(false) : setIsChange(true))
+
+  let str = window.location.href
+  let url = new URL(str)
+  let pathname = url.pathname
+  let arrPathname = pathname.split('/')
+  let userNameOfContact = arrPathname[arrPathname.length - 1]
 
   useEffect(() => {
     getSocketContact()
-  }, [])
+  }, [userNameOfContact])
 
   async function getSocketContact() {
-    let str = window.location.href
-    let url = new URL(str)
-    let pathname = url.pathname
-    let arrPathname = pathname.split('/')
-    let userNameOfContact = arrPathname[arrPathname.length - 1]
     let allContacts = await getAllUsers()
     for (const user of allContacts) {
       if (user.userName === userNameOfContact) {
+        // console.log('user', user)
         setSocketContact(user)
       }
     }
@@ -91,7 +90,7 @@ export const SocketContactProvider = ({ children }) => {
   async function getAllUsers() {
     let allContacts = await readAllUsers()
     allContacts = allContacts.users
-    console.log('allContacts', allContacts)
+    // console.log('allContacts', allContacts)
     setAllUsers(allContacts)
     return allContacts
   }
@@ -99,52 +98,29 @@ export const SocketContactProvider = ({ children }) => {
   socket.on('new user', (users) => {
     // console.log('users', users)
     setTimeout(() => {
-      getSocketContact()
+      toggleChange()
     }, 2000)
   })
 
   socket.on('user disonnected', (users) => {
     // console.log('users', users)
     setTimeout(() => {
-      getSocketContact()
+      toggleChange()
     }, 2000)
   })
 
   return (
     <SocketContactContext.Provider
-      value={{ socketContact, setSocketContact, allUsers, setAllUsers }}
+      value={{
+        socketContact,
+        setSocketContact,
+        allUsers,
+        setAllUsers,
+        toggleChange,
+        isChange,
+      }}
     >
       {children}
     </SocketContactContext.Provider>
   )
 }
-
-// let usersList = []
-
-// const socket = io('https://chat-example.michelmoreau.repl.co', {
-//   reconnectionDelayMax: 10000,
-//   auth: {
-//     token: '123',
-//   },
-//   query: {
-//     userId: userId,
-//   },
-// })
-
-// socket.onAny((event, ...args) => {
-//   // console.log('onAny', event, args)
-// })
-
-// socket.on('new user', (users) => {
-//   // console.log('users', users)
-//   usersList = users
-// })
-
-// socket.on('user disonnected', (users) => {
-//   // console.log('users', users)
-//   usersList = users
-// })
-
-// export { usersList }
-
-// export default socket

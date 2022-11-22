@@ -18,6 +18,7 @@ import './utils/style/index.css'
 import { ThemeProvider } from './utils/context/ThemeContext'
 import { LanguageProvider } from './utils/context/LanguageContext'
 import { SocketContactProvider } from './utils/context/SocketContact'
+import { MessagesContextProvider } from './utils/context/MessagesContext'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
@@ -26,29 +27,19 @@ root.render(
       <LanguageProvider>
         <ThemeProvider>
           <SocketContactProvider>
-            <Routes>
-              <Route path="/" element={<Home />}></Route>
-              <Route
-                path="profile"
-                element={
-                  <Protected>
-                    <Profile />
-                  </Protected>
-                }
-              ></Route>
-              <Route
-                path="chat"
-                element={
-                  <Protected>
-                    <App>
-                      <SideBar />
-                      <Chat />
-                    </App>
-                  </Protected>
-                }
-              >
+            <MessagesContextProvider>
+              <Routes>
+                <Route path="/" element={<Home />}></Route>
                 <Route
-                  path=":username"
+                  path="profile"
+                  element={
+                    <Protected>
+                      <Profile />
+                    </Protected>
+                  }
+                ></Route>
+                <Route
+                  path="chat"
                   element={
                     <Protected>
                       <App>
@@ -57,17 +48,29 @@ root.render(
                       </App>
                     </Protected>
                   }
-                ></Route>
-              </Route>
-              <Route
-                path="*"
-                element={
-                  <main style={{ padding: '1rem' }}>
-                    <p>There's nothing here!</p>
-                  </main>
-                }
-              />
-            </Routes>
+                >
+                  <Route
+                    path=":username"
+                    element={
+                      <Protected>
+                        <App>
+                          <SideBar />
+                          <Chat />
+                        </App>
+                      </Protected>
+                    }
+                  ></Route>
+                </Route>
+                <Route
+                  path="*"
+                  element={
+                    <main style={{ padding: '1rem' }}>
+                      <p>There's nothing here!</p>
+                    </main>
+                  }
+                />
+              </Routes>
+            </MessagesContextProvider>
           </SocketContactProvider>
         </ThemeProvider>
       </LanguageProvider>

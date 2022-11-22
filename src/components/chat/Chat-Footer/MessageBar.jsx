@@ -1,54 +1,93 @@
 import { useContext, useRef, useState } from 'react'
 import color from '../../../utils/style/color'
 import socket from '../../../utils/socket.io'
-// eslint-disable-next-line no-unused-vars
-import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { usersList } from '../../../utils/socket.io'
 import { ThemeContext } from '../../../utils/context/ThemeContext'
 import { LanguageContext } from '../../../utils/context/LanguageContext'
 import { SocketContactContext } from '../../../utils/context/SocketContact'
 import { UserAuth } from '../../../utils/context/AuthContext'
+import { v4 as uuidv4 } from 'uuid'
+import { MessagesContext } from '../../../utils/context/MessagesContext'
 
-const arrOfKey = []
-
-export default function MessageBar({
-  message,
-  setMessage,
-  sendMessage,
-  setSendMessage,
-}) {
+export default function MessageBar() {
   const { user } = UserAuth()
-  const { socketContact, setSocketContact } = useContext(SocketContactContext)
-
-  let myId = user.uid
-  // console.log('myId', myId)
-
-  // console.log('socketContact', socketContact)
-
-  const alignCenter =
-    'row bg-white rounded-5 py-1 w-100 w-lg-75 align-items-center'
-
-  const [classNameBar, setClassNameBar] = useState(alignCenter)
-
+  const { socketContact } = useContext(SocketContactContext)
+  const { messageSend, setMessageSend, arrOfMessages, setArrOfMessages } =
+    useContext(MessagesContext)
   const [messageInput, setMessageInput] = useState('')
-
-  const cursorPointer = messageInput.trim() === '' ? 'default' : 'pointer'
-
-  // console.log('messageBAr', message);
-
-  function socketEmitPrivateMessage(msg, receiver) {
-    // console.log('receiver', receiver)
-    socket.emit('private message', { content: msg, to: receiver, sender: myId })
-  }
-
   let textareaRef = useRef()
 
+  //Socket functions
+  function socketEmitPrivateMessage() {
+    const message = {
+      content: messageInput,
+      to: socketContact.userId,
+      from: user.uid,
+      time: Date.now(),
+      id: uuidv4(),
+      status: 'waiting',
+    }
+    // setMessageSend([...messageSend, message])
+    // console.log('messageSend', messageSend)
+    // socket.emit('private message', message, (response) => {
+    //   console.log('response', response)
+    //   message.status = 'ok'
+    //   setMessageSend([...messageSend, message]) ==========
+    // })
+    // setMessageSend([...messageSend, message]) )===========
+    socket.emit('private message', message)
+    console.log('message', message)
+    setArrOfMessages([...arrOfMessages, message])
+  }
+
+  function handleTyping() {
+    socket.emit('typing', user.uid)
+  }
+
+  //Send message
+  function sendMessage() {
+    if (messageInput.trim() === '') {
+      return
+    }
+    // console.log('messageInput', messageInput)
+    // const message = {
+    //   content: messageInput,
+    //   to: socketContact.userId,
+    //   from: user.uid,
+    //   time: Date.now(),
+    //   id: uuidv4(),
+    //   status: 'waiting',
+    // }
+    // setMessageSend([...messageSend, message])
+    // console.log('messageSend', messageSend)
+    // socketEmitPrivateMessage(message)
+    socketEmitPrivateMessage()
+    textareaRef.current.value = ''
+    setMessageInput('')
+    autoResizeBar()
+  }
+
+  //Sends message when pressing the enter key unless the shift key has been pressed before
+  function checkKey(e) {
+    const arrOfKey = []
+    if (messageInput.trim() === '') {
+      return
+    }
+    arrOfKey.push(e.key)
+    if (arrOfKey[arrOfKey.length - 2] === 'Shift') {
+      return
+    }
+    if (e.key !== 'Enter') {
+      return
+    }
+    if (messageInput.trim() === '') {
+      e.target.value = ''
+    }
+    e.preventDefault()
+    sendMessage()
+  }
+
   function autoResizeBar() {
-    // event.style.height = 'auto'
-    // event.style.height = event.scrollHeight + 'px'
     if (textareaRef.current) {
-      console.log('textareaRef', textareaRef.current.style.height)
       textareaRef.current.style.height = 'auto'
       if (textareaRef.current.scrollHeight < 200) {
         textareaRef.current.style.height =
@@ -59,49 +98,7 @@ export default function MessageBar({
     }
   }
 
-  function checkMessage(e) {
-    // console.log('messageInput', messageInput)
-    if (messageInput.trim() === '') {
-      return
-    }
-    writeMessage()
-    let textarea = document.getElementById('autoresizing')
-    textarea.value = ''
-    setMessageInput('')
-    autoResizeBar()
-  }
-
-  function checkKey(e) {
-    handleTyping()
-    if (messageInput.trim() === '') {
-      return
-    }
-    arrOfKey.push(e.key)
-    if (arrOfKey[arrOfKey.length - 2] === 'Shift') {
-      // console.log('cocuou')
-      return
-    }
-    if (e.key !== 'Enter') {
-      return
-    }
-    if (messageInput.trim() === '') {
-      e.target.value = ''
-    }
-    e.preventDefault()
-    // setMessage([...message, [messageInput]])
-    // socketEmitPrivateMessage(messageInput, socketContact.userId)
-    writeMessage()
-    e.target.value = ''
-    setMessageInput('')
-    autoResizeBar()
-  }
-
-  function writeMessage() {
-    console.log('messageInput', messageInput)
-    setMessage([...message, [messageInput]])
-    console.log('message', message)
-    socketEmitPrivateMessage(messageInput, socketContact.userId)
-  }
+  const cursorPointer = messageInput.trim() === '' ? 'default' : 'pointer'
 
   // DARK MODE
   const { theme } = useContext(ThemeContext)
@@ -133,8 +130,6 @@ export default function MessageBar({
 
   const iconBars = theme === 'light' ? 'icon-bars-light' : ' icon-bars-dark'
 
-  const handleTyping = () => socket.emit('typing', user.uid)
-
   // LANGUAGE
   const { language } = useContext(LanguageContext)
 
@@ -148,7 +143,6 @@ export default function MessageBar({
     <div className={`row sticky-bottom py-1 w-100 m-0 p-0 ${bgColor1}`}>
       <div className="col py-1 d-flex justify-content-center">
         <div
-          // className={classNameBar}
           className={`row rounded-5 py-1 w-100 w-lg-75 align-items-baseline ${bgColor2}`}
           style={{ position: 'relative', bottom: '2px' }}
         >
@@ -186,9 +180,11 @@ export default function MessageBar({
             <textarea
               id="autoresizing"
               ref={textareaRef}
-              onInput={(e) => autoResizeBar(e.target)}
+              onInput={() => {
+                autoResizeBar()
+                handleTyping()
+              }}
               onChange={(e) => {
-                console.log('e.target.value', e.target.value)
                 setMessageInput(e.target.value)
               }}
               onKeyDown={(e) => checkKey(e)}
@@ -208,7 +204,7 @@ export default function MessageBar({
           </div>
           <div className="col-1 d-flex justify-content-end">
             <span
-              onClick={(e) => checkMessage(e)}
+              onClick={() => sendMessage()}
               className={`${iconSend()} d-flex justify-content-center align-items-center`}
             >
               {/* ICON SEARCH - equal to ("fa-solid fa-paper-plane fa-lg") */}

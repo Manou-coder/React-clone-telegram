@@ -12,6 +12,25 @@
   background-color: rgb(43, 43, 43, 1);
 }
 
+.arrow {
+  display: flex;
+  height: 40px;
+  width: 40px;
+  align-items: center;
+  cursor: pointer;
+  justify-content: center;
+}
+
+.arrow-hover-dark:hover {
+  background-color: rgb(43, 43, 43, 1);
+  border-radius: 20px;
+}
+
+.arrow-hover-light:hover {
+  background-color: #f0f2f5;
+  border-radius: 20px;
+}
+
 /* 
 
 black 1 : #212121;
