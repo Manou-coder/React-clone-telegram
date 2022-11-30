@@ -1,52 +1,46 @@
-import Contact from '../../SideBar-Body/Contact'
-import ContactsList from '../../../../datas/Users.json'
 import searchContact from '../../../../utils/functions/searchContact'
 import getSearchedUser from '../../../../utils/functions/getSearchedUser'
-import { useEffect, useState } from 'react'
-import { db, readAllUsers } from '../../../../firebase-config'
+import { useEffect, useMemo, useState } from 'react'
+import { getMyContactsFromDB } from '../../../../firebase-config'
 import { UserAuth } from '../../../../utils/context/AuthContext'
-import { doc, getDoc } from 'firebase/firestore'
 import { useContext } from 'react'
 import { SocketContactContext } from '../../../../utils/context/SocketContact'
 import MyContact from '../MyContact'
 
 function MyContacts({ inputLetters }) {
   const { user } = UserAuth()
-  const { toggleChange, isChange } = useContext(SocketContactContext)
-  //get all users
-
-  const [allUsers, setAllUsers] = useState([])
+  const { socketContact, myContacts, setMyContacts, allUsers } =
+    useContext(SocketContactContext)
 
   useEffect(() => {
-    getAllUsers()
-    // console.log('coucou')
-  }, [isChange])
-
-  async function getAllUsers() {
-    const docRef = doc(db, 'users', user.uid)
-    const docSnap = await getDoc(docRef)
-    let listOfUsers
-    if (docSnap.exists()) {
-      // console.log('Document data:', docSnap.data().myContacts)
-      listOfUsers = docSnap.data().myContacts
-      // console.log('listOfUsers', listOfUsers)
-      setAllUsers(listOfUsers)
-      return
-    } else {
-      console.log('No such document!')
+    if (allUsers && allUsers.length > 0) {
+      setMyContactsFromDB()
     }
+  }, [socketContact, allUsers])
 
-    // const listOfUsers = await readAllUsers()
-    // setAllUsers(listOfUsers.users)
-  }
+  // console.log('myContacts', myContacts)
 
-  let searchedContactList = searchContact(allUsers, inputLetters)
-
-  // console.log('allUsers', allUsers)
-
+  let searchedContactList = searchContact(myContacts, inputLetters)
   searchedContactList = searchedContactList.filter((e) => e.userId !== user.uid)
-
   // console.log('searchedContactList', searchedContactList)
+
+  // --------------------- INTERNES FUNCTIONS ---------------------
+
+  async function setMyContactsFromDB() {
+    const myContactsFromDB = await getMyContactsFromDB(user.uid)
+    // console.log('myContactsFromDB', myContactsFromDB)
+    // searches in 'allUsers' for contacts that have the same id as in 'myContactsFromDB' and adds them to 'myContacts'
+    const myContacts = []
+    for (const contactId of myContactsFromDB) {
+      for (const contact of allUsers) {
+        if (contactId === contact.userId) {
+          myContacts.push(contact)
+        }
+      }
+    }
+    // console.log('myContacts 5', myContacts)
+    setMyContacts(myContacts)
+  }
 
   return (
     <ul className="p-0 mt-2" style={{ listStyleType: 'none' }}>
@@ -56,18 +50,14 @@ function MyContacts({ inputLetters }) {
           name1={getSearchedUser(searchedContactList, i, inputLetters)[0]}
           name2={getSearchedUser(searchedContactList, i, inputLetters)[1]}
           name3={getSearchedUser(searchedContactList, i, inputLetters)[2]}
-          random={getRandomNumber(searchedContactList)}
           photoURL={searchedContactList[i].photoURL}
+          description={searchedContactList[i].isTyping}
           id={searchedContactList[i].id}
           key={i + 2}
         />
       ))}
     </ul>
   )
-}
-
-function getRandomNumber(arr) {
-  return Math.floor(Math.random() * arr.length)
 }
 
 export default MyContacts

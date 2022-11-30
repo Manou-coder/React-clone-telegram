@@ -65,6 +65,7 @@ function Sidebar() {
         setInputLetters={setInputLetters}
         iconBarIsActive={iconBarIsActive}
         setIconBarIsActive={setIconBarIsActive}
+        setCanvasOption={setCanvasOption}
       />
       {isOffline && <Offline />}
       <SlideMenu

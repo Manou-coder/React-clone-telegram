@@ -1,30 +1,37 @@
 import { useEffect, useState } from 'react'
 import { useContext } from 'react'
-import { useParams } from 'react-router-dom'
 import { LanguageContext } from '../../../utils/context/LanguageContext'
 import { SocketContactContext } from '../../../utils/context/SocketContact'
 import { ThemeContext } from '../../../utils/context/ThemeContext'
-import socket from '../../../utils/socket.io'
-import styled from 'styled-components'
-
-// const Arrow = styled.span`
-//   display: flex;
-//   height: 40px;
-//   width: 40px;
-//   align-items: center;
-//   cursor: pointer;
-//   justify-content: center;
-//   &:hover {
-//     background-color: #909294;
-//     border-radius: 20px;
-//   }
-// `
+import ContactMenu from './ContactMenu'
+import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
 
 export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
-  const { socketContact, setSocketContact, allUsers } =
-    useContext(SocketContactContext)
+  const {
+    socketContact,
+    setSocketContact,
+    allUsers,
+    myContacts,
+    actuallyContactId,
+  } = useContext(SocketContactContext)
 
   const { setIsChatOpen } = useContext(ThemeContext)
+
+  // const [contact, setContact] = useState(socketContact)
+
+  const contact = allUsers.find((user) => user.userId === actuallyContactId)
+  console.log()
+
+  // useEffect(() => {
+  //   console.log('socketContact 55', socketContact)
+  //   if (myContacts.length > 0) {
+  //     // console.log('myContacts3', myContacts)
+  //     // console.log('socketContact.userId', socketContact.userId)
+  //     const contact = myContacts.find((e) => e.userId === socketContact.userId)
+  //     // console.log('contact3', contact)
+  //     setContact(contact)
+  //   }
+  // }, [myContacts, socketContact])
 
   function showSidebar() {
     setIsChatOpen(false)
@@ -42,26 +49,16 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
 
   // console.log('socketContact', socketContact)
 
-  const [isTyping, setIsTyping] = useState(false)
-
-  socket.on('typingResponse', (data) => {
-    // console.log('typing', data)
-    if (socketContact.userId === data) {
-      setIsTyping(true)
-    }
-    setTimeout(() => setIsTyping(false), 1000)
-  })
-
   const connectionStatus = () => {
-    // console.log('type of', typeof socketContact.isConnect)
-    if (typeof socketContact.isConnect === 'number') {
-      const date = new Date(socketContact.isConnect)
+    // console.log('type of', typeof contact.isConnect)
+    if (typeof contact.isConnect === 'number') {
+      const date = new Date(contact.isConnect)
       const hoursAndMinutes = date.getHours() + ':' + addZero(date.getMinutes())
       // console.log(hoursAndMinutes) // 👉️ 8:33
       // new Date().toLocaleTimeString()
       return _lastSeen[language] + ' ' + hoursAndMinutes
     }
-    if (socketContact.isConnect) {
+    if (contact.isConnect) {
       return _online[language]
     } else {
       return _offline[language]
@@ -103,67 +100,41 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
     il: 'לא מקוון',
   }
 
-  function iconeBarFunc(element) {
-    if (!iconBarIsActive) {
-      setIconBarIsActive(true)
-      document.addEventListener('click', (e) => {
-        clickOutside(e)
-      })
-    } else {
-      setIconBarIsActive(false)
-    }
-  }
-
-  function clickOutside(event) {
-    // console.log('click')
-    let target = event.target
-    const allParentsOfTarget = []
-    while (target) {
-      allParentsOfTarget.unshift(target)
-      target = target.parentElement
-      try {
-        let targetClassName = target.className
-        // console.log('targetClassName', targetClassName)
-        if (targetClassName.indexOf('settings-chat') >= 0) {
-          return
-        }
-        if (
-          targetClassName.indexOf('flag-icon') >= 0 ||
-          targetClassName.indexOf('flag-icon2') >= 0
-        ) {
-          return
-        }
-      } catch (error) {}
-    }
-    setIconBarIsActive(false)
-  }
-
   const arrowHover =
     theme === 'light' ? 'arrow-hover-light' : 'arrow-hover-dark'
 
+  // Detect click outside React component
+
+  const { refComponent, refButton, isComponentVisible, setIsComponentVisible } =
+    useComponentVisible(false)
+
+  const handleClickRefButton = () => {
+    isComponentVisible
+      ? setIsComponentVisible(false)
+      : setIsComponentVisible(true)
+  }
+
+  useEffect(() => {
+    if (refButton.current && isComponentVisible) {
+      if (theme === 'light') {
+        refButton.current.style.backgroundColor = '#f0f2f5'
+      } else {
+        refButton.current.style.backgroundColor = 'rgb(43, 43, 43, 1)'
+      }
+    } else {
+      refButton.current.style.backgroundColor = ''
+    }
+  }, [isComponentVisible])
+
   return (
     <div
-      className={`row w-100 sticky-top ${bgColor} align-items-center m-0`}
+      className={`row w-100 sticky-top ${bgColor} align-items-center m-0 mb-1`}
       style={{ minHeight: '58px' }}
     >
       <div
         className="col-2 h-100 d-lg-none d-flex align-items-center justify-content-center p-0"
         onClick={showSidebar}
       >
-        {/* <Arrow>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 448 512"
-            style={{ fill: iconColor }}
-            height="1.25em"
-          >
-            {language === 'il' ? (
-              <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
-            ) : (
-              <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
-            )}
-          </svg>
-        </Arrow> */}
         <span className={`arrow ${arrowHover}`}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -182,7 +153,7 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
       <div className="col-2 col-lg-1 py-1">
         <img
           style={{ height: '50px', width: '50px' }}
-          src={socketContact.photoURL}
+          src={socketContact && socketContact.photoURL}
           className="rounded-circle"
           alt="..."
         ></img>
@@ -190,12 +161,13 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
       <div className="col">
         <div>
           <h3 className={`mb-0 fs-5 lh-1 ${colorName}`}>
-            {socketContact.displayName}
+            {/* {socketContact.displayName} */}
+            {contact && contact.displayName}
           </h3>
         </div>
         <div>
           <p className={`mb-0 fw-light pt-0 lh-1 ${colorInfo}`}>
-            {isTyping ? _isTyping[language] : connectionStatus()}
+            {contact.isTyping ? _isTyping[language] : connectionStatus()}
           </p>
         </div>
       </div>
@@ -232,11 +204,11 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
         </span>
       </div>
       <div
-        className="col-2 col-lg-1 d-flex justify-content-center align-items-center settings-chat"
-        // onClick={() => toggleIconBarIsActive()}
-        onClick={(e) => iconeBarFunc(e.target)}
+        className="col-2 col-lg-1 d-flex justify-content-center align-items-center position-relative"
+        onClick={() => handleClickRefButton()}
       >
-        <span className={`arrow ${arrowHover}`}>
+        <span className={`arrow ${arrowHover}`} ref={refButton}>
+          {/* <i className="fa-solid fa-ellipsis fa-lg"></i> */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 128 512"
@@ -248,6 +220,7 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
             <path d="M64 360c30.9 0 56 25.1 56 56s-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56zm0-160c30.9 0 56 25.1 56 56s-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56zM120 96c0 30.9-25.1 56-56 56S8 126.9 8 96S33.1 40 64 40s56 25.1 56 56z" />
           </svg>
         </span>
+        <div ref={refComponent}>{isComponentVisible && <ContactMenu />}</div>
       </div>
     </div>
   )

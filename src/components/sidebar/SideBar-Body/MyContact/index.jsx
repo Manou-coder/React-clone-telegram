@@ -6,10 +6,14 @@ import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import colors from '../../../../utils/style/color'
 // import './index.css'
 import Avatar from '../../../../assets/img/avatar4.png'
-import { SocketContactContext } from '../../../../utils/context/SocketContact'
+import {
+  setActuallyContactIdInStorage,
+  SocketContactContext,
+} from '../../../../utils/context/SocketContact'
 import { arrayUnion, doc, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../../../../firebase-config'
 import { UserAuth } from '../../../../utils/context/AuthContext'
+import { LanguageContext } from '../../../../utils/context/LanguageContext'
 
 function MyContact({
   random,
@@ -18,22 +22,42 @@ function MyContact({
   name3,
   contact,
   id,
+  description,
   info,
   photoURL,
 }) {
   const { user } = UserAuth()
-  const { socketContact, setSocketContact, toggleChange } =
-    useContext(SocketContactContext)
+  const {
+    socketContact,
+    setSocketContact,
+    setMyContacts,
+    newMessages,
+    setActuallyContactId,
+  } = useContext(SocketContactContext)
   const { setIsChatOpen } = useContext(ThemeContext)
   const navigate = useNavigate()
   const listOfContacts = useRef([])
 
   // console.log('contact', contact)
+  // console.log('description', description)
 
   function handleClickContact() {
     setSocketContact(contact)
-    navigate(contact.userName)
-    // console.log('mpàlçokijuyhbgtrvfdces')
+    //
+    setActuallyContactId(contact.userId)
+    setActuallyContactIdInStorage(contact.userId)
+    //
+    // navigate(contact.userName)
+    setMyContacts((curr) => {
+      for (const elem of curr) {
+        if (elem.userId === contact.userId) {
+          elem.hasNewMessages = 0
+        }
+      }
+      //necessaire pour que react comprenne le changement
+      // curr = JSON.parse(JSON.stringify(curr))
+      return curr
+    })
     setIsChatOpen(true)
   }
 
@@ -43,6 +67,15 @@ function MyContact({
   const bgContact = theme === 'light' ? 'li-bg-light' : 'li-bg-dark'
   const colorName = theme === 'light' ? '' : 'text-white'
   const colorInfo = theme === 'light' ? '' : 'text-white-50'
+
+  // LANGUAGE
+  const { language } = useContext(LanguageContext)
+
+  const _isTyping = {
+    en: 'Is typing...',
+    fr: "En train d'écrire...",
+    il: 'כותב/ת',
+  }
 
   return (
     <li
@@ -79,12 +112,20 @@ function MyContact({
             </h3>
           </div>
           <div>
-            <p className={`mb-0 fw-light pt-0 lh-1 ${colorInfo}`}>{info}</p>
+            {description ? (
+              <p className={`mb-0 pt-0 lh-1`} style={{ color: '#00ff00' }}>
+                {_isTyping[language]}
+              </p>
+            ) : (
+              <p className={`mb-0 fw-light pt-0 lh-1 ${colorInfo}`}>
+                {'coucou'}
+              </p>
+            )}
           </div>
         </div>
         <div className="col-2 p-0">
           <span className={`badge rounded-pill bg-primary`}>
-            {contact.hasNewMessages > 0 && contact.hasNewMessages}
+            {newMessages[contact.userId] > 0 && newMessages[contact.userId]}
           </span>
         </div>
       </div>

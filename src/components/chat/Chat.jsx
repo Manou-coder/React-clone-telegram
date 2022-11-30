@@ -8,18 +8,11 @@ import { useEffect } from 'react'
 import ContactMenu from './Chat-Header/ContactMenu'
 
 export default function Chat() {
-  let params = useParams()
-
-  // const [messageSend, setMessageSend] = useState([])
-
+  const params = useParams()
   const [showChat, setShowChat] = useState(false)
-  const [iconBarIsActive, setIconBarIsActive] = useState(false)
-
   const { theme, isChatOpen } = useContext(ThemeContext)
 
   const wallpaper = theme === 'light' ? 'wallpapper' : 'wallpapper-black'
-
-  // console.log('params.username', params.username)
 
   function readParamsAndSetShowCat() {
     if (params.username !== undefined) {
@@ -39,19 +32,15 @@ export default function Chat() {
     <div
       className={`${displayChat} col-12 col-lg-8 p-0 vh-100 flex-column position-relative _chat ${wallpaper}`}
     >
-      {!showChat ? (
+      {/* {!showChat ? (
         <div className={`h-100 w-100`}></div>
-      ) : (
-        <>
-          {iconBarIsActive && <ContactMenu />}
-          <NavbarChat
-            iconBarIsActive={iconBarIsActive}
-            setIconBarIsActive={setIconBarIsActive}
-          />
-          <MesssageBody />
-          <MessageBar />
-        </>
-      )}
+      ) : ( */}
+      <>
+        <NavbarChat />
+        <MesssageBody />
+        <MessageBar />
+      </>
+      {/* )} */}
     </div>
   )
 }

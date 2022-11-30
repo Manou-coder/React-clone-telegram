@@ -5,7 +5,6 @@ import {
   getFirestore,
   setDoc,
   getDoc,
-  onSnapshot,
   updateDoc,
   arrayUnion,
 } from 'firebase/firestore'
@@ -20,13 +19,25 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 //   appId: process.env.REACT_APP_FIREBASE_MESSAGE_APP_ID,
 // }
 
+// V6
+
+// const firebaseConfig = {
+//   apiKey: 'AIzaSyCdfAoe1Xcsm11iokwHN2uQVDG_JALKGxU',
+//   authDomain: 'react-auth-rrv6-954c0.firebaseapp.com',
+//   projectId: 'react-auth-rrv6-954c0',
+//   storageBucket: 'react-auth-rrv6-954c0.appspot.com',
+//   messagingSenderId: '1089001112233',
+//   appId: '1:1089001112233:web:40b883ac4e0c8079849fb8',
+// }
+
+// React-clone-telegram
 const firebaseConfig = {
-  apiKey: 'AIzaSyCdfAoe1Xcsm11iokwHN2uQVDG_JALKGxU',
-  authDomain: 'react-auth-rrv6-954c0.firebaseapp.com',
-  projectId: 'react-auth-rrv6-954c0',
-  storageBucket: 'react-auth-rrv6-954c0.appspot.com',
-  messagingSenderId: '1089001112233',
-  appId: '1:1089001112233:web:40b883ac4e0c8079849fb8',
+  apiKey: 'AIzaSyCHQD1NqBVQdQ_auXM2yoLQsXRV_sHPd-U',
+  authDomain: 'react-clone-telegram.firebaseapp.com',
+  projectId: 'react-clone-telegram',
+  storageBucket: 'react-clone-telegram.appspot.com',
+  messagingSenderId: '34430176565',
+  appId: '1:34430176565:web:35d130742ab59760e8907c',
 }
 
 const app = initializeApp(firebaseConfig)
@@ -37,6 +48,8 @@ export const storage = getStorage(app)
 
 // console.log('db', db)
 // console.log('storage', storage)
+
+// ------ 2 ------------- IMAGE PROFILE ---------------------------
 
 export const uploadImage = async (storageRef, file) => {
   storageRef = ref(storage, storageRef)
@@ -64,6 +77,10 @@ export const downloadImage = async (reference) => {
   return urlAvatar
 }
 
+// ----------------------------------------------------------
+
+// ------- 4 --------------------- MY DB ---------------------------
+
 export const createUserInDB = async (user) => {
   const { uid, email } = user
   const schemaUserDB = {
@@ -73,7 +90,7 @@ export const createUserInDB = async (user) => {
     photoURL: '',
     userId: uid,
     isProfileCreated: false,
-    myContacts: [],
+    myContacts: {},
   }
   await readDoc(uid)
     .then((res) => {
@@ -87,6 +104,49 @@ export const createUserInDB = async (user) => {
     })
     .catch((err) => console.dir(err))
 }
+
+export const setUserinDB = async (userId, data) => {
+  const docRef = doc(db, 'users', userId)
+  try {
+    const docSnap = await setDoc(docRef, data, { merge: true })
+    // console.log('docSnap', docSnap)
+  } catch (error) {
+    // console.dir(error)
+  }
+}
+
+export const readDoc = async (userId) => {
+  const docRef = doc(db, 'users', userId)
+  const docSnap = await getDoc(docRef)
+
+  if (docSnap.exists()) {
+    // console.log('Document data:', docSnap.data())
+    return docSnap.data()
+  } else {
+    console.log('No such document!')
+    return null
+  }
+}
+
+export const updateHasNewMessagesInDB = async (myId, contactId, operation) => {
+  const hasNewMessages = await getHasNewMessagesFromDB(myId)
+  // console.log('hasNewMessages', hasNewMessages)
+  if (operation === 'add') {
+    // console.log('hasNewMessages[contactId]', hasNewMessages[contactId])
+    hasNewMessages[contactId] =
+      hasNewMessages[contactId] === undefined
+        ? 1
+        : hasNewMessages[contactId] + 1
+    updateHasNewMessagesInDB___2(myId, hasNewMessages)
+  } else if (operation === 'suppr') {
+    hasNewMessages[contactId] = 0
+    updateHasNewMessagesInDB___2(myId, hasNewMessages)
+  }
+}
+
+// -----------------------------------------------------
+
+// ------ 3 --------------------- USERSLIST -------------------------
 
 export const saveUserInContactsList = async (userId, data) => {
   createUsersMessagesDB(userId)
@@ -127,19 +187,6 @@ export const saveUserInContactsList = async (userId, data) => {
   }
 }
 
-export const readDoc = async (userId) => {
-  const docRef = doc(db, 'users', userId)
-  const docSnap = await getDoc(docRef)
-
-  if (docSnap.exists()) {
-    // console.log('Document data:', docSnap.data())
-    return docSnap.data()
-  } else {
-    console.log('No such document!')
-    return null
-  }
-}
-
 export const readAllUsers = async () => {
   const docRef = doc(db, 'usersList', 'usersList')
   const docSnap = await getDoc(docRef)
@@ -153,15 +200,20 @@ export const readAllUsers = async () => {
   }
 }
 
-export const setUserinDB = async (userId, data) => {
-  const docRef = doc(db, 'users', userId)
-  try {
-    const docSnap = await setDoc(docRef, data, { merge: true })
-    // console.log('docSnap', docSnap)
-  } catch (error) {
-    // console.dir(error)
+export const getAllUsersFromDB = async () => {
+  const docRef = doc(db, 'usersList', 'usersList')
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    return docSnap.data().users
+  } else {
+    console.log('no such document')
+    return null
   }
 }
+
+// -----------------------------------------------------------------
+
+// ------ 3 ---------------------- USERSMESSAGES -----------------------
 
 const createUsersMessagesDB = async (userId) => {
   const docRef = doc(db, 'usersMessages', userId)
@@ -177,3 +229,85 @@ const createUsersMessagesDB = async (userId) => {
     return
   }
 }
+
+export const setMessagesWithThisContact = async (
+  myId,
+  socketContactId,
+  arrMsg
+) => {
+  const docRef = doc(db, 'usersMessages', myId)
+  try {
+    updateDoc(docRef, { [socketContactId]: arrMsg })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getMessagesWithThisContact = async (myId, socketContactId) => {
+  const docRef = doc(db, 'usersMessages', myId)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    return docSnap.data()[socketContactId]
+  } else {
+    console.log('No such document!')
+    return null
+  }
+}
+
+// -----2------------ MY CONTACTS ----------------
+
+// get MyContacts
+export const getMyContactsFromDB = async (myId) => {
+  const docRef = doc(db, 'users', myId)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    const myContacts = docSnap.data().myContacts
+    return myContacts
+  } else {
+    console.log('No such document!')
+  }
+}
+
+// update MyContacts
+export const updateMyContactsInDB = async (myId, contactId) => {
+  const docRef = doc(db, 'users', myId)
+  try {
+    await updateDoc(docRef, {
+      myContacts: contactId,
+    })
+    console.log('doc updated !!')
+  } catch (error) {
+    console.dir(error)
+  }
+}
+
+//  ----------------------------------------------------------
+
+// -----2------------ HAS NEW MESSGES ----------------
+
+// get hasNewMessages
+export const getHasNewMessagesFromDB = async (myId) => {
+  const docRef = doc(db, 'users', myId)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    const hasNewMessages = docSnap.data().hasNewMessages
+    return hasNewMessages
+  } else {
+    console.log('No such document!')
+  }
+}
+
+// update hasNewMessages
+export const updateHasNewMessagesInDB___2 = async (myId, data) => {
+  const docRef = doc(db, 'users', myId)
+  try {
+    await updateDoc(docRef, {
+      hasNewMessages: data,
+    })
+    console.log('doc updated !!')
+  } catch (error) {
+    console.dir(error)
+  }
+}
+
+//  ----------------------------------------------------------

@@ -7,16 +7,19 @@ import { SocketContactContext } from '../../../utils/context/SocketContact'
 import { UserAuth } from '../../../utils/context/AuthContext'
 import { v4 as uuidv4 } from 'uuid'
 import { MessagesContext } from '../../../utils/context/MessagesContext'
+import { useEffect } from 'react'
+import { addBadgeDateToArr } from '../Chat-Body/MessageBody'
+import Emojis from './Emojis'
+import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
 
 export default function MessageBar() {
   const { user } = UserAuth()
   const { socketContact } = useContext(SocketContactContext)
-  const { messageSend, setMessageSend, arrOfMessages, setArrOfMessages } =
-    useContext(MessagesContext)
+  const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
   const [messageInput, setMessageInput] = useState('')
-  let textareaRef = useRef()
+  const textareaRef = useRef()
 
-  //Socket functions
+  // Socket function
   function socketEmitPrivateMessage() {
     const message = {
       content: messageInput,
@@ -26,47 +29,33 @@ export default function MessageBar() {
       id: uuidv4(),
       status: 'waiting',
     }
-    // setMessageSend([...messageSend, message])
-    // console.log('messageSend', messageSend)
-    // socket.emit('private message', message, (response) => {
-    //   console.log('response', response)
-    //   message.status = 'ok'
-    //   setMessageSend([...messageSend, message]) ==========
-    // })
-    // setMessageSend([...messageSend, message]) )===========
     socket.emit('private message', message)
-    console.log('message', message)
-    setArrOfMessages([...arrOfMessages, message])
+    // console.log('message', message)
+    const newArr = addBadgeDateToArr([...arrOfMessages, message])
+    // console.log('newArr', newArr)
+    setArrOfMessages(newArr)
   }
 
-  function handleTyping() {
-    socket.emit('typing', user.uid)
+  function handleOnInputTyping() {
+    socket.emit('typing', { contactId: user.uid, typingStatus: true })
   }
 
-  //Send message
+  function handleOnBlurTyping() {
+    socket.emit('typing', { contactId: user.uid, typingStatus: false })
+  }
+
+  // Sends message
   function sendMessage() {
     if (messageInput.trim() === '') {
       return
     }
-    // console.log('messageInput', messageInput)
-    // const message = {
-    //   content: messageInput,
-    //   to: socketContact.userId,
-    //   from: user.uid,
-    //   time: Date.now(),
-    //   id: uuidv4(),
-    //   status: 'waiting',
-    // }
-    // setMessageSend([...messageSend, message])
-    // console.log('messageSend', messageSend)
-    // socketEmitPrivateMessage(message)
     socketEmitPrivateMessage()
     textareaRef.current.value = ''
     setMessageInput('')
     autoResizeBar()
   }
 
-  //Sends message when pressing the enter key unless the shift key has been pressed before
+  // Sends message when pressing the enter key unless the shift key has been pressed before
   function checkKey(e) {
     const arrOfKey = []
     if (messageInput.trim() === '') {
@@ -139,15 +128,45 @@ export default function MessageBar() {
     il: 'הודעה...',
   }
 
+  // Detect click outside React component
+
+  const { refComponent, refButton, isComponentVisible, setIsComponentVisible } =
+    useComponentVisible(false)
+
+  const handleClickRefButton = () => {
+    isComponentVisible
+      ? setIsComponentVisible(false)
+      : setIsComponentVisible(true)
+  }
+
+  useEffect(() => {
+    if (refButton.current && isComponentVisible) {
+      if (theme === 'light') {
+        refButton.current.style.backgroundColor = '#f0f2f5'
+      } else {
+        refButton.current.style.backgroundColor = 'rgb(43, 43, 43, 1)'
+      }
+    } else {
+      refButton.current.style.backgroundColor = ''
+    }
+  }, [isComponentVisible])
+
   return (
-    <div className={`row sticky-bottom py-1 w-100 m-0 p-0 ${bgColor1}`}>
+    <div className={`row position-relative py-1 w-100 m-0 p-0 ${bgColor1}`}>
+      <div ref={refComponent}>
+        {isComponentVisible && (
+          <Emojis textareaRef={textareaRef} setMessageInput={setMessageInput} />
+        )}
+      </div>
       <div className="col py-1 d-flex justify-content-center">
         <div
           className={`row rounded-5 py-1 w-100 w-lg-75 align-items-baseline ${bgColor2}`}
-          style={{ position: 'relative', bottom: '2px' }}
+          style={{ position: 'relative' }}
         >
           <div className="col-1 d-flex justify-content-start">
             <span
+              ref={refButton}
+              onClick={() => handleClickRefButton()}
               className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
             >
               {/* <i className="fa-solid fa-face-smile fa-lg"></i> */}
@@ -182,10 +201,13 @@ export default function MessageBar() {
               ref={textareaRef}
               onInput={() => {
                 autoResizeBar()
-                handleTyping()
+                // handleTyping()
+                // console.log('input')
+                handleOnInputTyping()
               }}
+              onBlur={() => handleOnBlurTyping()}
               onChange={(e) => {
-                setMessageInput(e.target.value)
+                setMessageInput(textareaRef.current.value)
               }}
               onKeyDown={(e) => checkKey(e)}
               rows="1"

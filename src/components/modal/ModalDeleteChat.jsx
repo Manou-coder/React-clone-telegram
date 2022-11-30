@@ -8,7 +8,11 @@ import {
 import React, { useContext, useRef } from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { db } from '../../firebase-config'
+import {
+  db,
+  getMyContactsFromDB,
+  updateMyContactsInDB,
+} from '../../firebase-config'
 import { UserAuth } from '../../utils/context/AuthContext'
 import { LanguageContext } from '../../utils/context/LanguageContext'
 import { MessagesContext } from '../../utils/context/MessagesContext'
@@ -17,57 +21,42 @@ import { ThemeContext } from '../../utils/context/ThemeContext'
 
 export default function ModalDeleteChat() {
   const { user } = UserAuth()
-  const { socketContact, isChange, toggleChange } =
-    useContext(SocketContactContext)
-  const { arrOfMessages, setArrOfMessages, messageSend, setMessageSend } =
-    useContext(MessagesContext)
+  const { socketContact, setMyContacts } = useContext(SocketContactContext)
+  const { setArrOfMessages, setMessageSend } = useContext(MessagesContext)
   const { theme, setIsChatOpen } = useContext(ThemeContext)
   const { language } = useContext(LanguageContext)
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const closeModal = useRef()
 
   async function deleteChat() {
     setIsLoading(true)
+    // empty the 'arrOfMessages
     setMessageSend([])
     setArrOfMessages([])
-    await deleteContact()
-    await deleteMessages()
+    // delete this contact and his messages from DB
+    await deleteThisContactIdFromMyContactsDB(user.uid, socketContact.userId)
+    await deleteMessages(user.uid, socketContact.userId)
+    // delete this contact from 'myContacts'
+    deleteThisContactIdFromMyContacts()
+    // close the modal and navigate to '/chat'
     closeModal.current.click()
-    toggleChange()
     setIsChatOpen(false)
     navigate('/chat')
     setIsLoading(false)
   }
 
-  async function deleteContact() {
-    const contact = socketContact
-    const docRef = doc(db, 'users', user.uid)
-    const docSnap = await getDoc(docRef)
-    if (docSnap.exists()) {
-      let data = docSnap.data().myContacts
-      let newData = data.filter((e) => e.userId !== contact.userId)
-      await updateDoc(docRef, { myContacts: newData })
-      // return
-    } else {
-      console.log('No such document!')
-    }
+  // ------------------ Internal Functions -------------------------------
+
+  function deleteThisContactIdFromMyContacts() {
+    setMyContacts((curr) => {
+      // console.log('curr', curr)
+      curr = curr.filter((e) => socketContact.userId !== e.userId)
+      return curr
+    })
   }
 
-  async function deleteMessages() {
-    const contactId = socketContact.userId
-    console.log('contactId', contactId)
-    const docRef = doc(db, 'usersMessages', user.uid)
-    const docSnap = await getDoc(docRef)
-    if (docSnap.exists()) {
-      let data = docSnap.data()
-      console.log('Document data contact:', data[contactId])
-      await updateDoc(docRef, { [contactId]: deleteField() })
-      // return
-    } else {
-      console.log('No such document!')
-    }
-  }
-
+  // ------------------------- Languages ---------------------------------
   const _deleteChat = {
     en: 'Delete chat',
     fr: "Supprimer l'échange",
@@ -86,8 +75,6 @@ export default function ModalDeleteChat() {
     il: 'בטל',
   }
 
-  const [isLoading, setIsLoading] = useState(false)
-
   return (
     <>
       <div className="modal-header w-100">
@@ -95,7 +82,7 @@ export default function ModalDeleteChat() {
           <div className="col-2">
             <img
               style={{ height: '50px', width: '50px' }}
-              src={socketContact.photoURL}
+              src={socketContact && socketContact.photoURL}
               className="rounded-circle me-4"
               alt="..."
             ></img>
@@ -119,7 +106,10 @@ export default function ModalDeleteChat() {
       <div className="modal-body">
         <h5>
           {_permanentlyDelete[language]}{' '}
-          <span className="fw-bold">{socketContact.displayName}</span>?
+          <span className="fw-bold">
+            {socketContact && socketContact.displayName}
+          </span>
+          ?
         </h5>
       </div>
       <div className="modal-footer">
@@ -130,13 +120,6 @@ export default function ModalDeleteChat() {
         >
           {_cancel[language]}
         </button>
-        {/* <button
-          type="button"
-          className="btn btn-danger"
-          onClick={() => deleteChat()}
-        >
-          {_deleteChat[language]}
-        </button> */}
         <button
           className="btn btn-danger"
           type="button"
@@ -154,4 +137,30 @@ export default function ModalDeleteChat() {
       </div>
     </>
   )
+}
+
+// ------------------------- External Functions -----------------------------
+
+async function deleteThisContactIdFromMyContactsDB(myId, contactId) {
+  const myContactsInDB = await getMyContactsFromDB(myId)
+  // console.log('contactId', contactId)
+  // console.log('myContactsInDB ', myContactsInDB)
+  const myContactsWhithinNewContact = myContactsInDB.filter(
+    (contact_id) => contact_id !== contactId
+  )
+  // console.log(' myContactsWhithinNewContact', myContactsWhithinNewContact)
+  updateMyContactsInDB(myId, myContactsWhithinNewContact)
+}
+
+async function deleteMessages(myId, contactId) {
+  console.log('contactId', contactId)
+  const docRef = doc(db, 'usersMessages', myId)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    let data = docSnap.data()
+    console.log('Document data contact:', data[contactId])
+    await updateDoc(docRef, { [contactId]: deleteField() })
+  } else {
+    console.log('No such document!')
+  }
 }

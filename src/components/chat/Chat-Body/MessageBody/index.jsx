@@ -6,7 +6,15 @@ import { useParams } from 'react-router-dom'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import { SocketContactContext } from '../../../../utils/context/SocketContact'
 import { UserAuth } from '../../../../utils/context/AuthContext'
-import { db, readDoc } from '../../../../firebase-config'
+import {
+  db,
+  getAllUsersFromDB,
+  getMessagesWithThisContact,
+  getUsersListFromDB,
+  readDoc,
+  setMessagesWithThisContact,
+  updateHasNewMessagesInDB,
+} from '../../../../firebase-config'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { MessagesContext } from '../../../../utils/context/MessagesContext'
 import { async } from '@firebase/util'
@@ -16,49 +24,26 @@ let firstTime
 export default function MesssageBody() {
   const { user } = UserAuth()
   const { isChatOpen } = useContext(ThemeContext)
-  const { socketContact, setSocketContact, toggleChange } =
+  const { socketContact, setMyContacts, actuallyContactid } =
     useContext(SocketContactContext)
   const { arrOfMessages, setArrOfMessages, messageSend, setMessageSend } =
     useContext(MessagesContext)
-  const lastMessageRef = useRef(null)
-  const [coucou, setCoucou] = useState('')
   const [isLoading, setLoading] = useState(true)
-
-  function addBadgeDateToArr(arr) {
-    const newArr = []
-    if (arr.length === 1) {
-      newArr.push(arr[0])
-    }
-    for (let i = 0; i < arr.length - 1; i++) {
-      const element = arr[i].time
-      let date1 = new Date(element)
-      let date2 = new Date(arr[i + 1].time)
-      // console.log('date1', date1)
-      // console.log('date2', date2)
-      if (date1.getDate() === date2.getDate()) {
-        // console.log('egal')
-        newArr.push(arr[i])
-      } else {
-        // console.log('pas egal')
-        newArr.push({ badgeTime: date2.getTime() })
-        newArr.push(arr[i])
-      }
-    }
-    newArr.unshift({ badgeTime: new Date(arr[0].time).getTime() })
-    // console.log('newArr', newArr)
-    return newArr
-  }
+  const lastMessageRef = useRef(null)
 
   async function getAllMessagesFromDB() {
     setLoading(true)
     firstTime = true
     setMessageSend([])
     setArrOfMessages([])
-    if (!socketContact.userId) {
+    // if (!socketContact.userId) {
+    //   return
+    // }
+    if (!actuallyContactid) {
       return
     }
-    updateHasNewMessages(user.uid, socketContact.userId, 'suppr')
-    toggleChange()
+    // updateHasNewMessagesInDB(user.uid, socketContact.userId, 'suppr')
+    // toggleChange()
     const docRef = doc(db, 'usersMessages', user.uid)
     const docRef2 = doc(db, 'usersMessages', socketContact.userId)
     // console.log('socketContact.userId', socketContact.userId)
@@ -74,8 +59,8 @@ export default function MesssageBody() {
             msg.status = 'read'
           }
         }
-        console.log('arrMessagesWithHisContact2', arrMessagesWithHisContact)
-        socket.emit('update status all messages', {
+        // console.log('arrMessagesWithHisContact2', arrMessagesWithHisContact)
+        socket.emit('update contact status from client', {
           from: user.uid,
           to: socketContact.userId,
           statusMsg: 'read',
@@ -86,6 +71,7 @@ export default function MesssageBody() {
         firstTime = true
         // setArrOfMessages(arrMessagesWithHisContact)
         const newArr = addBadgeDateToArr(arrMessagesWithHisContact)
+        // console.log('newArr', newArr)
         setArrOfMessages(newArr)
         setLoading(false)
       } else {
@@ -106,16 +92,25 @@ export default function MesssageBody() {
     }
   }, [socketContact])
 
+  // SOCKET - receives the message sent by the contact and sends back to the server my status about this message (if I have read it or just received it)
   useEffect(() => {
     socket.on('private message', ({ msg }) => {
       // console.log('msg', msg)
-      // console.log('socketContact.userId', socketContact.userId)
-      // console.log('msg.from', msg.from)
-      if (socketContact.userId === msg.from && isChatOpen) {
-        setRead(msg)
-      } else {
-        setReceived(msg)
+
+      function checkMyStatus() {
+        if (socketContact.userId === msg.from && isChatOpen) {
+          console.log('read')
+          setRead(msg)
+        } else if (socketContact.userId === msg.from && !isChatOpen) {
+          console.log('received whit chat is closed')
+          setReceived(msg)
+        } else {
+          console.log('different user')
+          setReceived(msg)
+        }
       }
+      checkMyStatus()
+
       firstTime = false
     })
     return () => {
@@ -123,217 +118,69 @@ export default function MesssageBody() {
     }
   })
 
+  // SOCKET - update status all messages of chat when status contact changed
   useEffect(() => {
-    socket.on('update status all messages server', (data) => {
-      // console.log('data3', data)
+    socket.on('update contact status from server', (data) => {
       if (socketContact.userId === data.from) {
         let newArr = [...arrOfMessages]
         if (data.statusMsg === 'read') {
           for (const msg of newArr) {
-            // console.log('msg', msg)
             if (msg.from === user.uid && msg.to === socketContact.userId) {
-              // console.log('vrai')
               msg.status = 'read'
             }
           }
-          // console.log('newArr', newArr)
         }
-        // newArr = addBadgeDateToArr(newArr)
         setArrOfMessages(newArr)
       }
     })
     return () => {
-      socket.off('update status all messages server')
+      socket.off('update contact status from server')
     }
   })
 
+  // SOCKET - update status of each message (if the message has been sent to the server or if the contact has read or received the message )
   useEffect(() => {
     socket.on('update message', ({ msg }) => {
-      //jai pas trop compris a quoi set ce setCoucou mais il est tres important car grasse a lui le changement du svg est direct
-      setCoucou(msg)
-      // console.log('update msg', msg)
-      for (let message of arrOfMessages) {
-        if (message.id === msg.id) {
-          // console.log(message)
-          message.status = msg.status
-          // setArrOfMessages(newArrOfMessages)
-        }
-      }
+      const copyOfArrOfMessages = JSON.parse(JSON.stringify(arrOfMessages))
+      const messageToUpdate = copyOfArrOfMessages.find(
+        (message) => message.id === msg.id
+      )
+      messageToUpdate.status = msg.status
+      const copyOfArrOfMessagesWithBadge =
+        addBadgeDateToArr(copyOfArrOfMessages)
+      setArrOfMessages(copyOfArrOfMessagesWithBadge)
     })
     return () => {
       socket.off('update message')
     }
-  }, [arrOfMessages])
+  })
+
+  // --------------------------- FUNCTIONS INTERNES -------------------
 
   function setReceived(msg) {
     msg.status = 'received'
     socket.emit('message received', { msg: msg })
-    if (msg.from !== socketContact.userId) {
-      updateHasNewMessages(user.uid, msg.from, 'add')
-      toggleChange()
-      return console.log('diffffffffffffffffffffffffffffffff')
-    } else {
-      // console.log('msg', msg)
-      // console.log('msg.content', msg.content)
-      setArrOfMessages([...arrOfMessages, ...[msg]])
-    }
+    // updateHasNewMessagesInDB(user.uid, msg.from, 'add')
+    updateHasNewMessagesInMyContacts(msg.from, setMyContacts)
+    setArrOfMessages([...arrOfMessages, ...[msg]])
   }
 
   function setRead(msg) {
     msg.status = 'read'
     socket.emit('message received', { msg: msg })
-    if (msg.from !== socketContact.userId) {
-      return console.log('diffffffffffffffffffffffffffffffff')
-    } else {
-      // console.log('msg', msg)
-      // console.log('msg.content', msg.content)
-      setArrOfMessages([...arrOfMessages, ...[msg]])
-    }
+    setArrOfMessages([...arrOfMessages, ...[msg]])
   }
 
-  async function updateHasNewMessages(myId, contactId, operation) {
-    const docRef = doc(db, 'users', myId)
-    const docSnap = await getDoc(docRef)
-
-    if (docSnap.exists()) {
-      // console.log("Document data4:", docSnap.data());
-      let myContacts = docSnap.data().myContacts
-      //console.log("myContacts:", myContacts);
-      for (let contact of myContacts) {
-        //console.log("contact: ", contact);
-        if (contact.userId === contactId) {
-          // console.log('contactId: ', contactId)
-          if (operation === 'add') {
-            contact.hasNewMessages += 1
-          } else if (operation === 'suppr') {
-            contact.hasNewMessages = 0
-          }
-        }
-      }
-      await updateDoc(docRef, { myContacts: myContacts })
-    } else {
-      // doc.data() will be undefined in this case
-      console.log('No such document!')
-    }
-  }
-
+  // --------------------------- SROLL EFFECT --------------------------
   useEffect(() => {
-    // 👇️ scroll to bottom every time messages change
     if (firstTime) {
+      // 👇️ scroll to bottom QUICKLY first time to download all messages
       lastMessageRef.current?.scrollIntoView(false)
     } else {
+      // 👇️ scroll to bottom SLOWLY every time messages change
       lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messageSend, arrOfMessages])
-
-  // useEffect(() => {
-  //   // console.log('arrOfMessages', arrOfMessages)
-  //   if (messageSend[messageSend.length - 1] !== undefined) {
-  //     if (arrOfMessages.length >= 1) {
-  //       if (
-  //         messageSend[messageSend.length - 1].id ===
-  //         arrOfMessages[arrOfMessages.length - 1].id
-  //       ) {
-  //         // console.log('------------------égal----------------')
-  //         let newArrOfMessages = [...arrOfMessages]
-  //         arrOfMessages[arrOfMessages.length - 1].id =
-  //           messageSend[messageSend.length - 1].id
-  //         setArrOfMessages(newArrOfMessages)
-  //         return
-  //       }
-  //     }
-
-  //     setArrOfMessages([
-  //       ...arrOfMessages,
-  //       ...[messageSend[messageSend.length - 1]],
-  //     ])
-  //   }
-  //   firstTime = false
-  // }, [messageSend])
-
-  let contactInDB
-
-  useEffect(() => {
-    socket.on('new user', (arrOfUsers) => {
-      console.log('arrOfUsers', arrOfUsers)
-      checkIfContactIdHasConnected(arrOfUsers)
-    })
-
-    return () => {
-      socket.off('new user')
-    }
-  })
-
-  async function checkIfContactIdHasConnected(arr) {
-    const myId = user.uid
-    let newUser = {}
-    for (const user of arr) {
-      // console.log('user', user)
-      if (socketContact.userId === user.userId) {
-        newUser = user
-      }
-    }
-
-    const docRef = doc(db, 'usersList', 'usersList')
-    const docSnap = await getDoc(docRef)
-
-    if (docSnap.exists()) {
-      let data = docSnap.data().users
-      console.log('Document data:', data)
-      let dateInMs = new Date().getTime()
-      for (const user of data) {
-        // console.log('user data:', user)
-        if (socketContact.userId === user.userId) {
-          console.log('contact id:', user)
-          contactInDB = user
-          if (user.isConnect === true || user.isConnect > dateInMs) {
-            console.log('connecté')
-            const docRef2 = doc(db, 'usersMessages', myId)
-            const docSnap2 = await getDoc(docRef2)
-            if (docSnap2.exists()) {
-              let data2 = docSnap2.data()[socketContact.userId]
-              console.log('Document data2:', data2)
-              const newArr = setAllMessagesIsReceived(data2)
-              updateDoc(docRef2, { [socketContact.userId]: newArr })
-            } else {
-              console.log('No such document!')
-            }
-          }
-        }
-      }
-    } else {
-      console.log('No such document!')
-    }
-
-    if (socketContact.userId === newUser.userId) {
-      // console.log('vrai')
-      const newArr = setAllMessagesIsReceived(arrOfMessages)
-      // newArr = addBadgeDateToArr(newArr)
-      setArrOfMessages(newArr)
-    }
-  }
-
-  function setAllMessagesIsReceived(arr) {
-    let dateInMs = new Date().getTime()
-    let newArr = [...arr]
-    for (const msg of newArr) {
-      // console.log('msg', msg)
-      if (
-        msg.from === user.uid &&
-        msg.to === socketContact.userId &&
-        msg.status === 'ok'
-      ) {
-        // console.log('vrai')
-        msg.status = 'received'
-      }
-      console.log('contactInDB', contactInDB)
-      if (contactInDB.isConnect > dateInMs) {
-        msg.status = 'received'
-      }
-      // console.log('newArr', newArr)
-    }
-    return newArr
-  }
 
   return (
     <div
@@ -360,7 +207,7 @@ export default function MesssageBody() {
       ) : (
         <div className="container d-flex flex-column" style={{ width: '90%' }}>
           {/* <!-- this div is meant to put a space between the message bubbles and the nav bar --> */}
-          {/* <div className="w-100" style={{ padding: '12px 0px' }}></div> */}
+          <div className="w-100" style={{ padding: '12px 0px' }}></div>
           {/* ------------------------------------MESSAGES-HERE------------------------------------------- */}
 
           {arrOfMessages.map((e, i) => {
@@ -391,4 +238,128 @@ export default function MesssageBody() {
       )}
     </div>
   )
+}
+
+// function qui ajoute des badges de dates au tableau des messages
+export function addBadgeDateToArr(arr) {
+  // console.log('arr1', arr)
+  arr = arr.filter((e) => !e.badgeTime)
+  // console.log('arr2', arr)
+  const newArr2 = []
+  if (arr.length === 0) {
+    return newArr2
+  }
+  if (arr.length === 1) {
+    newArr2.push(arr[0])
+    // console.log('arr[0]', arr[0])
+    newArr2.unshift({ badgeTime: new Date(arr[0].time).getTime() })
+    return newArr2
+  }
+  newArr2.push({ badgeTime: new Date(arr[0].time).getTime() })
+  for (let i = 0; i < arr.length - 1; i++) {
+    const element = arr[i].time
+    let date1 = new Date(element)
+    let date2 = new Date(arr[i + 1].time)
+    // console.log('element', element)
+    // console.log('date1', date1)
+    // console.log('date2', date2)
+    if (date1.getDate() === date2.getDate()) {
+      // console.log('egal')
+      newArr2.push(arr[i])
+    } else {
+      // console.log('pas egal')
+      newArr2.push(arr[i])
+      newArr2.push({ badgeTime: date2.getTime() })
+    }
+  }
+  // console.log(newArr2[0].time)
+  // newArr2.unshift({ badgeTime: new Date(arr[0].time).getTime() })
+  newArr2.push(arr[arr.length - 1])
+  // console.log('newArr2', newArr2)
+  // return arr
+  return newArr2
+}
+
+export async function setAllMessagesIsReceivedInDB(
+  myId,
+  socketContactId,
+  usersListFromSocket
+) {
+  // console.log('usersList', usersList)
+  console.log('socketContactId', socketContactId)
+  const socketUser = usersListFromSocket.find(
+    (user) => socketContactId === user.userId
+  )
+  // console.log('socketUser', socketUser)
+
+  // const usersListFromDB = await getUsersListFromDB()
+  const allUsers = await getAllUsersFromDB()
+  // console.log('usersListFromDB', usersListFromDB)
+
+  const timeNowInMs = Date.now()
+  // console.log('timeNowInMs', timeNowInMs)
+
+  const contactInUsersListFromDB = allUsers.find(
+    (user) => socketContactId === user.userId
+  )
+  // console.log('contactInUsersListFromDB', contactInUsersListFromDB)
+
+  let newArr = []
+  if (
+    socketUser.userId === socketContactId ||
+    contactInUsersListFromDB.isConnect > timeNowInMs
+  ) {
+    // console.log('connecté')
+    const messagesWithThisContact = await getMessagesWithThisContact(
+      myId,
+      socketContactId
+    )
+    // console.log('messagesWithThisContact', messagesWithThisContact)
+    newArr = setAllMessagesIsReceived(
+      myId,
+      contactInUsersListFromDB,
+      socketContactId,
+      messagesWithThisContact
+    )
+    // console.log('newArr', newArr)
+    await setMessagesWithThisContact(
+      myId,
+      socketContactId,
+      messagesWithThisContact
+    )
+  }
+
+  if (socketContactId === socketUser.userId) {
+    return newArr
+  }
+}
+
+function setAllMessagesIsReceived(myId, contactInDB, socketContactId, arr) {
+  let dateInMs = new Date().getTime()
+  let newArr = [...arr]
+  for (const msg of newArr) {
+    if (
+      msg.from === myId &&
+      msg.to === socketContactId &&
+      msg.status === 'ok'
+    ) {
+      msg.status = 'received'
+    }
+    if (
+      msg.from === myId &&
+      contactInDB.isConnect > dateInMs &&
+      msg.status === 'ok'
+    ) {
+      msg.status = 'received'
+    }
+  }
+  return newArr
+}
+
+function updateHasNewMessagesInMyContacts(contactId, setMyContacts) {
+  setMyContacts((curr) => {
+    const contact = curr.find((user) => user.userId === contactId)
+    contact.hasNewMessages += 1
+    return curr
+  })
 }

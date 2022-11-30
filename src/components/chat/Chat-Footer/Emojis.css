@@ -1,0 +1,73 @@
+.div-emojis {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 10px;
+  position: absolute;
+  top: -140px;
+  left: 12px;
+  width: 320px;
+  padding: 8px;
+  z-index: 1;
+}
+
+.grid-container {
+  /* background-color: brown; */
+  grid-template-columns: repeat(auto-fill, 30px);
+  display: grid;
+  justify-content: center;
+  gap: 5px;
+  max-height: 110px;
+  overflow: scroll;
+  overflow-x: hidden;
+  /* margin-bottom: 8px; */
+}
+
+.grid-item {
+  text-align: center;
+  /* background-color: beige; */
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.grid-item:hover {
+  background-color: white;
+  font-size: 1.4em;
+}
+
+/* .grid-container::-webkit-scrollbar {
+  display: none;
+} */
+
+.grid-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track
+.grid-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+} */
+
+/* Handle */
+.grid-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+  /* padding-top: 2px; */
+}
+
+/* Handle on hover */
+.grid-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.div_emojis {
+  cursor: pointer;
+  /* background-color: aliceblue; */
+}
+
+.prevent-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}

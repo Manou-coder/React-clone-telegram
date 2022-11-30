@@ -7,20 +7,6 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
 
-const DivMenu = styled.div`
-  position: absolute;
-  z-index: 1021;
-  background-color: rgb(255, 255, 255, 0.9);
-  top: 48px;
-  left: 42px;
-  width: 300px;
-`
-const UlMenu = styled.ul`
-  list-style-type: none;
-  padding: 10px;
-  margin-bottom: 0;
-`
-
 export default function ContactMenu({ iconBarIsActive, setIconBarIsActive }) {
   // const navigate = useNavigate()
 
@@ -42,14 +28,17 @@ export default function ContactMenu({ iconBarIsActive, setIconBarIsActive }) {
     il: "למחוק צ'אט",
   }
 
+  const rightPosition = language === 'il' ? '-125px' : '35px'
+
   return (
     <div
       className={`rounded shadow`}
       style={{
         position: 'absolute',
+        width: 'max-content',
         zIndex: '1021',
         top: '45px',
-        right: '10px',
+        right: rightPosition,
         backgroundColor: bgColor,
         color: textColor,
       }}

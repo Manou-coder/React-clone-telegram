@@ -10,6 +10,7 @@ import EnglandFlag from '../../../../assets/img/united-kingdom.png'
 import FranceFlag from '../../../../assets/img/france.png'
 import IsraelFlag from '../../../../assets/img/israel.png'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
+import { SocketContactContext } from '../../../../utils/context/SocketContact'
 
 const DivMenu = styled.div`
   position: absolute;
@@ -138,6 +139,8 @@ export default function SettingsMenu({ canvasOption, setCanvasOption }) {
     il: 'להתנתק',
   }
 
+  const { setAllUsersFromDB } = useContext(SocketContactContext)
+
   return (
     <DivMenu
       className={`rounded shadow settings-menu`}
@@ -166,6 +169,8 @@ export default function SettingsMenu({ canvasOption, setCanvasOption }) {
             className={`row ${listItemMenuBgColor} py-2`}
             data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasProfile"
+            // download All users
+            onClick={() => setAllUsersFromDB()}
           >
             <div className="col-1">
               <i className="fa-solid fa-address-book"></i>
@@ -205,7 +210,8 @@ export default function SettingsMenu({ canvasOption, setCanvasOption }) {
                       backgroundColor: 'white',
                       borderRadius: '5px',
                       position: 'absolute',
-                      top: '48px',
+                      top: '47px',
+                      right: '53px',
                       zIndex: '1000',
                       gap: '5px',
                     }}

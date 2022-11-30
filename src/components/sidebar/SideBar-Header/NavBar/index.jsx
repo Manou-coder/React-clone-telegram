@@ -1,19 +1,13 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import SearchSideBar from '../SearchSideBar'
 import color from '../../../../utils/style/color'
 import './style.css'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
+import useComponentVisible from '../../../../utils/functions/useHandleClickOutside'
+import SettingsMenu from '../SettingsMenu'
 
-function NavBar({
-  inputLetters,
-  setInputLetters,
-  setIconBarIsActive,
-  iconBarIsActive,
-}) {
-  // DARK MODE
-
+function NavBar({ inputLetters, setInputLetters, setCanvasOption }) {
   const { theme } = useContext(ThemeContext)
-
   const [borderColor, setBorderColor] = useState(false)
 
   const shadowColor = !borderColor ? 'transparent' : color.primary
@@ -28,56 +22,34 @@ function NavBar({
     }
   }
 
-  const iconGrey = () => {
-    if (!iconBarIsActive) {
-      return ''
-    } else if (theme === 'light') {
-      return 'icon-bars-light-hover'
-    } else {
-      return 'icon-bars-dark-hover'
-    }
-  }
-
-  function clickOutside(event) {
-    // console.log('click')
-    let target = event.target
-    const allParentsOfTarget = []
-    while (target) {
-      allParentsOfTarget.unshift(target)
-      target = target.parentElement
-      try {
-        let targetClassName = target.className
-        // console.log('targetClassName', targetClassName)
-        if (targetClassName.indexOf('settings-menu') >= 0) {
-          return
-        }
-        if (
-          targetClassName.indexOf('flag-icon') >= 0 ||
-          targetClassName.indexOf('flag-icon2') >= 0
-        ) {
-          return
-        }
-      } catch (error) {}
-    }
-    setIconBarIsActive(false)
-  }
-
-  function iconeBarFunc(element) {
-    if (!iconBarIsActive) {
-      setIconBarIsActive(true)
-      document.addEventListener('click', (e) => {
-        clickOutside(e)
-      })
-    } else {
-      setIconBarIsActive(false)
-    }
-  }
-
   const bgColor1 = theme === 'light' ? 'bg-white' : 'bg-dark'
   const bgColor2 = theme === 'light' ? 'bg-white' : 'bg-black'
   const border = theme === 'light' ? 'border' : ''
   const fill = theme === 'light' ? '' : '#909294'
   const iconBars = theme === 'light' ? 'icon-bars-light' : ' icon-bars-dark'
+
+  // Detect click outside React component
+
+  const { refComponent, refButton, isComponentVisible, setIsComponentVisible } =
+    useComponentVisible(false)
+
+  const handleClickRefButton = () => {
+    isComponentVisible
+      ? setIsComponentVisible(false)
+      : setIsComponentVisible(true)
+  }
+
+  useEffect(() => {
+    if (refButton.current && isComponentVisible) {
+      if (theme === 'light') {
+        refButton.current.style.backgroundColor = '#f0f2f5'
+      } else {
+        refButton.current.style.backgroundColor = 'rgb(43, 43, 43, 1)'
+      }
+    } else {
+      refButton.current.style.backgroundColor = ''
+    }
+  }, [isComponentVisible])
 
   return (
     <div
@@ -86,8 +58,9 @@ function NavBar({
     >
       <div className="col-2 d-flex justify-content-center settings-menu">
         <span
-          onClick={(e) => iconeBarFunc(e.target)}
-          className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center ${iconGrey()}`}
+          ref={refButton}
+          onClick={() => handleClickRefButton()}
+          className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
         >
           {/* <i className="fa-solid fa-bars fa-lg"></i> */}
           <svg
@@ -101,6 +74,11 @@ function NavBar({
             <path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z" />
           </svg>
         </span>
+        <div ref={refComponent}>
+          {isComponentVisible && (
+            <SettingsMenu setCanvasOption={setCanvasOption} />
+          )}
+        </div>
       </div>
       <div className="col d-flex justify-content-center">
         <div

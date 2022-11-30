@@ -1,39 +1,13 @@
 import React, { useContext, useState } from 'react'
-import { useEffect } from 'react'
-import { readAllUsers } from '../../firebase-config'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 import color from '../../utils/style/color'
 import SearchSideBar from '../sidebar/SideBar-Header/SearchSideBar'
-import Contact from '../sidebar/SideBar-Body/Contact'
-import getSearchedUser from '../../utils/functions/getSearchedUser'
-import searchContact from '../../utils/functions/searchContact'
-import ContactsList from '../../datas/Users.json'
-import { UserAuth } from '../../utils/context/AuthContext'
+import Contacts from '../sidebar/SideBar-Body/Contacts'
 
 export default function OffCanvasContacts() {
-  const { user } = UserAuth()
-  const [isHover, setIsHover] = useState(false)
-  const [isSelected, setIsSelected] = useState(false)
-  const bgBadge = isHover ? 'bg-white text-primary' : 'bg-primary'
-
-  // DARK MODE
-
   const { theme } = useContext(ThemeContext)
-
-  const bgContact = () => {
-    if (isSelected) {
-      return 'li-bg-primary'
-    }
-    if (!isSelected && theme === 'light') {
-      return 'li-bg-light'
-    } else if (!isSelected && theme !== 'light') {
-      return 'li-bg-dark'
-    }
-  }
-
   const [borderColor, setBorderColor] = useState(false)
-
-  const shadowColor = !borderColor ? 'transparent' : color.primary
+  const [inputLetters, setInputLetters] = useState('')
 
   const iconSearchColor = () => {
     if (borderColor) {
@@ -45,30 +19,9 @@ export default function OffCanvasContacts() {
     }
   }
 
-  // const bgColor1 = theme === 'light' ? 'bg-white' : 'bg-dark'
+  const shadowColor = !borderColor ? 'transparent' : color.primary
   const bgColor2 = theme === 'light' ? 'bg-white' : 'bg-black'
   const border = theme === 'light' ? 'border' : ''
-
-  const [inputLetters, setInputLetters] = useState('')
-
-  //get all users
-
-  const [allUsers, setAllUsers] = useState([])
-
-  useEffect(() => {
-    getAllUsers()
-  }, [])
-
-  async function getAllUsers() {
-    const listOfUsers = await readAllUsers()
-    setAllUsers(listOfUsers.users)
-  }
-
-  let searchedContactList = searchContact(allUsers, inputLetters)
-
-  searchedContactList = searchedContactList.filter((e) => e.userId !== user.uid)
-
-  // console.log('searchedContactList', searchedContactList)
 
   return (
     <div>
@@ -103,20 +56,7 @@ export default function OffCanvasContacts() {
           </div>
         </div>
       </div>
-      <ul className="p-0 mt-2" style={{ listStyleType: 'none' }}>
-        {searchedContactList.map((e, i) => (
-          <Contact
-            contact={searchedContactList[i]}
-            name1={getSearchedUser(searchedContactList, i, inputLetters)[0]}
-            name2={getSearchedUser(searchedContactList, i, inputLetters)[1]}
-            name3={getSearchedUser(searchedContactList, i, inputLetters)[2]}
-            id={searchedContactList[i].userId}
-            info={`Username: ${searchedContactList[i].userName}`}
-            photoURL={searchedContactList[i].photoURL}
-            key={i + 2}
-          />
-        ))}
-      </ul>
+      <Contacts inputLetters={inputLetters} setInputLetters={setInputLetters} />
     </div>
   )
 }

@@ -21,10 +21,6 @@ function EndOfSlidebar({ inputLetters, setInputLetters, isContactsOpen }) {
     >
       <div className="container-fluid p-0">
         {isContactsOpen ? (
-          // <Contacts
-          //   inputLetters={inputLetters}
-          //   setInputLetters={setInputLetters}
-          // />
           <MyContacts
             inputLetters={inputLetters}
             setInputLetters={setInputLetters}
