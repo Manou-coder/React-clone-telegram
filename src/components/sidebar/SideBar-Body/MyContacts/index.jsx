@@ -1,7 +1,5 @@
 import searchContact from '../../../../utils/functions/searchContact'
 import getSearchedUser from '../../../../utils/functions/getSearchedUser'
-import { useEffect, useMemo, useState } from 'react'
-import { getMyContactsFromDB } from '../../../../firebase-config'
 import { UserAuth } from '../../../../utils/context/AuthContext'
 import { useContext } from 'react'
 import { SocketContactContext } from '../../../../utils/context/SocketContact'
@@ -13,10 +11,12 @@ function MyContacts({ inputLetters }) {
 
   const myContactsObj = []
   for (const contactId of myContacts) {
-    // console.log(contactId, 'contactId')
+    console.log(contactId, 'contactId')
     const contactObj = allUsers.find((contact) => contact.userId === contactId)
-    // console.log('contactObj', contactObj)
-    myContactsObj.push(contactObj)
+    console.log('contactObj', contactObj)
+    if (contactObj) {
+      myContactsObj.push(contactObj)
+    }
   }
 
   console.log('myContactsObj', myContactsObj)
