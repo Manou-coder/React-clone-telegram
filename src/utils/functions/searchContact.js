@@ -87,5 +87,6 @@ export default function searchContact(arr, inputLetters) {
 
   // return newArr
 
-  return arrRegex2
+  // return arrRegex2
+  return arr
 }
