@@ -21,24 +21,24 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 
 // V6
 
-// const firebaseConfig = {
-//   apiKey: 'AIzaSyCdfAoe1Xcsm11iokwHN2uQVDG_JALKGxU',
-//   authDomain: 'react-auth-rrv6-954c0.firebaseapp.com',
-//   projectId: 'react-auth-rrv6-954c0',
-//   storageBucket: 'react-auth-rrv6-954c0.appspot.com',
-//   messagingSenderId: '1089001112233',
-//   appId: '1:1089001112233:web:40b883ac4e0c8079849fb8',
-// }
+const firebaseConfig = {
+  apiKey: 'AIzaSyCdfAoe1Xcsm11iokwHN2uQVDG_JALKGxU',
+  authDomain: 'react-auth-rrv6-954c0.firebaseapp.com',
+  projectId: 'react-auth-rrv6-954c0',
+  storageBucket: 'react-auth-rrv6-954c0.appspot.com',
+  messagingSenderId: '1089001112233',
+  appId: '1:1089001112233:web:40b883ac4e0c8079849fb8',
+}
 
 // React-clone-telegram
-const firebaseConfig = {
-  apiKey: 'AIzaSyCHQD1NqBVQdQ_auXM2yoLQsXRV_sHPd-U',
-  authDomain: 'react-clone-telegram.firebaseapp.com',
-  projectId: 'react-clone-telegram',
-  storageBucket: 'react-clone-telegram.appspot.com',
-  messagingSenderId: '34430176565',
-  appId: '1:34430176565:web:35d130742ab59760e8907c',
-}
+// const firebaseConfig = {
+//   apiKey: 'AIzaSyCHQD1NqBVQdQ_auXM2yoLQsXRV_sHPd-U',
+//   authDomain: 'react-clone-telegram.firebaseapp.com',
+//   projectId: 'react-clone-telegram',
+//   storageBucket: 'react-clone-telegram.appspot.com',
+//   messagingSenderId: '34430176565',
+//   appId: '1:34430176565:web:35d130742ab59760e8907c',
+// }
 
 const app = initializeApp(firebaseConfig)
 
@@ -90,7 +90,8 @@ export const createUserInDB = async (user) => {
     photoURL: '',
     userId: uid,
     isProfileCreated: false,
-    myContacts: {},
+    myContacts: [],
+    hasNewMessages: {},
   }
   await readDoc(uid)
     .then((res) => {
@@ -109,7 +110,7 @@ export const setUserinDB = async (userId, data) => {
   const docRef = doc(db, 'users', userId)
   try {
     const docSnap = await setDoc(docRef, data, { merge: true })
-    // console.log('docSnap', docSnap)
+    console.log('docSnap', docSnap)
   } catch (error) {
     // console.dir(error)
   }
@@ -137,11 +138,12 @@ export const updateHasNewMessagesInDB = async (myId, contactId, operation) => {
       hasNewMessages[contactId] === undefined
         ? 1
         : hasNewMessages[contactId] + 1
-    updateHasNewMessagesInDB___2(myId, hasNewMessages)
+    // updateHasNewMessagesInDB___2(myId, hasNewMessages)
   } else if (operation === 'suppr') {
     hasNewMessages[contactId] = 0
-    updateHasNewMessagesInDB___2(myId, hasNewMessages)
+    // updateHasNewMessagesInDB___2(myId, hasNewMessages)
   }
+  finallyUpdateHasNewMessagesInDB(myId, hasNewMessages)
 }
 
 // -----------------------------------------------------
@@ -230,24 +232,21 @@ const createUsersMessagesDB = async (userId) => {
   }
 }
 
-export const setMessagesWithThisContact = async (
-  myId,
-  socketContactId,
-  arrMsg
-) => {
+export const setMessagesWithThisContact = async (myId, contactId, arrMsg) => {
   const docRef = doc(db, 'usersMessages', myId)
   try {
-    updateDoc(docRef, { [socketContactId]: arrMsg })
+    updateDoc(docRef, { [contactId]: arrMsg })
+    console.log('doc updated !!')
   } catch (error) {
     console.log(error)
   }
 }
 
-export const getMessagesWithThisContact = async (myId, socketContactId) => {
+export const getMessagesWithThisContact = async (myId, contactId) => {
   const docRef = doc(db, 'usersMessages', myId)
   const docSnap = await getDoc(docRef)
   if (docSnap.exists()) {
-    return docSnap.data()[socketContactId]
+    return docSnap.data()[contactId]
   } else {
     console.log('No such document!')
     return null
@@ -298,11 +297,46 @@ export const getHasNewMessagesFromDB = async (myId) => {
 }
 
 // update hasNewMessages
-export const updateHasNewMessagesInDB___2 = async (myId, data) => {
+export const finallyUpdateHasNewMessagesInDB = async (myId, data) => {
   const docRef = doc(db, 'users', myId)
   try {
     await updateDoc(docRef, {
       hasNewMessages: data,
+    })
+    console.log('doc updated !!')
+  } catch (error) {
+    console.dir(error)
+  }
+}
+
+//  ----------------------------------------------------------
+
+// -----2------------ USERS MESSAGES ----------------
+
+// get allMessagesWhithThisContact
+export const getAllMessagesWhithThisContactFromDB = async (myId, contactId) => {
+  const docRef = doc(db, 'usersMessages', myId)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    const allMessagesWhithThisContact = docSnap.data()[contactId]
+    // console.log('Document data:', allMessagesWhithThisContact)
+    console.log('doc downloaded')
+    return allMessagesWhithThisContact
+  } else {
+    console.log('No such document!')
+  }
+}
+
+// update that I read all messages in the DB OF THIS CONTACT
+export const updatetAllMessagesWhithThisContactInDB = async (
+  myId,
+  contactId,
+  data
+) => {
+  const docRef = doc(db, 'usersMessages', myId)
+  try {
+    await updateDoc(docRef, {
+      [contactId]: data,
     })
     console.log('doc updated !!')
   } catch (error) {

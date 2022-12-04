@@ -14,17 +14,17 @@ export default function Chat() {
 
   const wallpaper = theme === 'light' ? 'wallpapper' : 'wallpapper-black'
 
-  function readParamsAndSetShowCat() {
-    if (params.username !== undefined) {
-      setShowChat(true)
-    } else {
-      setShowChat(false)
-    }
-  }
+  // function readParamsAndSetShowCat() {
+  //   if (params.username !== undefined) {
+  //     setShowChat(true)
+  //   } else {
+  //     setShowChat(false)
+  //   }
+  // }
 
-  useEffect(() => {
-    readParamsAndSetShowCat()
-  }, [params.username])
+  // useEffect(() => {
+  //   readParamsAndSetShowCat()
+  // }, [params.username])
 
   const displayChat = isChatOpen ? 'd-flex' : 'd-none d-lg-flex'
 

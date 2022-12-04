@@ -2,107 +2,113 @@ import { useContext, useEffect, useRef } from 'react'
 import Message from '../Message'
 import socket from '../../../../utils/socket.io'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import { SocketContactContext } from '../../../../utils/context/SocketContact'
 import { UserAuth } from '../../../../utils/context/AuthContext'
 import {
-  db,
+  getAllMessagesWhithThisContactFromDB,
   getAllUsersFromDB,
   getMessagesWithThisContact,
-  getUsersListFromDB,
-  readDoc,
   setMessagesWithThisContact,
   updateHasNewMessagesInDB,
+  updatetAllMessagesWhithThisContactInDB,
 } from '../../../../firebase-config'
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { MessagesContext } from '../../../../utils/context/MessagesContext'
-import { async } from '@firebase/util'
+import ButtonScroll from '../../ButtonScroll'
 
 let firstTime
 
 export default function MesssageBody() {
   const { user } = UserAuth()
   const { isChatOpen } = useContext(ThemeContext)
-  const { socketContact, setMyContacts, actuallyContactid } =
-    useContext(SocketContactContext)
+  const { setNewMessages, actuallyContactId } = useContext(SocketContactContext)
   const { arrOfMessages, setArrOfMessages, messageSend, setMessageSend } =
     useContext(MessagesContext)
   const [isLoading, setLoading] = useState(true)
   const lastMessageRef = useRef(null)
 
+  useEffect(() => {
+    if (actuallyContactId && isChatOpen) {
+      socket.emit('receiver status is read', {
+        from: user.uid,
+        to: actuallyContactId,
+        statusContact: 'read',
+      })
+
+      return () => {
+        socket.off('receiver status is read')
+      }
+    }
+  }, [actuallyContactId, isChatOpen])
+
   async function getAllMessagesFromDB() {
+    // start loading
     setLoading(true)
+    // set it's downloaded for the first time (that the scroll is auto and not 'smooth')
     firstTime = true
-    setMessageSend([])
+    // empty the arrOfMessages
     setArrOfMessages([])
-    // if (!socketContact.userId) {
-    //   return
-    // }
-    if (!actuallyContactid) {
+
+    // ----------------------------
+    // get all messages with this contact from DB
+    const allMessagesWithThisContactFromDB =
+      await getAllMessagesWhithThisContactFromDB(user.uid, actuallyContactId)
+    // console.log('allMessagesFromDB 1', allMessagesWithThisContactFromDB)
+
+    // check if was not messages then stop loading and return
+    if (!allMessagesWithThisContactFromDB) {
+      console.log('No messages!!!')
+      setLoading(false)
       return
     }
-    // updateHasNewMessagesInDB(user.uid, socketContact.userId, 'suppr')
-    // toggleChange()
-    const docRef = doc(db, 'usersMessages', user.uid)
-    const docRef2 = doc(db, 'usersMessages', socketContact.userId)
-    // console.log('socketContact.userId', socketContact.userId)
-    const docSnap = await getDoc(docRef)
-    if (docSnap.exists()) {
-      let arrMessagesWithHisContact = docSnap.data()[socketContact.userId]
-      if (arrMessagesWithHisContact) {
-        // console.log('arrMessagesWithHisContact', arrMessagesWithHisContact)
-        for (const msg of arrMessagesWithHisContact) {
-          // console.log('msg', msg)
-          if (msg.to === user.uid && msg.from === socketContact.userId) {
-            // console.log('vrai')
-            msg.status = 'read'
-          }
-        }
-        // console.log('arrMessagesWithHisContact2', arrMessagesWithHisContact)
-        socket.emit('update contact status from client', {
-          from: user.uid,
-          to: socketContact.userId,
-          statusMsg: 'read',
-        })
-        await updateDoc(docRef2, {
-          [user.uid]: arrMessagesWithHisContact,
-        })
-        firstTime = true
-        // setArrOfMessages(arrMessagesWithHisContact)
-        const newArr = addBadgeDateToArr(arrMessagesWithHisContact)
-        // console.log('newArr', newArr)
-        setArrOfMessages(newArr)
-        setLoading(false)
-      } else {
-        setArrOfMessages([])
-        setLoading(false)
+
+    // set this array with status 'read' for all messages that I received
+    allMessagesWithThisContactFromDB.forEach((msg) => {
+      if (msg.from !== user.uid) {
+        msg.status = 'read'
       }
-      return docSnap.data()
-    } else {
-      console.log('No such document!')
-      setLoading(false)
-    }
+    })
+    console.log('allMessagesFromDB 2', allMessagesWithThisContactFromDB)
+    // add to this array badge time and update the CHAT with this array
+    const allMessagesWithThisContactFromDBWithBadge = addBadgeDateToArr(
+      allMessagesWithThisContactFromDB
+    )
+    setArrOfMessages(allMessagesWithThisContactFromDBWithBadge)
+
+    // update DB with this array
+    updatetAllMessagesWhithThisContactInDB(
+      user.uid,
+      actuallyContactId,
+      allMessagesWithThisContactFromDB
+    )
+
+    // send my status is 'read' to the contact
+    socket.emit('receiver status is read', {
+      from: user.uid,
+      to: actuallyContactId,
+      statusContact: 'read',
+    })
+    // stop loading
+    setLoading(false)
   }
 
   useEffect(() => {
-    if (socketContact !== '{}') {
+    if (actuallyContactId) {
       getAllMessagesFromDB()
-      // setLoading(false)
     }
-  }, [socketContact])
+  }, [actuallyContactId])
 
   // SOCKET - receives the message sent by the contact and sends back to the server my status about this message (if I have read it or just received it)
   useEffect(() => {
     socket.on('private message', ({ msg }) => {
-      // console.log('msg', msg)
+      console.log('msg', msg)
 
       function checkMyStatus() {
-        if (socketContact.userId === msg.from && isChatOpen) {
+        if (actuallyContactId === msg.from && isChatOpen) {
           console.log('read')
           setRead(msg)
-        } else if (socketContact.userId === msg.from && !isChatOpen) {
-          console.log('received whit chat is closed')
+        } else if (actuallyContactId === msg.from || !isChatOpen) {
+          console.log('received whith chat is closed')
           setReceived(msg)
         } else {
           console.log('different user')
@@ -118,29 +124,29 @@ export default function MesssageBody() {
     }
   })
 
-  // SOCKET - update status all messages of chat when status contact changed
+  // SOCKET - update status all messages that I send on CHAT to 'read' when status contact read my messages (but the change in the db is done in the backend)
   useEffect(() => {
-    socket.on('update contact status from server', (data) => {
-      if (socketContact.userId === data.from) {
-        let newArr = [...arrOfMessages]
-        if (data.statusMsg === 'read') {
-          for (const msg of newArr) {
-            if (msg.from === user.uid && msg.to === socketContact.userId) {
-              msg.status = 'read'
-            }
-          }
-        }
-        setArrOfMessages(newArr)
+    socket.on('update receiver status is read', (contact) => {
+      // check if the actually contact is the same of the contact was send 'update receiver status is read'
+      // and if not the same return (and the next time I will chat with this contact the change will have already been made in the db )
+      if (contact.from !== actuallyContactId) {
+        console.log(
+          "the contact who updated their status to 'read' is not the same as actually contact"
+        )
+        return
       }
+      // update status all messages that I send on CHAT to 'read'
+      updateAllMessagesToReadStatusInChat()
     })
     return () => {
-      socket.off('update contact status from server')
+      socket.off('update receiver status is read')
     }
   })
 
   // SOCKET - update status of each message (if the message has been sent to the server or if the contact has read or received the message )
   useEffect(() => {
-    socket.on('update message', ({ msg }) => {
+    socket.on('update this message status', ({ msg }) => {
+      console.log('msg', msg)
       const copyOfArrOfMessages = JSON.parse(JSON.stringify(arrOfMessages))
       const messageToUpdate = copyOfArrOfMessages.find(
         (message) => message.id === msg.id
@@ -151,7 +157,7 @@ export default function MesssageBody() {
       setArrOfMessages(copyOfArrOfMessagesWithBadge)
     })
     return () => {
-      socket.off('update message')
+      socket.off('update this message status')
     }
   })
 
@@ -159,16 +165,48 @@ export default function MesssageBody() {
 
   function setReceived(msg) {
     msg.status = 'received'
-    socket.emit('message received', { msg: msg })
-    // updateHasNewMessagesInDB(user.uid, msg.from, 'add')
-    updateHasNewMessagesInMyContacts(msg.from, setMyContacts)
-    setArrOfMessages([...arrOfMessages, ...[msg]])
+    socket.emit('message read or received', { msg: msg })
+    // if message is recived and not read update has new messages to contact id 'msg.from'
+    updateHasNewMessagesInDB(user.uid, msg.from, 'add')
+    setNewMessages((curr) => {
+      curr[msg.from] += 1
+      curr = JSON.parse(JSON.stringify(curr))
+      return curr
+    })
   }
 
   function setRead(msg) {
     msg.status = 'read'
-    socket.emit('message received', { msg: msg })
+    socket.emit('message read or received', { msg: msg })
     setArrOfMessages([...arrOfMessages, ...[msg]])
+  }
+
+  function updateAllMessagesToReadStatusInChat() {
+    // console.log('arrOfMessages', arrOfMessages)
+    // remove all badges from 'arrOfMessages' and return arr with only messages
+    const arrWhitinBadge = arrOfMessages.filter((mesage) => mesage.status)
+    // console.log('arrWhitinBadge', arrWhitinBadge)
+    // return arr whith only my messages
+    const arrOfMyMessages = arrWhitinBadge.filter(
+      (mesage) => mesage.from === user.uid
+    )
+    // console.log('arrOfMyMessages', arrOfMyMessages)
+    // verify if all messages that I send was read by the contact
+    const isAllMessagesRead = arrOfMyMessages.every(
+      (message) => message.status === 'read'
+    )
+    // console.log('isAllMessagesRead', isAllMessagesRead)
+    // if all messages was not read by the contact then update a new arr of messages whith status read for each message that I send
+    if (!isAllMessagesRead) {
+      arrWhitinBadge.forEach((message) => {
+        if (message.from === user.uid) {
+          message.status = 'read'
+        }
+      })
+    }
+    // add badge to this arr of messages and set the 'arrOfMessages' whith this arr
+    const arrWhithBadge = addBadgeDateToArr(arrWhitinBadge)
+    setArrOfMessages(arrWhithBadge)
   }
 
   // --------------------------- SROLL EFFECT --------------------------
@@ -229,6 +267,68 @@ export default function MesssageBody() {
             )
           })}
 
+          <ButtonScroll lastMessageRef={lastMessageRef} />
+
+          {/* <div
+            className="bg-primary"
+            onClick={() =>
+              lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
+            }
+            style={{
+              height: '50px',
+              width: '50px',
+              borderRadius: '25px',
+              position: 'absolute',
+              bottom: '80px',
+              right: '30px',
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              version="1.1"
+              height="30px"
+              viewBox="0 0 256 256"
+              style={{ position: 'relative', top: '3px' }}
+            >
+              <defs></defs>
+              <g
+                style={{
+                  stroke: 'none',
+                  strokeWidth: '0',
+                  strokeDasharray: 'none',
+                  strokeLinecap: 'butt',
+                  strokeLinejoin: 'miter',
+                  strokeMiterlimit: '10',
+                  fill: 'none',
+                  fillRule: 'nonzero',
+                  opacity: '1',
+                }}
+                transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)"
+              >
+                <path
+                  d="M 90 24.25 c 0 -0.896 -0.342 -1.792 -1.025 -2.475 c -1.366 -1.367 -3.583 -1.367 -4.949 0 L 45 60.8 L 5.975 21.775 c -1.367 -1.367 -3.583 -1.367 -4.95 0 c -1.366 1.367 -1.366 3.583 0 4.95 l 41.5 41.5 c 1.366 1.367 3.583 1.367 4.949 0 l 41.5 -41.5 C 89.658 26.042 90 25.146 90 24.25 z"
+                  style={{
+                    stroke: 'none',
+                    strokeWidth: '1',
+                    strokeDasharray: 'none',
+                    strokeLinecap: 'butt',
+                    strokeLinejoin: 'miter',
+                    strokeMiterlimit: '10',
+                    fill: 'white',
+                    fillRule: 'nonzero',
+                    opacity: '1',
+                  }}
+                  transform=" matrix(1 0 0 1 0 0) "
+                  stroke-linecap="round"
+                />
+              </g>
+            </svg>
+          </div> */}
+
           <div className="mt-4" ref={lastMessageRef}></div>
 
           {/* ------------------------------------MESSAGES-HERE------------------------------------------- */}
@@ -282,13 +382,13 @@ export function addBadgeDateToArr(arr) {
 
 export async function setAllMessagesIsReceivedInDB(
   myId,
-  socketContactId,
+  actuallyContactId,
   usersListFromSocket
 ) {
   // console.log('usersList', usersList)
-  console.log('socketContactId', socketContactId)
+  console.log('actuallyContactId', actuallyContactId)
   const socketUser = usersListFromSocket.find(
-    (user) => socketContactId === user.userId
+    (user) => actuallyContactId === user.userId
   )
   // console.log('socketUser', socketUser)
 
@@ -300,47 +400,48 @@ export async function setAllMessagesIsReceivedInDB(
   // console.log('timeNowInMs', timeNowInMs)
 
   const contactInUsersListFromDB = allUsers.find(
-    (user) => socketContactId === user.userId
+    (user) => actuallyContactId === user.userId
   )
   // console.log('contactInUsersListFromDB', contactInUsersListFromDB)
 
   let newArr = []
   if (
-    socketUser.userId === socketContactId ||
+    socketUser.userId === actuallyContactId ||
     contactInUsersListFromDB.isConnect > timeNowInMs
   ) {
     // console.log('connecté')
     const messagesWithThisContact = await getMessagesWithThisContact(
       myId,
-      socketContactId
+      actuallyContactId
     )
     // console.log('messagesWithThisContact', messagesWithThisContact)
     newArr = setAllMessagesIsReceived(
       myId,
       contactInUsersListFromDB,
-      socketContactId,
+      actuallyContactId,
       messagesWithThisContact
     )
     // console.log('newArr', newArr)
     await setMessagesWithThisContact(
       myId,
-      socketContactId,
+      actuallyContactId,
       messagesWithThisContact
     )
   }
 
-  if (socketContactId === socketUser.userId) {
+  if (actuallyContactId === socketUser.userId) {
     return newArr
   }
 }
 
-function setAllMessagesIsReceived(myId, contactInDB, socketContactId, arr) {
+function setAllMessagesIsReceived(myId, contactInDB, actuallyContactId, arr) {
+  console.log('arr', arr)
   let dateInMs = new Date().getTime()
   let newArr = [...arr]
   for (const msg of newArr) {
     if (
       msg.from === myId &&
-      msg.to === socketContactId &&
+      msg.to === actuallyContactId &&
       msg.status === 'ok'
     ) {
       msg.status = 'received'
@@ -354,12 +455,4 @@ function setAllMessagesIsReceived(myId, contactInDB, socketContactId, arr) {
     }
   }
   return newArr
-}
-
-function updateHasNewMessagesInMyContacts(contactId, setMyContacts) {
-  setMyContacts((curr) => {
-    const contact = curr.find((user) => user.userId === contactId)
-    contact.hasNewMessages += 1
-    return curr
-  })
 }

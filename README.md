@@ -68,3 +68,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+<!-- MY NOTIFICATIONS -->
+
+1 - The reason why the logic of users logged in or not is in the backend is because when a user logs out he cannot notify others.
+
+2 - bizarre dans la fonction 'updatetAllMessagesWhithThisContactInDB' dans firebase.js je met a jour que j'ai lu tous les messages dans la DB du contact ca m'a l'air d'un gros problème de sécurité

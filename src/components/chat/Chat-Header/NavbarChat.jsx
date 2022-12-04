@@ -5,33 +5,16 @@ import { SocketContactContext } from '../../../utils/context/SocketContact'
 import { ThemeContext } from '../../../utils/context/ThemeContext'
 import ContactMenu from './ContactMenu'
 import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
+import Avatar from '../../../assets/img/avatar4.png'
+import { imgError } from '../../../utils/functions/returnAvatarIsImgError'
 
 export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
-  const {
-    socketContact,
-    setSocketContact,
-    allUsers,
-    myContacts,
-    actuallyContactId,
-  } = useContext(SocketContactContext)
+  const { actuallyContactId, allUsers } = useContext(SocketContactContext)
 
   const { setIsChatOpen } = useContext(ThemeContext)
 
-  // const [contact, setContact] = useState(socketContact)
-
-  const contact = allUsers.find((user) => user.userId === actuallyContactId)
-  console.log()
-
-  // useEffect(() => {
-  //   console.log('socketContact 55', socketContact)
-  //   if (myContacts.length > 0) {
-  //     // console.log('myContacts3', myContacts)
-  //     // console.log('socketContact.userId', socketContact.userId)
-  //     const contact = myContacts.find((e) => e.userId === socketContact.userId)
-  //     // console.log('contact3', contact)
-  //     setContact(contact)
-  //   }
-  // }, [myContacts, socketContact])
+  const contact =
+    allUsers && allUsers.find((e) => e.userId === actuallyContactId)
 
   function showSidebar() {
     setIsChatOpen(false)
@@ -51,14 +34,14 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
 
   const connectionStatus = () => {
     // console.log('type of', typeof contact.isConnect)
-    if (typeof contact.isConnect === 'number') {
+    if (contact && typeof contact.isConnect === 'number') {
       const date = new Date(contact.isConnect)
       const hoursAndMinutes = date.getHours() + ':' + addZero(date.getMinutes())
       // console.log(hoursAndMinutes) // 👉️ 8:33
       // new Date().toLocaleTimeString()
       return _lastSeen[language] + ' ' + hoursAndMinutes
     }
-    if (contact.isConnect) {
+    if (contact && contact.isConnect) {
       return _online[language]
     } else {
       return _offline[language]
@@ -126,6 +109,13 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
     }
   }, [isComponentVisible])
 
+  // function imgError(target) {
+  //   // console.log('onerror', target.onerror)
+  //   if (target.onerror === null) {
+  //     target.src = Avatar
+  //   }
+  // }
+
   return (
     <div
       className={`row w-100 sticky-top ${bgColor} align-items-center m-0 mb-1`}
@@ -153,7 +143,8 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
       <div className="col-2 col-lg-1 py-1">
         <img
           style={{ height: '50px', width: '50px' }}
-          src={socketContact && socketContact.photoURL}
+          src={contact && contact.photoURL}
+          onError={(e) => imgError(e.target)}
           className="rounded-circle"
           alt="..."
         ></img>
@@ -167,7 +158,9 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
         </div>
         <div>
           <p className={`mb-0 fw-light pt-0 lh-1 ${colorInfo}`}>
-            {contact.isTyping ? _isTyping[language] : connectionStatus()}
+            {contact && contact.isTyping
+              ? _isTyping[language]
+              : connectionStatus()}
           </p>
         </div>
       </div>

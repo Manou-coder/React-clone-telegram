@@ -9,38 +9,41 @@ import MyContact from '../MyContact'
 
 function MyContacts({ inputLetters }) {
   const { user } = UserAuth()
-  const { socketContact, myContacts, setMyContacts, allUsers } =
-    useContext(SocketContactContext)
+  const { myContacts, allUsers } = useContext(SocketContactContext)
 
-  useEffect(() => {
-    if (allUsers && allUsers.length > 0) {
-      setMyContactsFromDB()
-    }
-  }, [socketContact, allUsers])
+  const myContactsObj = []
+  for (const contactId of myContacts) {
+    // console.log(contactId, 'contactId')
+    const contactObj = allUsers.find((contact) => contact.userId === contactId)
+    // console.log('contactObj', contactObj)
+    myContactsObj.push(contactObj)
+  }
+
+  // console.log('myContactsObj', myContactsObj)
 
   // console.log('myContacts', myContacts)
 
-  let searchedContactList = searchContact(myContacts, inputLetters)
+  let searchedContactList = searchContact(myContactsObj, inputLetters)
   searchedContactList = searchedContactList.filter((e) => e.userId !== user.uid)
   // console.log('searchedContactList', searchedContactList)
 
   // --------------------- INTERNES FUNCTIONS ---------------------
 
-  async function setMyContactsFromDB() {
-    const myContactsFromDB = await getMyContactsFromDB(user.uid)
-    // console.log('myContactsFromDB', myContactsFromDB)
-    // searches in 'allUsers' for contacts that have the same id as in 'myContactsFromDB' and adds them to 'myContacts'
-    const myContacts = []
-    for (const contactId of myContactsFromDB) {
-      for (const contact of allUsers) {
-        if (contactId === contact.userId) {
-          myContacts.push(contact)
-        }
-      }
-    }
-    // console.log('myContacts 5', myContacts)
-    setMyContacts(myContacts)
-  }
+  // async function setMyContactsFromDB() {
+  //   const myContactsFromDB = await getMyContactsFromDB(user.uid)
+  //   console.log('myContactsFromDB', myContactsFromDB)
+  //   // searches in 'allUsers' for contacts that have the same id as in 'myContactsFromDB' and adds them to 'myContacts'
+  //   const myContacts = []
+  //   for (const contactId of myContactsFromDB) {
+  //     for (const contact of allUsers) {
+  //       if (contactId === contact.userId) {
+  //         myContacts.push(contact)
+  //       }
+  //     }
+  //   }
+  //   // console.log('myContacts 5', myContacts)
+  //   setMyContacts(myContacts)
+  // }
 
   return (
     <ul className="p-0 mt-2" style={{ listStyleType: 'none' }}>

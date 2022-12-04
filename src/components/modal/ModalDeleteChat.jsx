@@ -21,13 +21,16 @@ import { ThemeContext } from '../../utils/context/ThemeContext'
 
 export default function ModalDeleteChat() {
   const { user } = UserAuth()
-  const { socketContact, setMyContacts } = useContext(SocketContactContext)
+  const { setMyContacts, actuallyContactId, allUsers, setActuallyContactId } =
+    useContext(SocketContactContext)
   const { setArrOfMessages, setMessageSend } = useContext(MessagesContext)
-  const { theme, setIsChatOpen } = useContext(ThemeContext)
+  const { setIsChatOpen } = useContext(ThemeContext)
   const { language } = useContext(LanguageContext)
   const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
   const closeModal = useRef()
+
+  const contact =
+    allUsers && allUsers.find((user) => user.userId === actuallyContactId)
 
   async function deleteChat() {
     setIsLoading(true)
@@ -35,14 +38,14 @@ export default function ModalDeleteChat() {
     setMessageSend([])
     setArrOfMessages([])
     // delete this contact and his messages from DB
-    await deleteThisContactIdFromMyContactsDB(user.uid, socketContact.userId)
-    await deleteMessages(user.uid, socketContact.userId)
+    await deleteThisContactIdFromMyContactsDB(user.uid, actuallyContactId)
+    await deleteMessages(user.uid, actuallyContactId)
     // delete this contact from 'myContacts'
     deleteThisContactIdFromMyContacts()
     // close the modal and navigate to '/chat'
     closeModal.current.click()
     setIsChatOpen(false)
-    navigate('/chat')
+    setActuallyContactId(null)
     setIsLoading(false)
   }
 
@@ -50,8 +53,7 @@ export default function ModalDeleteChat() {
 
   function deleteThisContactIdFromMyContacts() {
     setMyContacts((curr) => {
-      // console.log('curr', curr)
-      curr = curr.filter((e) => socketContact.userId !== e.userId)
+      curr = curr.filter((contactId) => actuallyContactId !== contactId)
       return curr
     })
   }
@@ -82,7 +84,7 @@ export default function ModalDeleteChat() {
           <div className="col-2">
             <img
               style={{ height: '50px', width: '50px' }}
-              src={socketContact && socketContact.photoURL}
+              src={contact && contact.photoURL}
               className="rounded-circle me-4"
               alt="..."
             ></img>
@@ -106,10 +108,7 @@ export default function ModalDeleteChat() {
       <div className="modal-body">
         <h5>
           {_permanentlyDelete[language]}{' '}
-          <span className="fw-bold">
-            {socketContact && socketContact.displayName}
-          </span>
-          ?
+          <span className="fw-bold">{contact && contact.displayName}</span>?
         </h5>
       </div>
       <div className="modal-footer">

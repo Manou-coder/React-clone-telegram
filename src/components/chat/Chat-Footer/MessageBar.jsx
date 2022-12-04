@@ -14,7 +14,7 @@ import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
 
 export default function MessageBar() {
   const { user } = UserAuth()
-  const { socketContact } = useContext(SocketContactContext)
+  const { actuallyContactId } = useContext(SocketContactContext)
   const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
   const [messageInput, setMessageInput] = useState('')
   const textareaRef = useRef()
@@ -23,7 +23,7 @@ export default function MessageBar() {
   function socketEmitPrivateMessage() {
     const message = {
       content: messageInput,
-      to: socketContact.userId,
+      to: actuallyContactId,
       from: user.uid,
       time: Date.now(),
       id: uuidv4(),

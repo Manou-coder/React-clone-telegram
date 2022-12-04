@@ -1,64 +1,42 @@
-import { useEffect } from 'react'
 import { useRef } from 'react'
 import { useContext, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import colors from '../../../../utils/style/color'
-// import './index.css'
 import Avatar from '../../../../assets/img/avatar4.png'
 import {
   setActuallyContactIdInStorage,
   SocketContactContext,
 } from '../../../../utils/context/SocketContact'
-import { arrayUnion, doc, setDoc, updateDoc } from 'firebase/firestore'
-import { db } from '../../../../firebase-config'
 import { UserAuth } from '../../../../utils/context/AuthContext'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
+import { updateHasNewMessagesInDB } from '../../../../firebase-config'
+import { imgError } from '../../../../utils/functions/returnAvatarIsImgError'
 
-function MyContact({
-  random,
-  name1,
-  name2,
-  name3,
-  contact,
-  id,
-  description,
-  info,
-  photoURL,
-}) {
+function MyContact({ name1, name2, name3, contact, description, photoURL }) {
   const { user } = UserAuth()
   const {
-    socketContact,
-    setSocketContact,
     setMyContacts,
+    setNewMessages,
+    // actuallyContact,
+    actuallyContactId,
     newMessages,
     setActuallyContactId,
   } = useContext(SocketContactContext)
   const { setIsChatOpen } = useContext(ThemeContext)
-  const navigate = useNavigate()
-  const listOfContacts = useRef([])
 
   // console.log('contact', contact)
   // console.log('description', description)
 
   function handleClickContact() {
-    setSocketContact(contact)
-    //
     setActuallyContactId(contact.userId)
     setActuallyContactIdInStorage(contact.userId)
-    //
-    // navigate(contact.userName)
-    setMyContacts((curr) => {
-      for (const elem of curr) {
-        if (elem.userId === contact.userId) {
-          elem.hasNewMessages = 0
-        }
-      }
-      //necessaire pour que react comprenne le changement
-      // curr = JSON.parse(JSON.stringify(curr))
+    setIsChatOpen(true)
+    updateHasNewMessagesInDB(user.uid, actuallyContactId, 'suppr')
+    // updateHasNewMessagesInDB(user.uid, socketContact.userId, 'add')
+    setNewMessages((curr) => {
+      curr[contact.userId] = 0
       return curr
     })
-    setIsChatOpen(true)
   }
 
   // DARK MODE
@@ -82,7 +60,6 @@ function MyContact({
       className={`w-100 py-2 m-0 rounded ${bgContact}`}
       style={{ cursor: 'pointer' }}
       onClick={(e) => handleClickContact(e)}
-      ref={listOfContacts}
     >
       <div className="row m-0 align-items-center">
         <div className="col-2">
@@ -98,6 +75,7 @@ function MyContact({
                 width: '50px',
               }}
               src={photoURL ? photoURL : Avatar}
+              onError={(e) => imgError(e.target)}
               className="rounded-circle"
               alt="..."
             ></img>

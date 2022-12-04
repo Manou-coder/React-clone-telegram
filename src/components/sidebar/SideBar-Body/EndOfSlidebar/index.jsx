@@ -4,10 +4,12 @@ import Calls from '../Calls'
 import { useContext, useState } from 'react'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import MyContacts from '../MyContacts'
+import { SocketContactContext } from '../../../../utils/context/SocketContact'
 
 function EndOfSlidebar({ inputLetters, setInputLetters, isContactsOpen }) {
   // DARK MODE
   const { theme } = useContext(ThemeContext)
+  const { myContacts } = useContext(SocketContactContext)
   const bgColor = theme === 'light' ? 'bg-white' : 'bg-dark'
   return (
     <div
@@ -20,7 +22,7 @@ function EndOfSlidebar({ inputLetters, setInputLetters, isContactsOpen }) {
       }}
     >
       <div className="container-fluid p-0">
-        {isContactsOpen ? (
+        {isContactsOpen && myContacts ? (
           <MyContacts
             inputLetters={inputLetters}
             setInputLetters={setInputLetters}

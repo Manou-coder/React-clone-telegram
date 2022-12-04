@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import {
   getAllUsersFromDB,
   getHasNewMessagesFromDB,
+  getMyContactsFromDB,
 } from '../../firebase-config'
 import { UserAuth } from './AuthContext'
 import socket from '../socket.io'
@@ -17,36 +18,14 @@ export const SocketContactContext = createContext()
 export const SocketContactProvider = ({ children }) => {
   // --------------------------------------------------------------------------------
   const { user } = UserAuth()
-  const [socketContact, setSocketContact] = useState({})
-  const [actuallyContactId, setActuallyContactId] = useState(
-    getFromStorage('actuallyContactId')
+
+  const [actuallyContactId, setActuallyContactId] = useState('')
+  const [allUsers, setAllUsers] = useState(getFromStorage('allUsers', []))
+  const [newMessages, setNewMessages] = useState(
+    getFromStorage('newMessages', [])
   )
-  const [allUsers, setAllUsers] = useState(getFromStorage('allUsers'))
-  const [newMessages, setNewMessages] = useState(getFromStorage('newMessages'))
-  const [myContacts, setMyContacts] = useState(getFromStorage('myContacts'))
+  const [myContacts, setMyContacts] = useState(getFromStorage('myContacts', []))
   const { setArrOfMessages } = useContext(MessagesContext)
-
-  // -----------------  SOCKET CONTACT "ID" WITH LOCALE STORAGE
-
-  // useEffect(() => {
-  //   const actuallyContactId = localStorage
-  // }, [allUsers])
-
-  // ------------- SOCKET CONTACT WITH URL
-
-  // Get the UserName Of SocketContact from URL
-  const userNameOfContact = getUserNameOfContactFromURL()
-
-  // Change the 'socketContact' to each URL changed from'AllUsers'
-  useEffect(() => {
-    if (allUsers && allUsers.length > 0) {
-      setSocketContactFromAllUsers(
-        userNameOfContact,
-        setSocketContact,
-        allUsers
-      )
-    }
-  }, [userNameOfContact, allUsers])
 
   // ----------------------------- ALL USERS --------------------
 
@@ -55,12 +34,21 @@ export const SocketContactProvider = ({ children }) => {
     setAllUsersFromDB()
   }, [])
 
+  // ----------------------------- MY CONTACTS --------------------
+
+  // get and set 'MyContacts' from DB for the first time
+  useEffect(() => {
+    if (user !== null) {
+      setMyContactsFromDB(user.uid, setMyContacts)
+    }
+  }, [user])
+
   // ----------------------------- HAS NEW MESSAGES --------------------
 
   // set 'newmessages' whith newmessages from DB
   useEffect(() => {
     if (user !== null) {
-      setNewMessagesFromDB(user.uid)
+      setNewMessagesInChatFromDB(user.uid)
     }
   }, [user])
 
@@ -73,11 +61,10 @@ export const SocketContactProvider = ({ children }) => {
     }
   }, [user])
 
-  // when a user disconnect of the app so update 'allUsers' wthin this user
+  // when a user disconnect of the app so update 'allUsers' within this user
   useEffect(() => {
     socket.on('user disonnected', ({ contactId, usersList }) => {
-      // setContactIsDisconnectInMyContacts(contactId, setMyContacts)
-      setContactIsDisconnectInMyContacts(contactId, setAllUsers)
+      setContactIsDisconnectInAllUsers(contactId, setAllUsers)
     })
     return () => {
       socket.off('user disonnected')
@@ -87,21 +74,23 @@ export const SocketContactProvider = ({ children }) => {
   // Update IsTyping
   useEffect(() => {
     socket.on('typingResponse', ({ contactId, typingStatus }) => {
-      setContactIsTypingInMyContacts(contactId, typingStatus, setMyContacts)
+      setContactIsTypingInAllUsers(contactId, typingStatus, setAllUsers)
     })
     return () => {
       socket.off('typingResponse')
     }
   })
 
-  // Update New User
+  // SOCKET - update new user
   useEffect(() => {
     socket.on('new user', ({ contactId, usersList }) => {
+      // it's me, so nothing to do !!!!
       if (contactId === user.uid) {
-        // console.log("It's me!!!")
         return
       }
-      setMyContactsWithNewUserIsConnected(contactId)
+      // update connection status of new user only in CHAT not in DB (because in the backend the new user has already been added in the DB)
+      setAllUsersWithNewUserIsConnected(contactId)
+      // update all the messages that I sent to this new user, to 'received' status because he is connected now (in DB and in CHAT)
       setAllMessagesIsReceivedInDBAndInChat(contactId, usersList)
     })
 
@@ -119,7 +108,14 @@ export const SocketContactProvider = ({ children }) => {
     setAllUsers(allUsers)
   }
 
-  async function setNewMessagesFromDB(myId) {
+  async function setMyContactsFromDB(myId, setMyContacts) {
+    const myContactsFromDB = await getMyContactsFromDB(myId)
+    console.log('myContactsFromDB', myContactsFromDB)
+    setInStorage('myContacts', myContactsFromDB)
+    setMyContacts(myContactsFromDB)
+  }
+
+  async function setNewMessagesInChatFromDB(myId) {
     const newMessages = await getHasNewMessagesFromDB(myId)
     // console.log('newMessages', newMessages)
     setInStorage('newMessages', newMessages)
@@ -127,26 +123,24 @@ export const SocketContactProvider = ({ children }) => {
   }
 
   async function setAllMessagesIsReceivedInDBAndInChat(contactId, usersList) {
-    // set all messages whith 'ok' status to 'received' status
+    // set all messages whith 'ok' status to 'received' status in DB
     const arrMessagesReceived = await setAllMessagesIsReceivedInDB(
       user.uid,
       contactId,
       usersList
     )
-    // console.log('newArr5', arrMessagesReceived)
-    // add Badge to 'arrMessagesReceived'
+    // add Badge to 'arrMessagesReceived' and set 'arrOfMessages' in the CHAT whith this
     const arrMessagesReceivedWithBadge = addBadgeDateToArr(arrMessagesReceived)
-    // set 'arrOfMessages' in the chat whith the new arr of messages
     setAllMessagesIsReceivedInChat(
       contactId,
-      socketContact.userId,
+      actuallyContactId,
       arrMessagesReceivedWithBadge,
       setArrOfMessages
     )
   }
 
-  function setMyContactsWithNewUserIsConnected(contactId) {
-    setMyContacts((curr) => {
+  function setAllUsersWithNewUserIsConnected(contactId) {
+    setAllUsers((curr) => {
       for (const contact of curr) {
         if (contact.userId === contactId) {
           contact.isConnect = true
@@ -160,10 +154,10 @@ export const SocketContactProvider = ({ children }) => {
   return (
     <SocketContactContext.Provider
       value={{
-        socketContact,
-        setSocketContact,
         actuallyContactId,
         setActuallyContactId,
+        // actuallyContact,
+        // setActuallyContact,
         allUsers,
         setAllUsers,
         myContacts,
@@ -186,38 +180,18 @@ function startSocket(userName) {
   socket.connect()
 }
 
-function getUserNameOfContactFromURL() {
-  let str = window.location.href
-  let url = new URL(str)
-  let pathname = url.pathname
-  let arrPathname = pathname.split('/')
-  return arrPathname[arrPathname.length - 1]
-}
-
-function setContactIsDisconnectInMyContacts(contactId, setAllUsers) {
-  // setMyContacts((curr) => {
-  //   for (const contact of curr) {
-  //     if (contact.userId === contactId) {
-  //       contact.isConnect = Date.now()
-  //     }
-  //   }
-  //   curr = JSON.parse(JSON.stringify(curr))
-  //   return curr
-  // })
+function setContactIsDisconnectInAllUsers(contactId, setAllUsers) {
   setAllUsers((curr) => {
     const contactOffline = curr.find((user) => user.userId === contactId)
     contactOffline.isConnect = Date.now()
     console.log('contactOffline', contactOffline)
+    curr = JSON.parse(JSON.stringify(curr))
     return curr
   })
 }
 
-function setContactIsTypingInMyContacts(
-  contactId,
-  typingStatus,
-  setMyContacts
-) {
-  setMyContacts((curr) => {
+function setContactIsTypingInAllUsers(contactId, typingStatus, setAllUsers) {
+  setAllUsers((curr) => {
     for (const contact of curr) {
       if (contact.userId === contactId) {
         contact.isTyping = typingStatus
@@ -227,18 +201,6 @@ function setContactIsTypingInMyContacts(
     // console.log('curr', curr)
     return curr
   })
-}
-
-async function setSocketContactFromAllUsers(
-  userNameOfContact,
-  setSocketContact,
-  allUsers
-) {
-  const socketContact = allUsers.find(
-    (user) => user.userName === userNameOfContact
-  )
-  // console.log('socketContact', socketContact)
-  setSocketContact(socketContact)
 }
 
 function setAllMessagesIsReceivedInChat(
@@ -260,13 +222,20 @@ export function getActuallyContactIdFromStorage() {
   localStorage.getItem('actuallyContactId')
 }
 
-export function getFromStorage(item) {
+export function getFromStorage(item, defaultItem) {
   item = localStorage.getItem(item)
+  // if item is Object so it's parse it else nothig to do
   try {
     item = JSON.parse(item)
   } catch (error) {}
-  // console.log('item ' + item, item)
-  return item
+  // if item is not 'null' return item else return defaultItem
+  if (item) {
+    // console.log('item', item)
+    return item
+  } else {
+    // console.log('defaultItem', defaultItem)
+    return defaultItem
+  }
 }
 
 export function setInStorage(key, item) {

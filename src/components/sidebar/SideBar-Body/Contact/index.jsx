@@ -1,6 +1,4 @@
-import { useRef } from 'react'
 import { useContext, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import colors from '../../../../utils/style/color'
 import './index.css'
@@ -10,57 +8,48 @@ import {
   SocketContactContext,
 } from '../../../../utils/context/SocketContact'
 import {
-  getMyContactsFromDB,
   updateHasNewMessagesInDB,
   updateMyContactsInDB,
 } from '../../../../firebase-config'
 import { UserAuth } from '../../../../utils/context/AuthContext'
+import { imgError } from '../../../../utils/functions/returnAvatarIsImgError'
 
-function Contact({
-  random,
-  name1,
-  name2,
-  name3,
-  contact,
-  id,
-  description,
-  info,
-  photoURL,
-}) {
+function Contact({ name1, name2, name3, contact, description, photoURL }) {
   const { user } = UserAuth()
   const {
-    socketContact,
-    setSocketContact,
     setMyContacts,
     newMessages,
     setNewMessages,
     setActuallyContactId,
+    actuallyContactId,
+    myContacts,
   } = useContext(SocketContactContext)
-
-  const navigate = useNavigate()
 
   // console.log('contact', contact)
 
   function handleClickContact(e) {
+    // close the offCanvas
     offCanvasButton[0].click()
-    setSocketContact(contact)
-    //
+    // set actually contact id whith this contact
     setActuallyContactId(contact.userId)
     setActuallyContactIdInStorage(contact.userId)
-    //
-    // navigate(contact.userName)
-    addThisContactIdInMyContactsDB(user.uid, contact.userId)
-    console.log(' socketContact', socketContact)
-    updateHasNewMessagesInDB(user.uid, socketContact.userId, 'suppr')
-    // updateHasNewMessagesInDB(user.uid, socketContact.userId, 'add')
-    setMyContacts((curr) => {
-      curr.push(contact)
-      return curr
-    })
-    setNewMessages((curr) => {
-      curr[contact.userId] = 0
-      return curr
-    })
+    // check if this contact has not yet in myContacts and if not so add this to myContacts (in DB and in 'myContacts)
+    if (!myContacts.includes(contact.userId)) {
+      addThisContactIdInMyContactsDB(user.uid, contact.userId, myContacts)
+      setMyContacts((curr) => {
+        curr.push(contact.userId)
+        return curr
+      })
+    }
+    // if this contact has New Messages so it delete there (in DB and in 'myContacts)
+    if (newMessages[contact.userId] > 0) {
+      updateHasNewMessagesInDB(user.uid, actuallyContactId, 'suppr')
+      setNewMessages((curr) => {
+        curr[contact.userId] = 0
+        curr = JSON.parse(JSON.stringify(curr))
+        return curr
+      })
+    }
   }
 
   // DARK MODE
@@ -73,7 +62,7 @@ function Contact({
   const offCanvasButton = document.getElementsByClassName('offcanvas-button')
   // console.log('offcanvas-button', offCanvasButton)
 
-  const bgColorOfBadgeIsOnline = contact.isConnect ? '#31a24c' : 'red'
+  const bgColorOfBadgeIsOnline = contact.isConnect === true ? '#31a24c' : 'red'
   const boxShadowOfBadgeIsOnline = theme === 'light' ? 'white' : '#212529'
 
   // console.log('contact NEW MESSAGE', newMessages[contact.userId])
@@ -110,6 +99,7 @@ function Contact({
                 width: '50px',
               }}
               src={photoURL ? photoURL : Avatar}
+              onError={(e) => imgError(e.target)}
               className="rounded-circle"
               alt="..."
             ></img>
@@ -150,15 +140,15 @@ function Contact({
 
 export default Contact
 
-async function addThisContactIdInMyContactsDB(myId, contactId) {
-  const myContactsInDB = await getMyContactsFromDB(myId)
-  console.log(' myContactsInDB ', myContactsInDB)
+async function addThisContactIdInMyContactsDB(myId, contactId, myContacts) {
+  // const myContactsInDB = await getMyContactsFromDB(myId)
+  console.log(' myContacts ', myContacts)
   // if this contact is already existing no need to update
-  if (myContactsInDB.includes(contactId)) {
+  if (myContacts.includes(contactId)) {
     console.log('utilisateur déjà exisistant dans Mycontacts !!')
     return
   }
-  const myContactsWhithNewContact = [...myContactsInDB, contactId]
-  console.log('myContactsWhithNewContact', myContactsWhithNewContact)
+  const myContactsWhithNewContact = [...myContacts, contactId]
+  // console.log('myContactsWhithNewContact', myContactsWhithNewContact)
   updateMyContactsInDB(myId, myContactsWhithNewContact)
 }
