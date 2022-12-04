@@ -1,26 +1,37 @@
 import React from 'react'
+import { useEffect } from 'react'
+import { useRef } from 'react'
 
 export default function Calls() {
   //   const videoGrid = document.getElementById('video-grid')
-  const myVideo = document.getElementById('my-video')
-  //   myVideo.muted = true
+  const myVideo = useRef()
 
-  navigator.mediaDevices
-    .getUserMedia({
-      video: true,
-      audio: true,
-    })
-    .then((stream) => {
-      addVideoStream(myVideo, stream)
-    })
+  useEffect(() => {
+    if (myVideo.current) {
+      playMyVideo()
+    }
+  }, [myVideo])
 
-  function addVideoStream(video, stream) {
-    video.srcObject = stream
-    video.addEventListener('loadedmetadata', () => {
-      video.play()
-    })
-    // videoGrid.append(video)
+  function playMyVideo() {
+    myVideo.current.muted = true
+    navigator.mediaDevices
+      .getUserMedia({
+        video: true,
+        audio: true,
+      })
+      .then((stream) => {
+        addVideoStream(myVideo.current, stream)
+      })
+
+    function addVideoStream(video, stream) {
+      video.srcObject = stream
+      video.addEventListener('loadedmetadata', () => {
+        video.play()
+      })
+      // videoGrid.append(video)
+    }
   }
+
   return (
     <div
       style={{
@@ -42,7 +53,7 @@ export default function Calls() {
           <div id="video" style={{ height: '100%' }}>
             <video
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              id="my-video"
+              ref={myVideo}
               src=""
             ></video>
           </div>

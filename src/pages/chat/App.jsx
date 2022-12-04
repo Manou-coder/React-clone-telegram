@@ -34,7 +34,7 @@ function App({ children }) {
       </div>
       {/* <!-- Modal --> */}
       <Modal />
-      {/* <Calls /> */}
+      <Calls />
     </div>
   )
 }
