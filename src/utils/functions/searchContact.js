@@ -8,13 +8,11 @@ the function returns in a array the contacts who have the 'inputSearch' in this 
 */
 
 export default function searchContact(arr, inputLetters) {
-  console.log('arr', arr)
+  // console.log('arr', arr)
 
   if (!arr) {
     return []
   }
-
-  return arr
   if (inputLetters.trim() === '') {
     arr = arr.map((e) => JSON.stringify(e))
     arr = arr.sort()

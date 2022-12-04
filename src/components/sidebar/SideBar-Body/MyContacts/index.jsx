@@ -19,13 +19,13 @@ function MyContacts({ inputLetters }) {
     myContactsObj.push(contactObj)
   }
 
-  // console.log('myContactsObj', myContactsObj)
+  console.log('myContactsObj', myContactsObj)
 
-  // console.log('myContacts', myContacts)
+  console.log('myContacts', myContacts)
 
   let searchedContactList = searchContact(myContactsObj, inputLetters)
   searchedContactList = searchedContactList.filter((e) => e.userId !== user.uid)
-  // console.log('searchedContactList', searchedContactList)
+  console.log('searchedContactList', searchedContactList)
 
   // --------------------- INTERNES FUNCTIONS ---------------------
 
