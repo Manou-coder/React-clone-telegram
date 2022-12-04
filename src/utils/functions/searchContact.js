@@ -13,6 +13,8 @@ export default function searchContact(arr, inputLetters) {
   if (!arr) {
     return []
   }
+
+  return arr
   if (inputLetters.trim() === '') {
     arr = arr.map((e) => JSON.stringify(e))
     arr = arr.sort()
@@ -87,6 +89,5 @@ export default function searchContact(arr, inputLetters) {
 
   // return newArr
 
-  // return arrRegex2
-  return arr
+  return arrRegex2
 }
