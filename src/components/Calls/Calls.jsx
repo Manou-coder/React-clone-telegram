@@ -60,7 +60,9 @@ export default function Calls() {
         .getUserMedia({ video: true, audio: true })
         .then((stream) => {
           call.answer(stream) // Answer the call with an A/V stream.
-          call.on('stream', renderVideo)
+          call.on('stream', (stream) => {
+            addVideoStream(grandVideo.current, stream)
+          })
         })
         .catch((err) => {
           console.error('Failed to get local stream', err)
@@ -83,7 +85,7 @@ export default function Calls() {
   }
 
   function connectToPeer() {
-    // playMyVideo()
+    playMyVideo()
     const connectionToAnotherPeer = myPeer.connect(actuallyContactId)
     setConn(connectionToAnotherPeer)
     connectionToAnotherPeer.on('data', (data) => {
@@ -98,7 +100,7 @@ export default function Calls() {
       .then((stream) => {
         let call = myPeer.call(actuallyContactId, stream)
         call.on('stream', (stream) => {
-          addVideoStream(smallVideo.current, stream)
+          addVideoStream(grandVideo.current, stream)
         })
       })
       .catch((err) => {
@@ -107,14 +109,14 @@ export default function Calls() {
   }
 
   function playMyVideo() {
-    grandVideo.current.muted = true
+    smallVideo.current.muted = true
     navigator.mediaDevices
       .getUserMedia({
         video: true,
         audio: true,
       })
       .then((stream) => {
-        addVideoStream(grandVideo.current, stream)
+        addVideoStream(smallVideo.current, stream)
       })
   }
 
