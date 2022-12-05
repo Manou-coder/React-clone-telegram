@@ -17,6 +17,8 @@ import { SocketContactProvider } from './utils/context/SocketContact'
 import { MessagesContextProvider } from './utils/context/MessagesContext'
 import Error from './pages/error/Error'
 
+import './utils/peerjs/peer'
+
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <BrowserRouter>

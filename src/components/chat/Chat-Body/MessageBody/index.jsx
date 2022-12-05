@@ -352,10 +352,16 @@ export function addBadgeDateToArr(arr) {
   if (arr.length === 1) {
     newArr2.push(arr[0])
     // console.log('arr[0]', arr[0])
-    newArr2.unshift({ badgeTime: new Date(arr[0].time).getTime() })
+    newArr2.unshift({
+      badgeTime: new Date(arr[0].time).getTime(),
+      id: new Date(arr[0].time).getTime(),
+    })
     return newArr2
   }
-  newArr2.push({ badgeTime: new Date(arr[0].time).getTime() })
+  newArr2.push({
+    badgeTime: new Date(arr[0].time).getTime(),
+    id: new Date(arr[0].time).getTime(),
+  })
   for (let i = 0; i < arr.length - 1; i++) {
     const element = arr[i].time
     let date1 = new Date(element)
@@ -369,7 +375,7 @@ export function addBadgeDateToArr(arr) {
     } else {
       // console.log('pas egal')
       newArr2.push(arr[i])
-      newArr2.push({ badgeTime: date2.getTime() })
+      newArr2.push({ badgeTime: date2.getTime(), id: date2.getTime() })
     }
   }
   // console.log(newArr2[0].time)

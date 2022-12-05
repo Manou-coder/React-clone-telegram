@@ -11,7 +11,7 @@ import { imgError } from '../../../utils/functions/returnAvatarIsImgError'
 export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
   const { actuallyContactId, allUsers } = useContext(SocketContactContext)
 
-  const { setIsChatOpen } = useContext(ThemeContext)
+  const { setIsChatOpen, setIsCallOpen } = useContext(ThemeContext)
 
   const contact =
     allUsers && allUsers.find((e) => e.userId === actuallyContactId)
@@ -166,6 +166,7 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
       </div>
       <div className="d-none d-lg-flex col-lg-1">
         <span
+          onClick={() => setIsCallOpen(true)}
           className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
         >
           {/* <i className="fa-solid fa-phone fa-lg"></i> */}

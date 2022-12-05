@@ -6,6 +6,7 @@ export const ThemeContext = createContext()
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('')
   const [isChatOpen, setIsChatOpen] = useState(false)
+  const [isCallOpen, setIsCallOpen] = useState(false)
 
   function checkDarkMode() {
     if (localStorage.getItem('mode')) {
@@ -38,7 +39,14 @@ export const ThemeProvider = ({ children }) => {
 
   return (
     <ThemeContext.Provider
-      value={{ theme, toggleTheme, isChatOpen, setIsChatOpen }}
+      value={{
+        theme,
+        toggleTheme,
+        isChatOpen,
+        setIsChatOpen,
+        isCallOpen,
+        setIsCallOpen,
+      }}
     >
       {children}
     </ThemeContext.Provider>

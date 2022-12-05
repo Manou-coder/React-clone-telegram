@@ -11,21 +11,21 @@ function MyContacts({ inputLetters }) {
 
   const myContactsObj = []
   for (const contactId of myContacts) {
-    console.log(contactId, 'contactId')
+    // console.log(contactId, 'contactId')
     const contactObj = allUsers.find((contact) => contact.userId === contactId)
-    console.log('contactObj', contactObj)
+    // console.log('contactObj', contactObj)
     if (contactObj) {
       myContactsObj.push(contactObj)
     }
   }
 
-  console.log('myContactsObj', myContactsObj)
+  // console.log('myContactsObj', myContactsObj)
 
-  console.log('myContacts', myContacts)
+  // console.log('myContacts', myContacts)
 
   let searchedContactList = searchContact(myContactsObj, inputLetters)
   searchedContactList = searchedContactList.filter((e) => e.userId !== user.uid)
-  console.log('searchedContactList', searchedContactList)
+  // console.log('searchedContactList', searchedContactList)
 
   // --------------------- INTERNES FUNCTIONS ---------------------
 

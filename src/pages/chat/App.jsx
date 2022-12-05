@@ -11,7 +11,7 @@ import Calls from '../../components/Calls/Calls'
 
 function App({ children }) {
   // DARK MODE
-  const { theme } = useContext(ThemeContext)
+  const { theme, isCallOpen } = useContext(ThemeContext)
   const bgColor = theme === 'light' ? 'bg-white' : 'bg-black'
   const { actuallyContactId, myContacts } = useContext(SocketContactContext)
 
@@ -34,7 +34,7 @@ function App({ children }) {
       </div>
       {/* <!-- Modal --> */}
       <Modal />
-      <Calls />
+      {isCallOpen && <Calls />}
     </div>
   )
 }
