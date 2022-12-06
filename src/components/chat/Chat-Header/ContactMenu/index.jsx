@@ -7,12 +7,9 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
 
-export default function ContactMenu({ iconBarIsActive, setIconBarIsActive }) {
-  // const navigate = useNavigate()
-
-  const { toggleTheme, theme } = useContext(ThemeContext)
-
-  const { setLanguage, language } = useContext(LanguageContext)
+export default function ContactMenu() {
+  const { theme, setIsCallOpen } = useContext(ThemeContext)
+  const { language } = useContext(LanguageContext)
 
   const bgColor =
     theme === 'light' ? 'rgb(255, 255, 255, 0.9)' : 'rgb(33, 37, 41, 0.9)'
@@ -26,6 +23,18 @@ export default function ContactMenu({ iconBarIsActive, setIconBarIsActive }) {
     en: 'Delete chat',
     fr: "Supprimer l'échange",
     il: "למחוק צ'אט",
+  }
+
+  const _audioCall = {
+    en: 'Audio call',
+    fr: 'Appel audio ',
+    il: 'שיחת שמע',
+  }
+
+  const _videoCall = {
+    en: 'Video call',
+    fr: 'Appel vidéo ',
+    il: 'שיחת וידאו',
   }
 
   const rightPosition = language === 'il' ? '-125px' : '35px'
@@ -46,10 +55,7 @@ export default function ContactMenu({ iconBarIsActive, setIconBarIsActive }) {
       <ul
         style={{ listStyleType: 'none', marginBottom: '0px', padding: '8px' }}
       >
-        <li
-        // className="mx-2"
-        //  onClick={() => setIconBarIsActive(true)}
-        >
+        <li>
           <div>
             <div
               className={`row ${listItemMenuBgColor} py-2 m-0`}
@@ -64,6 +70,42 @@ export default function ContactMenu({ iconBarIsActive, setIconBarIsActive }) {
               </div>
               <div className="col ps-2">
                 <span>{_deleteChat[language]}</span>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li className="d-lg-none">
+          <div>
+            <div
+              className={`row ${listItemMenuBgColor} py-2 m-0`}
+              type="button"
+              onClick={() => setIsCallOpen(true)}
+            >
+              <div className="col-2 d-flex justify-content-center align-items-center">
+                <span className="d-flex">
+                  <i className="fa-solid fa-phone"></i>
+                </span>
+              </div>
+              <div className="col ps-2">
+                <span>{_audioCall[language]}</span>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li className="d-lg-none">
+          <div>
+            <div
+              className={`row ${listItemMenuBgColor} py-2 m-0`}
+              type="button"
+              onClick={() => setIsCallOpen(true)}
+            >
+              <div className="col-2 d-flex justify-content-center align-items-center">
+                <span className="d-flex">
+                  <i className="fa-solid fa-video"></i>
+                </span>
+              </div>
+              <div className="col ps-2">
+                <span>{_videoCall[language]}</span>
               </div>
             </div>
           </div>

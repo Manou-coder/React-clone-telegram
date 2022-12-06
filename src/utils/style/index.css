@@ -36,4 +36,31 @@ black 1 : #212121;
 black 2: #181818;
 black 3: #000000;
 
+	≥992px
+  background-image: linear-gradient(to bottom right, red, yellow);
+
 */
+
+#video-container {
+  height: 100%;
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    45deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 121, 78, 1) 47%,
+    rgba(0, 212, 255, 1) 100%
+  );
+}
+
+#menu-phone {
+  width: 100%;
+}
+
+@media screen and (min-width: 992px) {
+  #video-container {
+    height: 95%;
+  }
+  #menu-phone {
+    width: 33%;
+  }
+}

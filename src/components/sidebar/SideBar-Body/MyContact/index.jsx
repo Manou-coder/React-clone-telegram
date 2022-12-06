@@ -11,23 +11,26 @@ import { UserAuth } from '../../../../utils/context/AuthContext'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
 import { updateHasNewMessagesInDB } from '../../../../firebase-config'
 import { imgError } from '../../../../utils/functions/returnAvatarIsImgError'
+import { MessagesContext } from '../../../../utils/context/MessagesContext'
 
 function MyContact({ name1, name2, name3, contact, description, photoURL }) {
   const { user } = UserAuth()
   const {
     setMyContacts,
     setNewMessages,
-    // actuallyContact,
     actuallyContactId,
     newMessages,
     setActuallyContactId,
   } = useContext(SocketContactContext)
+  const { setArrOfMessages } = useContext(MessagesContext)
   const { setIsChatOpen } = useContext(ThemeContext)
 
   // console.log('contact', contact)
   // console.log('description', description)
 
   function handleClickContact() {
+    // empty the arrOfMessages
+    setArrOfMessages([])
     setActuallyContactId(contact.userId)
     setActuallyContactIdInStorage(contact.userId)
     setIsChatOpen(true)
