@@ -10,9 +10,21 @@ function Contacts({ inputLetters }) {
   const { allUsers } = useContext(SocketContactContext)
 
   // console.log('allUsers', allUsers)
+
+  // PROBLEME avec 'searchContact()' il renvoi pas dans le meme ordre
   let searchedContactList = searchContact(allUsers, inputLetters)
 
+  // let searchedContactList = allUsers
+
+  // remove me of the list of contacts
   searchedContactList = searchedContactList.filter((e) => e.userId !== user.uid)
+
+  // sort contacts by numeric alphabet order
+  searchedContactList = searchedContactList.sort((a, b) =>
+    a.displayName > b.displayName ? 1 : b.displayName > a.displayName ? -1 : 0
+  )
+
+  console.log(' searchedContactList 2', searchedContactList)
 
   return (
     <ul className="p-0 mt-2" style={{ listStyleType: 'none' }}>

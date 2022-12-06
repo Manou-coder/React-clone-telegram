@@ -123,9 +123,12 @@ export const SocketContactProvider = ({ children }) => {
 
   async function setAllUsersFromDB() {
     const allUsers = await getAllUsersFromDB()
-    // console.log('allUsers', allUsers)
+    console.log('allUsers', allUsers)
     setInStorage('allUsers', allUsers)
-    setAllUsers(allUsers)
+    setAllUsers((curr) => {
+      curr = JSON.parse(JSON.stringify(allUsers))
+      return curr
+    })
   }
 
   async function setMyContactsFromDB(myId, setMyContacts) {

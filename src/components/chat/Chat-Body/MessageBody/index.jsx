@@ -3,7 +3,11 @@ import Message from '../Message'
 import socket from '../../../../utils/socket.io'
 import { useState } from 'react'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
-import { SocketContactContext } from '../../../../utils/context/SocketContact'
+import {
+  getFromStorage,
+  setInStorage,
+  SocketContactContext,
+} from '../../../../utils/context/SocketContact'
 import { UserAuth } from '../../../../utils/context/AuthContext'
 import {
   getAllMessagesWhithThisContactFromDB,
@@ -22,8 +26,7 @@ export default function MesssageBody() {
   const { user } = UserAuth()
   const { isChatOpen } = useContext(ThemeContext)
   const { setNewMessages, actuallyContactId } = useContext(SocketContactContext)
-  const { arrOfMessages, setArrOfMessages, messageSend, setMessageSend } =
-    useContext(MessagesContext)
+  const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
   const [isLoading, setLoading] = useState(true)
   const lastMessageRef = useRef(null)
 
@@ -42,12 +45,20 @@ export default function MesssageBody() {
   }, [actuallyContactId, isChatOpen])
 
   async function getAllMessagesFromDB() {
-    // start loading
-    setLoading(true)
+    // check if messages in storage exsists and if yes set them in arrOFMessages
+    const allMessagesWhithThisContactFromStorage =
+      getFromStorage(actuallyContactId)
+    if (allMessagesWhithThisContactFromStorage) {
+      const allMessagesWithThisContactFromStorageWithBadge = addBadgeDateToArr(
+        allMessagesWhithThisContactFromStorage
+      )
+      setArrOfMessages(allMessagesWithThisContactFromStorageWithBadge)
+    } else {
+      // start loading
+      setLoading(true)
+    }
     // set it's downloaded for the first time (that the scroll is auto and not 'smooth')
     firstTime = true
-    // // empty the arrOfMessages
-    // setArrOfMessages([])
 
     // ----------------------------
     // get all messages with this contact from DB
@@ -97,6 +108,8 @@ export default function MesssageBody() {
       getAllMessagesFromDB()
     }
   }, [actuallyContactId])
+
+  // ---------------------- SOCKETS -----------------------------------------
 
   // SOCKET - receives the message sent by the contact and sends back to the server my status about this message (if I have read it or just received it)
   useEffect(() => {
@@ -209,6 +222,14 @@ export default function MesssageBody() {
     setArrOfMessages(arrWhithBadge)
   }
 
+  // --------------------------- SET MESSAGES IN STORAGE --------------------------
+  useEffect(() => {
+    const arrOfMessagesWithinBadge = arrOfMessages.filter(
+      (message) => message.status
+    )
+    setInStorage(actuallyContactId, arrOfMessagesWithinBadge)
+  }, [arrOfMessages])
+
   // --------------------------- SROLL EFFECT --------------------------
   useEffect(() => {
     if (firstTime) {
@@ -218,7 +239,7 @@ export default function MesssageBody() {
       // 👇️ scroll to bottom SLOWLY every time messages change
       lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [messageSend, arrOfMessages])
+  }, [arrOfMessages])
 
   return (
     <div

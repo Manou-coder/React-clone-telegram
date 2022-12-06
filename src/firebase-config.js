@@ -138,10 +138,8 @@ export const updateHasNewMessagesInDB = async (myId, contactId, operation) => {
       hasNewMessages[contactId] === undefined
         ? 1
         : hasNewMessages[contactId] + 1
-    // updateHasNewMessagesInDB___2(myId, hasNewMessages)
   } else if (operation === 'suppr') {
     hasNewMessages[contactId] = 0
-    // updateHasNewMessagesInDB___2(myId, hasNewMessages)
   }
   finallyUpdateHasNewMessagesInDB(myId, hasNewMessages)
 }
