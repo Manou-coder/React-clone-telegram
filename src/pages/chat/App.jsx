@@ -8,6 +8,7 @@ import Sidebar from '../../components/sidebar/SideBar'
 import { SocketContactContext } from '../../utils/context/SocketContact'
 import DefaultChat from '../../components/default chat/DefaultChat'
 import Calls from '../../components/Calls/Calls'
+import Toast from '../../components/Toasts/Toast'
 
 function App({ children }) {
   // DARK MODE
@@ -29,11 +30,15 @@ function App({ children }) {
               // ></div>
               <DefaultChat />
             )}
+            {/* toasts */}
+            {/* <Toast /> */}
           </>
         )}
       </div>
       {/* <!-- Modal --> */}
       <Modal />
+
+      {/* call */}
       {isCallOpen && <Calls />}
     </div>
   )

@@ -8,6 +8,8 @@ import { UserAuth } from '../../utils/context/AuthContext'
 import { SocketContactContext } from '../../utils/context/SocketContact'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 import { imgError } from '../../utils/functions/returnAvatarIsImgError'
+import socket from '../../utils/socket.io'
+import SoundOutgoingCall from '../../assets/sound/appel-sortant.m4a'
 
 export default function Calls() {
   const { user } = UserAuth()
@@ -16,6 +18,7 @@ export default function Calls() {
   const { setIsCallOpen } = useContext(ThemeContext)
   const grandVideo = useRef()
   const smallVideo = useRef()
+  const musique2 = useRef()
 
   const [conn, setConn] = useState(null)
   const [isCalling, setIsCalling] = useState(null)
@@ -87,7 +90,12 @@ export default function Calls() {
   // Functions
 
   function connectToPeer() {
+    socket.emit('callUser', {
+      from: user.uid,
+      to: actuallyContactId,
+    })
     setIsCalling(true)
+
     playMyVideo()
     const connectionToAnotherPeer = myPeer.connect(actuallyContactId)
     setConn(connectionToAnotherPeer)
@@ -113,6 +121,7 @@ export default function Calls() {
   }
 
   function playMyVideo() {
+    musique2.current.play()
     console.log('smallVideo.current', smallVideo.current)
     smallVideo.current.muted = true
     navigator.mediaDevices
@@ -135,8 +144,15 @@ export default function Calls() {
 
   const displayVideo = isCalling ? '' : 'd-none'
   const displayConatct = isCalling ? 'd-none' : ''
+
   return (
     <>
+      <audio
+        src={SoundOutgoingCall}
+        type="audio/mpeg"
+        autoplay
+        ref={musique2}
+      ></audio>
       <div
         style={{
           position: 'fixed',
@@ -154,7 +170,10 @@ export default function Calls() {
           <span
             role={'button'}
             style={{ position: 'absolute', top: '0px', right: '10px' }}
-            onClick={() => setIsCallOpen(false)}
+            onClick={() => {
+              musique2.current.pause()
+              setIsCallOpen(false)
+            }}
           >
             <svg
               style={{

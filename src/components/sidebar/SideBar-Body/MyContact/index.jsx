@@ -73,7 +73,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
   if (allMessagesWithThisContact && allMessagesWithThisContact.length > 0) {
     lastMessageWithThisContact =
       allMessagesWithThisContact[allMessagesWithThisContact.length - 1]
-    console.log('lastMessageWithThisContact', lastMessageWithThisContact)
+    // console.log('lastMessageWithThisContact', lastMessageWithThisContact)
   }
 
   function readableDate(timeInMs) {
