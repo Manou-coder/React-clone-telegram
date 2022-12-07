@@ -62,14 +62,15 @@ export default function Calls() {
       })
     })
 
+    // c'est celui la AUSSI qui recoit la video du contact
     myPeer.on('call', (call) => {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((stream) => {
           call.answer(stream) // Answer the call with an A/V stream.
-          call.on('stream', (stream) => {
-            addVideoStream(grandVideo.current, stream)
-          })
+          // call.on('stream', (stream) => {
+          //   addVideoStream(grandVideo.current, stream)
+          // })
         })
         .catch((err) => {
           console.error('Failed to get local stream', err)
@@ -85,13 +86,8 @@ export default function Calls() {
 
   // Functions
 
-  let renderVideo = (stream) => {
-    console.log('stream', stream)
-    console.log('grandVideo.current.src', grandVideo.current.src)
-    grandVideo.current.src = stream
-  }
-
   function connectToPeer() {
+    setIsCalling(true)
     playMyVideo()
     const connectionToAnotherPeer = myPeer.connect(actuallyContactId)
     setConn(connectionToAnotherPeer)
@@ -102,6 +98,7 @@ export default function Calls() {
       connectionToAnotherPeer.send('hi!')
     })
 
+    // c'est celui la qui recoit la video du contact
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
@@ -116,6 +113,7 @@ export default function Calls() {
   }
 
   function playMyVideo() {
+    console.log('smallVideo.current', smallVideo.current)
     smallVideo.current.muted = true
     navigator.mediaDevices
       .getUserMedia({
@@ -128,11 +126,15 @@ export default function Calls() {
   }
 
   function addVideoStream(video, stream) {
+    console.log('video.srcObject', video.srcObject)
     video.srcObject = stream
     video.addEventListener('loadedmetadata', () => {
       video.play()
     })
   }
+
+  const displayVideo = isCalling ? '' : 'd-none'
+  const displayConatct = isCalling ? 'd-none' : ''
   return (
     <>
       <div
@@ -173,52 +175,60 @@ export default function Calls() {
             >
               APPEL
             </button>
-            {isCalling ? (
-              <div id="video" style={{ height: '100%', position: 'relative' }}>
-                <video
+            {/* DISPLAY ONLY IF IS CALLING TRUE */}
+            <div
+              className={displayVideo}
+              id="video"
+              style={{ height: '100%', position: 'relative' }}
+            >
+              <video
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '5px',
+                }}
+                ref={grandVideo}
+                src=""
+              ></video>
+              <video
+                style={{
+                  position: 'absolute',
+                  bottom: '5px',
+                  right: '5px',
+                  width: '25%',
+                  height: '50%',
+                  objectFit: 'cover',
+                  borderRadius: '5px',
+                }}
+                ref={smallVideo}
+                src=""
+              ></video>
+            </div>
+            {/* DISPLAY ONLY IF IS CALLING FALSE */}
+            <div
+              className={
+                'h-100 d-flex justify-content-center align-items-center ' +
+                displayConatct
+              }
+            >
+              <div className="d-flex flex-column align-items-center gap-2">
+                <img
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    borderRadius: '5px',
+                    width: '150px',
+                    height: '150px',
                   }}
-                  ref={grandVideo}
-                  src=""
-                ></video>
-                <video
-                  style={{
-                    position: 'absolute',
-                    bottom: '5px',
-                    right: '5px',
-                    width: '25%',
-                    height: '50%',
-                    objectFit: 'cover',
-                    borderRadius: '5px',
-                  }}
-                  ref={smallVideo}
-                  src=""
-                ></video>
-              </div>
-            ) : (
-              <div className="h-100 d-flex justify-content-center align-items-center">
-                <div className="d-flex flex-column align-items-center gap-2">
-                  <img
-                    style={{
-                      width: '150px',
-                      height: '150px',
-                    }}
-                    onError={(e) => imgError(e.target)}
-                    className="rounded-circle"
-                    src={contact.photoURL}
-                    alt="avatar-contact"
-                  />
-                  <div className="text-center text-light">
-                    <h1>{contact.displayName}</h1>
-                    <h2>Appel en cours ...</h2>
-                  </div>
+                  onError={(e) => imgError(e.target)}
+                  className="rounded-circle"
+                  src={contact.photoURL}
+                  alt="avatar-contact"
+                />
+                <div className="text-center text-light">
+                  <h1>{contact.displayName}</h1>
+                  <h2>Appel en cours ...</h2>
                 </div>
               </div>
-            )}
+            </div>
             <div
               id="menu-phone"
               style={{
