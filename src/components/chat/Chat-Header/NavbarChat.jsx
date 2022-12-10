@@ -7,11 +7,14 @@ import ContactMenu from './ContactMenu'
 import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
 import Avatar from '../../../assets/img/avatar4.png'
 import { imgError } from '../../../utils/functions/returnAvatarIsImgError'
+import { PeerContext } from '../../../utils/context/PeerContext'
 
 export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
   const { actuallyContactId, allUsers } = useContext(SocketContactContext)
 
   const { setIsChatOpen, setIsCallOpen } = useContext(ThemeContext)
+
+  const { setIsCalling } = useContext(PeerContext)
 
   const contact =
     allUsers && allUsers.find((e) => e.userId === actuallyContactId)
@@ -109,12 +112,11 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
     }
   }, [isComponentVisible])
 
-  // function imgError(target) {
-  //   // console.log('onerror', target.onerror)
-  //   if (target.onerror === null) {
-  //     target.src = Avatar
-  //   }
-  // }
+  // appel le contact
+  function callThisContact() {
+    setIsCallOpen(true)
+    setIsCalling(true)
+  }
 
   return (
     <div
@@ -166,7 +168,9 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
       </div>
       <div className="d-none d-lg-flex col-lg-1">
         <span
-          onClick={() => setIsCallOpen(true)}
+          onClick={() => {
+            callThisContact()
+          }}
           className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
         >
           {/* <i className="fa-solid fa-phone fa-lg"></i> */}
@@ -214,7 +218,11 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
             <path d="M64 360c30.9 0 56 25.1 56 56s-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56zm0-160c30.9 0 56 25.1 56 56s-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56zM120 96c0 30.9-25.1 56-56 56S8 126.9 8 96S33.1 40 64 40s56 25.1 56 56z" />
           </svg>
         </span>
-        <div ref={refComponent}>{isComponentVisible && <ContactMenu />}</div>
+        <div ref={refComponent}>
+          {isComponentVisible && (
+            <ContactMenu callThisContact={callThisContact} />
+          )}
+        </div>
       </div>
     </div>
   )

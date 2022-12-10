@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
 
-export default function ContactMenu() {
+export default function ContactMenu({ callThisContact }) {
   const { theme, setIsCallOpen } = useContext(ThemeContext)
   const { language } = useContext(LanguageContext)
 
@@ -79,7 +79,7 @@ export default function ContactMenu() {
             <div
               className={`row ${listItemMenuBgColor} py-2 m-0`}
               type="button"
-              onClick={() => setIsCallOpen(true)}
+              onClick={() => callThisContact()}
             >
               <div className="col-2 d-flex justify-content-center align-items-center">
                 <span className="d-flex">
@@ -97,7 +97,7 @@ export default function ContactMenu() {
             <div
               className={`row ${listItemMenuBgColor} py-2 m-0`}
               type="button"
-              onClick={() => setIsCallOpen(true)}
+              onClick={() => callThisContact()}
             >
               <div className="col-2 d-flex justify-content-center align-items-center">
                 <span className="d-flex">

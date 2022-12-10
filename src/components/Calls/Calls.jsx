@@ -10,147 +10,193 @@ import { ThemeContext } from '../../utils/context/ThemeContext'
 import { imgError } from '../../utils/functions/returnAvatarIsImgError'
 import socket from '../../utils/socket.io'
 import SoundOutgoingCall from '../../assets/sound/appel-sortant.m4a'
+import Croix from '../../assets/svg/croix.svg'
+import Expand from '../../assets/svg/expand.svg'
+import { PeerContext } from '../../utils/context/PeerContext'
 
 export default function Calls() {
   const { user } = UserAuth()
-  const { actuallyContactId, myPeer, setMyPeer, allUsers } =
-    useContext(SocketContactContext)
+  const { actuallyContactId, allUsers } = useContext(SocketContactContext)
+  const {
+    myPeer,
+    setMyPeer,
+    isCalling,
+    setIsCalling,
+    connectToPeer,
+    isCallAccepted,
+    setIsCallAccepted,
+    musique2,
+    grandVideo,
+    smallVideo,
+  } = useContext(PeerContext)
   const { setIsCallOpen } = useContext(ThemeContext)
-  const grandVideo = useRef()
-  const smallVideo = useRef()
-  const musique2 = useRef()
-
-  const [conn, setConn] = useState(null)
-  const [isCalling, setIsCalling] = useState(null)
-
   const contact =
     allUsers && allUsers.find((e) => e.userId === actuallyContactId)
 
-  console.log('contact', contact)
+  // const grandVideo = useRef()
+  // const smallVideo = useRef()
+  // const musique2 = useRef()
+
+  // const [conn, setConn] = useState(null)
+
+  // console.log('contact', contact)
+
+  // useEffect(() => {
+  //   console.log('myPeer', myPeer)
+  //   if (!myPeer) {
+  //     console.log("il n'y a pas de peer")
+  //     return
+  //   }
+  //   myPeer.on('open', (id) => {
+  //     console.log('My peer ID is: ' + id)
+  //   })
+  //   myPeer.on('error', (error) => {
+  //     console.error(error)
+  //   })
+
+  //   return () => {
+  //     myPeer.off('open')
+  //     myPeer.off('error')
+  //   }
+  // }, [myPeer])
+
+  // useEffect(() => {
+  //   if (!myPeer || !conn) {
+  //     console.log("il n'y a pas de conn ou de peer")
+  //     return
+  //   }
+  //   console.log('conn exists!')
+  //   // Handle incoming data connection
+  //   myPeer.on('connection', (conn) => {
+  //     console.log('incoming peer connection!')
+  //     conn.on('data', (data) => {
+  //       console.log(`received: ${data}`)
+  //     })
+  //     conn.on('open', () => {
+  //       console.log('open')
+  //       conn.send('hello!')
+  //     })
+  //   })
+
+  //   // c'est celui la AUSSI qui recoit la video du contact
+  //   myPeer.on('call', (call) => {
+  //     alert('vous recevez un appel')
+  //     setIsCallAccepted(true)
+  //     navigator.mediaDevices
+  //       .getUserMedia({ video: true, audio: true })
+  //       .then((stream) => {
+  //         call.answer(stream) // Answer the call with an A/V stream.
+  //         // call.on('stream', (stream) => {
+  //         //   addVideoStream(grandVideo.current, stream)
+  //         // })
+  //       })
+  //       .catch((err) => {
+  //         console.error('Failed to get local stream', err)
+  //       })
+  //   })
+
+  //   return () => {
+  //     myPeer.off('connection')
+  //     myPeer.off('call')
+  //     conn.off('data')
+  //   }
+  // }, [myPeer, conn])
+
+  // // Functions
+
+  // useEffect(() => {
+  //   // alert('baba')
+  //   if (isCalling) {
+  //     console.log('baaba')
+  //     const connectToPeer = () => {
+  //       socket.emit('callUser', {
+  //         from: user.uid,
+  //         to: actuallyContactId,
+  //       })
+  //       setIsCalling(true)
+
+  //       playMyVideo(smallVideo)
+  //       const connectionToAnotherPeer = myPeer.connect(actuallyContactId)
+  //       setConn(connectionToAnotherPeer)
+  //       connectionToAnotherPeer.on('data', (data) => {
+  //         console.log(`received: ${data}`)
+  //       })
+  //       connectionToAnotherPeer.on('open', () => {
+  //         connectionToAnotherPeer.send('hi!')
+  //       })
+
+  //       // c'est celui la qui recoit la video du contact
+  //       navigator.mediaDevices
+  //         .getUserMedia({ video: true, audio: true })
+  //         .then((stream) => {
+  //           let call = myPeer.call(actuallyContactId, stream)
+  //           call.on('stream', (stream) => {
+  //             addVideoStream(grandVideo.current, stream)
+  //           })
+  //         })
+  //         .catch((err) => {
+  //           console.log('Failed to get local stream', err)
+  //         })
+  //     }
+  //     connectToPeer()
+  //   }
+  // }, [isCalling, smallVideo])
+
+  // function playMyVideo(video) {
+  //   console.log('video.current', video.current)
+  //   video.current.muted = true
+  //   navigator.mediaDevices
+  //     .getUserMedia({
+  //       video: true,
+  //       audio: true,
+  //     })
+  //     .then((stream) => {
+  //       addVideoStream(video.current, stream)
+  //     })
+  // }
+
+  // function addVideoStream(video, stream) {
+  //   console.log('video.srcObject', video.srcObject)
+  //   video.srcObject = stream
+  //   video.addEventListener('loadedmetadata', () => {
+  //     video.play()
+  //   })
+  // }
+
+  // // met la musique d'appel si unn contact est appele et enleve si on ferme la fenetre
+  // useEffect(() => {
+  //   if (musique2.current) {
+  //     if (isCalling) {
+  //       musique2.current.play()
+  //     } else {
+  //       musique2.current.pause()
+  //     }
+  //   }
+  // }, [musique2, isCalling])
+
+  const displayVideo = isCallAccepted ? '' : 'd-none'
+  const displayContact = isCallAccepted ? 'd-none' : ''
+
+  // console.log('displayVideo', displayVideo)
+  useEffect(() => {
+    if (grandVideo.current) {
+      console.log('grandVideo.current.srcObject', grandVideo.current.srcObject)
+    }
+  }, [grandVideo])
 
   useEffect(() => {
-    console.log('myPeer', myPeer)
-    if (!myPeer) {
-      console.log("il n'y a pas de peer")
-      return
+    if (isCallAccepted) {
+      console.log('Appel accepte par le contact!')
     }
-    myPeer.on('open', (id) => {
-      console.log('My peer ID is: ' + id)
-    })
-    myPeer.on('error', (error) => {
-      console.error(error)
-    })
-
-    return () => {
-      myPeer.off('open')
-      myPeer.off('error')
-    }
-  }, [myPeer])
-
-  useEffect(() => {
-    if (!myPeer || !conn) {
-      console.log("il n'y a pas de conn ou de peer")
-      return
-    }
-    console.log('conn exists!')
-    // Handle incoming data connection
-    myPeer.on('connection', (conn) => {
-      console.log('incoming peer connection!')
-      conn.on('data', (data) => {
-        console.log(`received: ${data}`)
-      })
-      conn.on('open', () => {
-        console.log('open')
-        conn.send('hello!')
-      })
-    })
-
-    // c'est celui la AUSSI qui recoit la video du contact
-    myPeer.on('call', (call) => {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          call.answer(stream) // Answer the call with an A/V stream.
-          // call.on('stream', (stream) => {
-          //   addVideoStream(grandVideo.current, stream)
-          // })
-        })
-        .catch((err) => {
-          console.error('Failed to get local stream', err)
-        })
-    })
-
-    return () => {
-      myPeer.off('connection')
-      myPeer.off('call')
-      conn.off('data')
-    }
-  }, [myPeer, conn])
-
-  // Functions
-
-  function connectToPeer() {
-    socket.emit('callUser', {
-      from: user.uid,
-      to: actuallyContactId,
-    })
-    setIsCalling(true)
-
-    playMyVideo()
-    const connectionToAnotherPeer = myPeer.connect(actuallyContactId)
-    setConn(connectionToAnotherPeer)
-    connectionToAnotherPeer.on('data', (data) => {
-      console.log(`received: ${data}`)
-    })
-    connectionToAnotherPeer.on('open', () => {
-      connectionToAnotherPeer.send('hi!')
-    })
-
-    // c'est celui la qui recoit la video du contact
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        let call = myPeer.call(actuallyContactId, stream)
-        call.on('stream', (stream) => {
-          addVideoStream(grandVideo.current, stream)
-        })
-      })
-      .catch((err) => {
-        console.log('Failed to get local stream', err)
-      })
-  }
-
-  function playMyVideo() {
-    musique2.current.play()
-    console.log('smallVideo.current', smallVideo.current)
-    smallVideo.current.muted = true
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-        audio: true,
-      })
-      .then((stream) => {
-        addVideoStream(smallVideo.current, stream)
-      })
-  }
-
-  function addVideoStream(video, stream) {
-    console.log('video.srcObject', video.srcObject)
-    video.srcObject = stream
-    video.addEventListener('loadedmetadata', () => {
-      video.play()
-    })
-  }
-
-  const displayVideo = isCalling ? '' : 'd-none'
-  const displayConatct = isCalling ? 'd-none' : ''
+  }, [isCallAccepted])
 
   return (
     <>
       <audio
         src={SoundOutgoingCall}
         type="audio/mpeg"
-        autoplay
+        autoPlay
+        loop
         ref={musique2}
       ></audio>
       <div
@@ -167,33 +213,39 @@ export default function Calls() {
         }}
       >
         <div className="w-100 h-100 d-flex justify-content-center align-items-center">
-          <span
-            role={'button'}
-            style={{ position: 'absolute', top: '0px', right: '10px' }}
-            onClick={() => {
-              musique2.current.pause()
-              setIsCallOpen(false)
-            }}
-          >
-            <svg
-              style={{
-                fill: 'black',
-                height: '50px',
-              }}
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 320 512"
-            >
-              <path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z" />
-            </svg>
-          </span>
           {/* media query in style.css (change height for 100% to 80%) */}
-          <div id="video-container" className="col-12 col-lg-4 rounded">
-            <button
-              className="position-absolute "
-              onClick={() => connectToPeer()}
-            >
-              APPEL
-            </button>
+          <div
+            id="video-container"
+            className="col-12 col-lg-4 rounded position-relative"
+          >
+            {/* CLOSE */}
+            <span onClick={() => setIsCallOpen(false)}>
+              <img
+                src={Croix}
+                alt="close"
+                style={{
+                  height: '30px',
+                  cursor: 'pointer',
+                  position: 'absolute',
+                  top: '0px',
+                  right: '5px',
+                }}
+              />
+            </span>
+            {/* EXPAND */}
+            <span className="d-none d-lg-block">
+              <img
+                src={Expand}
+                alt="expand"
+                style={{
+                  height: '25px',
+                  cursor: 'pointer',
+                  position: 'absolute',
+                  top: '4px',
+                  left: '5px',
+                }}
+              />
+            </span>
             {/* DISPLAY ONLY IF IS CALLING TRUE */}
             <div
               className={displayVideo}
@@ -228,7 +280,7 @@ export default function Calls() {
             <div
               className={
                 'h-100 d-flex justify-content-center align-items-center ' +
-                displayConatct
+                displayContact
               }
             >
               <div className="d-flex flex-column align-items-center gap-2">
@@ -244,7 +296,7 @@ export default function Calls() {
                 />
                 <div className="text-center text-light">
                   <h1>{contact.displayName}</h1>
-                  <h2>Appel en cours ...</h2>
+                  <h3>Appel en cours ...</h3>
                 </div>
               </div>
             </div>
@@ -252,10 +304,11 @@ export default function Calls() {
               id="menu-phone"
               style={{
                 position: 'absolute',
-                bottom: '40px',
+                bottom: '0px',
                 left: '',
                 backgroundColor: '',
                 height: '100px',
+                width: '100%',
               }}
               className="d-flex"
             >

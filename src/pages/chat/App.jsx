@@ -9,10 +9,12 @@ import { SocketContactContext } from '../../utils/context/SocketContact'
 import DefaultChat from '../../components/default chat/DefaultChat'
 import Calls from '../../components/Calls/Calls'
 import Toast from '../../components/Toasts/Toast'
+import { useState } from 'react'
+import { PeerContext, PeerProvider } from '../../utils/context/PeerContext'
 
 function App({ children }) {
   // DARK MODE
-  const { theme, isCallOpen } = useContext(ThemeContext)
+  const { theme, isCallOpen, isToastOpen } = useContext(ThemeContext)
   const bgColor = theme === 'light' ? 'bg-white' : 'bg-black'
   const { actuallyContactId, myContacts } = useContext(SocketContactContext)
 
@@ -31,13 +33,12 @@ function App({ children }) {
               <DefaultChat />
             )}
             {/* toasts */}
-            {/* <Toast /> */}
+            {isToastOpen && <Toast />}
           </>
         )}
       </div>
       {/* <!-- Modal --> */}
       <Modal />
-
       {/* call */}
       {isCallOpen && <Calls />}
     </div>

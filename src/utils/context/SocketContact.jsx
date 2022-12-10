@@ -27,25 +27,25 @@ export const SocketContactProvider = ({ children }) => {
   )
   const [myContacts, setMyContacts] = useState(getFromStorage('myContacts', []))
   const { setArrOfMessages } = useContext(MessagesContext)
-  const [myPeer, setMyPeer] = useState(null)
+  // const [myPeer, setMyPeer] = useState(null)
 
-  // ---------------- PEER -----------------------
+  // // ---------------- PEER -----------------------
 
-  useEffect(() => {
-    if (user !== null) {
-      setMyPeer((curr) => {
-        curr = new Peer(user.uid)
-        console.log('curr', curr)
-        curr.on('open', (id) => {
-          console.log('My peer ID is: ' + id)
-        })
-        curr.on('error', (error) => {
-          console.error(error)
-        })
-        return curr
-      })
-    }
-  }, [user])
+  // useEffect(() => {
+  //   if (user !== null) {
+  //     setMyPeer((curr) => {
+  //       curr = new Peer(user.uid)
+  //       console.log('curr', curr)
+  //       curr.on('open', (id) => {
+  //         console.log('My peer ID is: ' + id)
+  //       })
+  //       curr.on('error', (error) => {
+  //         console.error(error)
+  //       })
+  //       return curr
+  //     })
+  //   }
+  // }, [user])
 
   // ----------------------------- ALL USERS --------------------
 
@@ -188,8 +188,8 @@ export const SocketContactProvider = ({ children }) => {
         newMessages,
         setNewMessages,
         setAllUsersFromDB,
-        myPeer,
-        setMyPeer,
+        // myPeer,
+        // setMyPeer,
       }}
     >
       {children}

@@ -18,6 +18,7 @@ import { MessagesContextProvider } from './utils/context/MessagesContext'
 import Error from './pages/error/Error'
 
 import './utils/peerjs/peer'
+import { PeerProvider } from './utils/context/PeerContext'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
@@ -27,35 +28,37 @@ root.render(
         <ThemeProvider>
           <MessagesContextProvider>
             <SocketContactProvider>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route
-                  path="profile"
-                  element={
-                    <Protected>
-                      <Profile />
-                    </Protected>
-                  }
-                />
-                <Route
-                  path="chat"
-                  element={
-                    <Protected>
-                      <App />
-                    </Protected>
-                  }
-                >
+              <PeerProvider>
+                <Routes>
+                  <Route path="/" element={<Home />} />
                   <Route
-                    path=":username"
+                    path="profile"
+                    element={
+                      <Protected>
+                        <Profile />
+                      </Protected>
+                    }
+                  />
+                  <Route
+                    path="chat"
                     element={
                       <Protected>
                         <App />
                       </Protected>
                     }
-                  />
-                </Route>
-                <Route path="*" element={<Error />} />
-              </Routes>
+                  >
+                    <Route
+                      path=":username"
+                      element={
+                        <Protected>
+                          <App />
+                        </Protected>
+                      }
+                    />
+                  </Route>
+                  <Route path="*" element={<Error />} />
+                </Routes>
+              </PeerProvider>
             </SocketContactProvider>
           </MessagesContextProvider>
         </ThemeProvider>
