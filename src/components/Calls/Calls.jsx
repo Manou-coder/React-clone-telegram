@@ -28,151 +28,13 @@ export default function Calls() {
     musique2,
     grandVideo,
     smallVideo,
+    call,
+    setCall,
+    hangingUp,
   } = useContext(PeerContext)
   const { setIsCallOpen } = useContext(ThemeContext)
   const contact =
     allUsers && allUsers.find((e) => e.userId === actuallyContactId)
-
-  // const grandVideo = useRef()
-  // const smallVideo = useRef()
-  // const musique2 = useRef()
-
-  // const [conn, setConn] = useState(null)
-
-  // console.log('contact', contact)
-
-  // useEffect(() => {
-  //   console.log('myPeer', myPeer)
-  //   if (!myPeer) {
-  //     console.log("il n'y a pas de peer")
-  //     return
-  //   }
-  //   myPeer.on('open', (id) => {
-  //     console.log('My peer ID is: ' + id)
-  //   })
-  //   myPeer.on('error', (error) => {
-  //     console.error(error)
-  //   })
-
-  //   return () => {
-  //     myPeer.off('open')
-  //     myPeer.off('error')
-  //   }
-  // }, [myPeer])
-
-  // useEffect(() => {
-  //   if (!myPeer || !conn) {
-  //     console.log("il n'y a pas de conn ou de peer")
-  //     return
-  //   }
-  //   console.log('conn exists!')
-  //   // Handle incoming data connection
-  //   myPeer.on('connection', (conn) => {
-  //     console.log('incoming peer connection!')
-  //     conn.on('data', (data) => {
-  //       console.log(`received: ${data}`)
-  //     })
-  //     conn.on('open', () => {
-  //       console.log('open')
-  //       conn.send('hello!')
-  //     })
-  //   })
-
-  //   // c'est celui la AUSSI qui recoit la video du contact
-  //   myPeer.on('call', (call) => {
-  //     alert('vous recevez un appel')
-  //     setIsCallAccepted(true)
-  //     navigator.mediaDevices
-  //       .getUserMedia({ video: true, audio: true })
-  //       .then((stream) => {
-  //         call.answer(stream) // Answer the call with an A/V stream.
-  //         // call.on('stream', (stream) => {
-  //         //   addVideoStream(grandVideo.current, stream)
-  //         // })
-  //       })
-  //       .catch((err) => {
-  //         console.error('Failed to get local stream', err)
-  //       })
-  //   })
-
-  //   return () => {
-  //     myPeer.off('connection')
-  //     myPeer.off('call')
-  //     conn.off('data')
-  //   }
-  // }, [myPeer, conn])
-
-  // // Functions
-
-  // useEffect(() => {
-  //   // alert('baba')
-  //   if (isCalling) {
-  //     console.log('baaba')
-  //     const connectToPeer = () => {
-  //       socket.emit('callUser', {
-  //         from: user.uid,
-  //         to: actuallyContactId,
-  //       })
-  //       setIsCalling(true)
-
-  //       playMyVideo(smallVideo)
-  //       const connectionToAnotherPeer = myPeer.connect(actuallyContactId)
-  //       setConn(connectionToAnotherPeer)
-  //       connectionToAnotherPeer.on('data', (data) => {
-  //         console.log(`received: ${data}`)
-  //       })
-  //       connectionToAnotherPeer.on('open', () => {
-  //         connectionToAnotherPeer.send('hi!')
-  //       })
-
-  //       // c'est celui la qui recoit la video du contact
-  //       navigator.mediaDevices
-  //         .getUserMedia({ video: true, audio: true })
-  //         .then((stream) => {
-  //           let call = myPeer.call(actuallyContactId, stream)
-  //           call.on('stream', (stream) => {
-  //             addVideoStream(grandVideo.current, stream)
-  //           })
-  //         })
-  //         .catch((err) => {
-  //           console.log('Failed to get local stream', err)
-  //         })
-  //     }
-  //     connectToPeer()
-  //   }
-  // }, [isCalling, smallVideo])
-
-  // function playMyVideo(video) {
-  //   console.log('video.current', video.current)
-  //   video.current.muted = true
-  //   navigator.mediaDevices
-  //     .getUserMedia({
-  //       video: true,
-  //       audio: true,
-  //     })
-  //     .then((stream) => {
-  //       addVideoStream(video.current, stream)
-  //     })
-  // }
-
-  // function addVideoStream(video, stream) {
-  //   console.log('video.srcObject', video.srcObject)
-  //   video.srcObject = stream
-  //   video.addEventListener('loadedmetadata', () => {
-  //     video.play()
-  //   })
-  // }
-
-  // // met la musique d'appel si unn contact est appele et enleve si on ferme la fenetre
-  // useEffect(() => {
-  //   if (musique2.current) {
-  //     if (isCalling) {
-  //       musique2.current.play()
-  //     } else {
-  //       musique2.current.pause()
-  //     }
-  //   }
-  // }, [musique2, isCalling])
 
   const displayVideo = isCallAccepted ? '' : 'd-none'
   const displayContact = isCallAccepted ? 'd-none' : ''
@@ -184,18 +46,17 @@ export default function Calls() {
     }
   }, [grandVideo])
 
-  useEffect(() => {
-    if (isCallAccepted) {
-      console.log('Appel accepte par le contact!')
-    }
-  }, [isCallAccepted])
+  // useEffect(() => {
+  //   // if (isCallAccepted) {
+  //   //   console.log('Appel accepte par le contact!')
+  //   // }
+  // }, [isCallAccepted])
 
   return (
     <>
       <audio
         src={SoundOutgoingCall}
         type="audio/mpeg"
-        autoPlay
         loop
         ref={musique2}
       ></audio>
@@ -227,6 +88,7 @@ export default function Calls() {
                   height: '30px',
                   cursor: 'pointer',
                   position: 'absolute',
+                  zIndex: '20000',
                   top: '0px',
                   right: '5px',
                 }}
@@ -241,6 +103,7 @@ export default function Calls() {
                   height: '25px',
                   cursor: 'pointer',
                   position: 'absolute',
+                  zIndex: '20000',
                   top: '4px',
                   left: '5px',
                 }}
@@ -291,11 +154,11 @@ export default function Calls() {
                   }}
                   onError={(e) => imgError(e.target)}
                   className="rounded-circle"
-                  src={contact.photoURL}
+                  src={contact && contact.photoURL}
                   alt="avatar-contact"
                 />
                 <div className="text-center text-light">
-                  <h1>{contact.displayName}</h1>
+                  <h1>{contact && contact.displayName}</h1>
                   <h3>Appel en cours ...</h3>
                 </div>
               </div>
@@ -355,6 +218,8 @@ export default function Calls() {
                 }
               />
               <ButtonPhone
+                onClick={() => hangingUp()}
+                // onClick={() => alert(':l;k,jnhbgfvdfcds')}
                 name={'telephone'}
                 buttonBgColor={'red'}
                 svgSrc={
@@ -383,9 +248,12 @@ export default function Calls() {
   )
 }
 
-const ButtonPhone = ({ buttonBgColor, svgSrc }) => {
+const ButtonPhone = ({ buttonBgColor, svgSrc, onClick }) => {
   return (
-    <div className="col d-flex justify-content-center align-items-center">
+    <div
+      onClick={onClick}
+      className="col d-flex justify-content-center align-items-center"
+    >
       <span
         style={{
           backgroundColor: buttonBgColor,

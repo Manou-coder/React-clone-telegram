@@ -8,7 +8,7 @@ export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('')
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isCallOpen, setIsCallOpen] = useState(false)
-  const [isToastOpen, setIsToastOpen] = useState(true)
+  const [isToastOpen, setIsToastOpen] = useState(false)
   // // pas en rapport avec themecontext
   // const [isCalling, setIsCalling] = useState(false)
   // const [isCallAccepted, setIsCallAccepted] = useState(false)
