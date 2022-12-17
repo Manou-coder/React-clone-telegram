@@ -40,11 +40,11 @@ export default function Calls() {
   const displayContact = isCallAccepted ? 'd-none' : ''
 
   // console.log('displayVideo', displayVideo)
-  useEffect(() => {
-    if (grandVideo.current) {
-      console.log('grandVideo.current.srcObject', grandVideo.current.srcObject)
-    }
-  }, [grandVideo])
+  // useEffect(() => {
+  //   if (grandVideo.current) {
+  //     console.log('grandVideo.current.srcObject', grandVideo.current.srcObject)
+  //   }
+  // }, [grandVideo])
 
   // useEffect(() => {
   //   // if (isCallAccepted) {

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Peer from 'peerjs'
 import React, { useState, createContext } from 'react'
 import { useContext } from 'react'
@@ -19,7 +20,6 @@ export const PeerProvider = ({ children }) => {
   const [isCalling, setIsCalling] = useState(false)
   const [isCallAccepted, setIsCallAccepted] = useState(false)
   const [isCallAcceptedByMe, setIsCallAcceptedByMe] = useState(false)
-  const [conn, setConn] = useState(null)
   const [call, setCall] = useState(null)
   const grandVideo = useRef()
   const smallVideo = useRef()
@@ -27,14 +27,15 @@ export const PeerProvider = ({ children }) => {
 
   // ---------------- PEER -----------------------
 
+  // Check if user exsists and if so then set the Peer with my user id
   useEffect(() => {
     if (user !== null) {
       setMyPeer(new Peer(user.uid))
     }
   }, [user])
 
+  // Log my Peer and catch error with him
   useEffect(() => {
-    // console.log('myPeer', myPeer)
     if (!myPeer) {
       console.log("il n'y a pas de peer")
       return
@@ -52,149 +53,28 @@ export const PeerProvider = ({ children }) => {
     }
   }, [myPeer])
 
-  useEffect(() => {
-    if (!myPeer || !conn) {
-      console.log("il n'y a pas de conn ou de peer")
-      return
-    }
-    console.log('conn exists!')
-    // Handle incoming data connection
-    myPeer.on('connection', (conn) => {
-      console.log('incoming peer connection!')
-      conn.on('data', (data) => {
-        console.log(`received: ${data}`)
-      })
-      conn.on('open', () => {
-        console.log('open')
-        conn.send('hello!')
-      })
-    })
-
-    return () => {
-      myPeer.off('connection')
-      myPeer.off('call')
-      conn.off('data')
-    }
-  }, [myPeer, conn])
-
+  // When I receive a call show toast with the contact calling and the option to pick up or hang up
   useEffect(() => {
     if (!myPeer) {
       return
     }
-    // c'est celui la AUSSI qui recoit la video du contact
     myPeer.on('call', (call) => {
-      // alert('vous recevez un appel')
-      // setIsToastOpen(true)
-      setIsCallAccepted(true)
-      // set le call
+      // set the call in 'setCall'
       setCall(call)
-      console.log('call', call)
-      // eslint-disable-next-line no-restricted-globals
-      const isCallAcceptedByMe = confirm(
-        `${call.peer} vous appelle. Voulez vous repondre ?`
-      )
-      if (isCallAcceptedByMe) {
-        setIsCallOpen(true)
-        // alert('jaccepte lappel')
-        call.on('stream', (stream) => {
-          addVideoStream(grandVideo.current, stream)
-        })
-        navigator.mediaDevices
-          .getUserMedia({ video: true, audio: true })
-          .then((stream) => {
-            call.answer(stream) // Answer the call with an A/V stream.
-            playMyVideo(smallVideo)
-          })
-          .catch((err) => {
-            console.error('Failed to get local stream', err)
-          })
-      } else {
-        // raccroche
-        call.close()
-        console.log('call', call)
-        // alert("je n'accepte pas l'appel")
-      }
+      // open the toast to be able to hang up or answer
+      setIsToastOpen(true)
     })
 
     return () => {
       myPeer.off('call')
     }
-  }, [myPeer, isCallAcceptedByMe])
+  }, [myPeer])
 
   // Functions
 
-  useEffect(() => {
-    // alert('baba')
-    if (isCalling) {
-      console.log('baaba')
-      const connectToPeer = () => {
-        // socket.emit('callUser', {
-        //   from: user.uid,
-        //   to: actuallyContactId,
-        // })
-
-        setIsCalling(true)
-
-        playMyVideo(smallVideo)
-
-        const connectionToAnotherPeer = myPeer.connect(actuallyContactId)
-
-        setConn(connectionToAnotherPeer)
-
-        connectionToAnotherPeer.on('data', (data) => {
-          console.log(`received: ${data}`)
-        })
-        connectionToAnotherPeer.on('open', () => {
-          connectionToAnotherPeer.send('hi!')
-        })
-
-        // c'est celui la qui recoit la video du contact
-        navigator.mediaDevices
-          .getUserMedia({ video: true, audio: true })
-          .then((stream) => {
-            let call = myPeer.call(actuallyContactId, stream)
-            // set le  call
-            setCall(call)
-            call.on('stream', (stream) => {
-              // alert('le contact a recu ton appel')
-              setIsCalling(false)
-              setIsCallAccepted(true)
-              addVideoStream(grandVideo.current, stream)
-            })
-          })
-          .catch((err) => {
-            console.log('Failed to get local stream', err)
-          })
-      }
-      connectToPeer()
-    }
-  }, [isCalling, smallVideo])
-
-  function playMyVideo(video) {
-    console.log('video.current', video.current)
-    video.current.muted = true
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-        audio: true,
-      })
-      .then((stream) => {
-        addVideoStream(video.current, stream)
-      })
-  }
-
-  function addVideoStream(video, stream) {
-    console.log('video.srcObject', video.srcObject)
-    video.srcObject = stream
-    video.addEventListener('loadedmetadata', () => {
-      video.play()
-    })
-  }
-
-  // met la musique d'appel si unn contact est appele et enleve si on ferme la fenetre
+  // Met la musique d'appel si unn contact est appele et enleve si on ferme la fenetre
   useEffect(() => {
     if (musique2.current) {
-      console.log()
       if (isCalling) {
         musique2.current.play()
       } else {
@@ -203,36 +83,87 @@ export const PeerProvider = ({ children }) => {
     }
   }, [musique2, isCalling])
 
+  // ------------- FUNCTIONS --------------
+
+  // call the contact
+  function callTheContact() {
+    //
+    // // emit socket that I am calling
+    // socket.emit('callUser', {
+    //   from: user.uid,
+    //   to: actuallyContactId,
+    // })
+
+    // request authorization to use the camera and the microphone and if so then call the contact
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((myStream) => {
+        // open call display
+        setIsCallOpen(true)
+        // create object of call
+        const call = myPeer.call(actuallyContactId, myStream)
+        // set the call in 'setCall'
+        setCall(call)
+        // I am calling and so the outgoing call music is activated
+        setIsCalling(true)
+        // function that fires when the contact answers the call and sends a stream
+        call.on('stream', (streamOfContact) => {
+          // turn off the outgoing call music
+          setIsCalling(false)
+          // define the call as accepted so that the application displays the stream instead of the call logo
+          setIsCallAccepted(true)
+          // display my video
+          playMyVideo(smallVideo.current, myStream)
+          // displays the video of the contact with the received stream
+          addVideoStream(grandVideo.current, streamOfContact)
+        })
+        // add the stream to the window object so that it can then be deleted
+        window.localStream = myStream
+      })
+      .catch((err) => {
+        console.log('Failed to get local stream', err)
+      })
+  }
+
+  // pick up the phone
+  function pickUp() {
+    // open call display (it has to be here and not in navigator so that the muted is not null)
+    setIsCallOpen(true)
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((myStream) => {
+        // define the call as accepted so that the application displays the stream instead of the call logo
+        setIsCallAccepted(true)
+        // listen to the contact's stream
+        call.on('stream', (streamOfContact) => {
+          // displays the video of the contact with the received stream
+          addVideoStream(grandVideo.current, streamOfContact)
+        })
+        // Answer the call with my stream.
+        call.answer(myStream)
+        // display my video
+        playMyVideo(smallVideo.current, myStream)
+      })
+      .catch((err) => {
+        console.error('Failed to get local stream', err)
+      })
+  }
+
+  //  hanging up the phone
   function hangingUp() {
     call.close()
-    stopStreamedVideo(smallVideo.current)
-    stopStreamedVideo(grandVideo.current)
-    // setIsCallOpen(false)
-    setIsCalling(false)
-    // setIsCallAccepted(false)
-  }
-
-  function stopStreamedVideo(videoElem) {
-    const stream = videoElem.srcObject
-    const tracks = stream.getTracks()
-    console.log('tracks', tracks)
-
-    tracks.forEach((track) => {
-      track.stop()
-      // track.enabled = false
-    })
-    console.log('tracks', tracks)
-
-    videoElem.srcObject = null
-    console.log('smallVideo.current', smallVideo.current)
-    console.log('grandVideo.current', grandVideo.current)
-  }
-
-  useEffect(() => {
-    if (call) {
-      call.on('close', () => alert('appel fini'))
+    // if the videos are visible then search for the streams from the videos then remove them
+    try {
+      stopStreamedVideo(smallVideo.current)
+      stopStreamedVideo(grandVideo.current)
+    } catch (error) {
+      // else (because the call has not yet been answered) get the stream in the window object and remove it
+      stopMyStream(window.localStream)
     }
-  }, [call])
+    setIsCallOpen(false)
+    setIsCalling(false)
+    setIsCallAccepted(false)
+  }
 
   return (
     <PeerContext.Provider
@@ -245,17 +176,111 @@ export const PeerProvider = ({ children }) => {
         setIsCallAccepted,
         isCallAcceptedByMe,
         setIsCallAcceptedByMe,
-        conn,
-        setConn,
         grandVideo,
         smallVideo,
         musique2,
         call,
         setCall,
         hangingUp,
+        pickUp,
+        callTheContact,
       }}
     >
       {children}
     </PeerContext.Provider>
   )
 }
+
+function playMyVideo(video, stream) {
+  console.log('video', video)
+  // the sound of my video is muted so that I cannot hear myself when I speak with the contact
+  video.muted = true
+  addVideoStream(video, stream)
+}
+
+function addVideoStream(video, stream) {
+  video.srcObject = stream
+  video.addEventListener('loadedmetadata', () => {
+    video.play()
+  })
+}
+
+// Remove all media streams (microphone and webcam will be disabled)
+function stopStreamedVideo(videoElem) {
+  console.log('videoElem', videoElem)
+  const stream = videoElem.srcObject
+  console.log('stream', stream)
+  // recover all the media Streams
+  const tracks = stream.getTracks()
+  // then stop them as well as remove them
+  tracks.forEach((track) => {
+    track.stop()
+    track.enabled = false
+  })
+  // remove the 'srcObject' from the video
+  videoElem.srcObject = null
+}
+
+function stopMyStream(stream) {
+  console.log('stream', stream)
+  const tracks = stream.getTracks()
+  // then stop them as well as remove them
+  tracks.forEach((track) => {
+    track.stop()
+    track.enabled = false
+  })
+}
+
+const getUserMedia =
+  navigator.getUserMedia ||
+  navigator['webkitGetUserMedia'] ||
+  navigator['mozGetUserMedia']
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+// function sends message with peerjs
+
+// useEffect(() => {
+//   if (!myPeer || !conn) {
+//     console.log("il n'y a pas de conn ou de peer")
+//     return
+//   }
+//   console.log('conn exists!')
+//   // Handle incoming data connection
+//   myPeer.on('connection', (conn) => {
+//     console.log('incoming peer connection!')
+//     conn.on('data', (data) => {
+//       console.log(`received: ${data}`)
+//     })
+//     conn.on('open', () => {
+//       console.log('open')
+//       conn.send('hello!')
+//     })
+//   })
+
+//   return () => {
+//     myPeer.off('connection')
+//     conn.off('data')
+//   }
+// }, [myPeer, conn])
+
+// // I connect with the contact I am calling
+// const connectionToAnotherPeer = myPeer.connect(actuallyContactId)
+// // I set the connexion to 'setConn'
+// setConn(connectionToAnotherPeer)
+
+// connectionToAnotherPeer.on('data', (data) => {
+//   console.log(`received: ${data}`)
+// })
+// connectionToAnotherPeer.on('open', () => {
+//   connectionToAnotherPeer.send('hi!')
+// })

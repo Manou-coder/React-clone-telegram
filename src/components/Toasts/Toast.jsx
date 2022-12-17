@@ -12,7 +12,8 @@ export default function Toast() {
     useContext(ThemeContext)
   const musique = useRef()
   const { actuallyContactId, allUsers } = useContext(SocketContactContext)
-  const { setIsCallAccepted, setIsCallAcceptedByMe } = useContext(PeerContext)
+  const { setIsCallAccepted, setIsCallAcceptedByMe, pickUp } =
+    useContext(PeerContext)
 
   const contact =
     allUsers && allUsers.find((e) => e.userId === actuallyContactId)
@@ -71,10 +72,8 @@ export default function Toast() {
           </button>
           <button
             onClick={() => {
-              setIsCallAccepted(true)
+              pickUp()
               setIsToastOpen(false)
-              setIsCallAcceptedByMe(true)
-              // setIsCallOpen(true)
             }}
             className="btn btn-success btn-sm "
           >

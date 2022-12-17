@@ -14,7 +14,7 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
 
   const { setIsChatOpen, setIsCallOpen } = useContext(ThemeContext)
 
-  const { setIsCalling } = useContext(PeerContext)
+  const { setIsCalling, callTheContact } = useContext(PeerContext)
 
   const contact =
     allUsers && allUsers.find((e) => e.userId === actuallyContactId)
@@ -112,12 +112,6 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
     }
   }, [isComponentVisible])
 
-  // appel le contact
-  function callThisContact() {
-    setIsCallOpen(true)
-    setIsCalling(true)
-  }
-
   return (
     <div
       className={`row w-100 sticky-top ${bgColor} align-items-center m-0 mb-1`}
@@ -168,9 +162,7 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
       </div>
       <div className="d-none d-lg-flex col-lg-1">
         <span
-          onClick={() => {
-            callThisContact()
-          }}
+          onClick={() => callTheContact()}
           className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
         >
           {/* <i className="fa-solid fa-phone fa-lg"></i> */}
@@ -220,7 +212,7 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
         </span>
         <div ref={refComponent}>
           {isComponentVisible && (
-            <ContactMenu callThisContact={callThisContact} />
+            <ContactMenu callTheContact={callTheContact} />
           )}
         </div>
       </div>
