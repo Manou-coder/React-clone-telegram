@@ -9,7 +9,7 @@ import { SocketContactContext } from '../../utils/context/SocketContact'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 import { imgError } from '../../utils/functions/returnAvatarIsImgError'
 import socket from '../../utils/socket.io'
-import SoundOutgoingCall from '../../assets/sound/appel-sortant.m4a'
+import RingtoneOutgoingCall from '../../assets/sound/appel-sortant.m4a'
 import Croix from '../../assets/svg/croix.svg'
 import Expand from '../../assets/svg/expand.svg'
 import { PeerContext } from '../../utils/context/PeerContext'
@@ -18,19 +18,13 @@ export default function Calls() {
   const { user } = UserAuth()
   const { actuallyContactId, allUsers } = useContext(SocketContactContext)
   const {
-    myPeer,
-    setMyPeer,
-    isCalling,
-    setIsCalling,
-    connectToPeer,
     isCallAccepted,
-    setIsCallAccepted,
-    musique2,
+    ringtone,
     grandVideo,
     smallVideo,
-    call,
-    setCall,
     hangingUp,
+    muteMyVideo,
+    muteMyAudio,
   } = useContext(PeerContext)
   const { setIsCallOpen } = useContext(ThemeContext)
   const contact =
@@ -39,26 +33,13 @@ export default function Calls() {
   const displayVideo = isCallAccepted ? '' : 'd-none'
   const displayContact = isCallAccepted ? 'd-none' : ''
 
-  // console.log('displayVideo', displayVideo)
-  // useEffect(() => {
-  //   if (grandVideo.current) {
-  //     console.log('grandVideo.current.srcObject', grandVideo.current.srcObject)
-  //   }
-  // }, [grandVideo])
-
-  // useEffect(() => {
-  //   // if (isCallAccepted) {
-  //   //   console.log('Appel accepte par le contact!')
-  //   // }
-  // }, [isCallAccepted])
-
   return (
     <>
       <audio
-        src={SoundOutgoingCall}
+        src={RingtoneOutgoingCall}
         type="audio/mpeg"
         loop
-        ref={musique2}
+        ref={ringtone}
       ></audio>
       <div
         style={{
@@ -177,6 +158,7 @@ export default function Calls() {
             >
               <ButtonPhone
                 name={'video'}
+                onClick={() => muteMyVideo()}
                 buttonBgColor={'rgb(0,0,0, 0.2)'}
                 svgSrc={
                   <svg
@@ -205,6 +187,7 @@ export default function Calls() {
               />
               <ButtonPhone
                 name={'micro'}
+                onClick={() => muteMyAudio()}
                 buttonBgColor={'rgb(0,0,0)'}
                 svgSrc={
                   <svg

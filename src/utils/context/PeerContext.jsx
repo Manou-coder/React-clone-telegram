@@ -21,6 +21,7 @@ export const PeerProvider = ({ children }) => {
   const [isCallAccepted, setIsCallAccepted] = useState(false)
   const [isCallAcceptedByMe, setIsCallAcceptedByMe] = useState(false)
   const [call, setCall] = useState(null)
+  const [myStream, setMyStream] = useState(null)
   const grandVideo = useRef()
   const smallVideo = useRef()
   const musique2 = useRef()
@@ -98,6 +99,8 @@ export const PeerProvider = ({ children }) => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((myStream) => {
+        // save my stream
+        setMyStream(myStream)
         // open call display
         setIsCallOpen(true)
         // create object of call
@@ -117,8 +120,6 @@ export const PeerProvider = ({ children }) => {
           // displays the video of the contact with the received stream
           addVideoStream(grandVideo.current, streamOfContact)
         })
-        // add the stream to the window object so that it can then be deleted
-        window.localStream = myStream
       })
       .catch((err) => {
         console.log('Failed to get local stream', err)
@@ -132,6 +133,8 @@ export const PeerProvider = ({ children }) => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((myStream) => {
+        // save my stream
+        setMyStream(myStream)
         // define the call as accepted so that the application displays the stream instead of the call logo
         setIsCallAccepted(true)
         // listen to the contact's stream
@@ -152,17 +155,18 @@ export const PeerProvider = ({ children }) => {
   //  hanging up the phone
   function hangingUp() {
     call.close()
-    // if the videos are visible then search for the streams from the videos then remove them
-    try {
-      stopStreamedVideo(smallVideo.current)
-      stopStreamedVideo(grandVideo.current)
-    } catch (error) {
-      // else (because the call has not yet been answered) get the stream in the window object and remove it
-      stopMyStream(window.localStream)
-    }
+    stopAllMyStreams(myStream)
     setIsCallOpen(false)
     setIsCalling(false)
     setIsCallAccepted(false)
+  }
+
+  function muteMyVideo() {
+    stopMyVideoStream(myStream)
+  }
+
+  function muteMyAudio() {
+    stopMyAudioStream(myStream)
   }
 
   return (
@@ -184,6 +188,8 @@ export const PeerProvider = ({ children }) => {
         hangingUp,
         pickUp,
         callTheContact,
+        muteMyVideo,
+        muteMyAudio,
       }}
     >
       {children}
@@ -205,36 +211,49 @@ function addVideoStream(video, stream) {
   })
 }
 
-// Remove all media streams (microphone and webcam will be disabled)
-function stopStreamedVideo(videoElem) {
-  console.log('videoElem', videoElem)
-  const stream = videoElem.srcObject
+// // Remove all media streams (microphone and webcam will be disabled)
+// function stopStreamedVideo(videoElem) {
+//   console.log('videoElem', videoElem)
+//   const stream = videoElem.srcObject
+//   console.log('stream', stream)
+//   // recover all the media Streams
+//   const tracks = stream.getTracks()
+//   // then stop them as well as remove them
+//   tracks.forEach((track) => {
+//     track.stop()
+//     track.enabled = false
+//   })
+//   // remove the 'srcObject' from the video
+//   videoElem.srcObject = null
+// }
+
+function stopAllMyStreams(stream) {
   console.log('stream', stream)
-  // recover all the media Streams
   const tracks = stream.getTracks()
   // then stop them as well as remove them
   tracks.forEach((track) => {
     track.stop()
     track.enabled = false
   })
-  // remove the 'srcObject' from the video
-  videoElem.srcObject = null
 }
 
-function stopMyStream(stream) {
+function stopMyVideoStream(stream) {
   console.log('stream', stream)
   const tracks = stream.getTracks()
-  // then stop them as well as remove them
-  tracks.forEach((track) => {
-    track.stop()
-    track.enabled = false
-  })
+  console.log('tracks', tracks)
+  const videoTrack = tracks.find((track) => track.kind === 'video')
+  console.log('videoTrack', videoTrack)
+  videoTrack.enabled = !videoTrack.enabled
 }
 
-const getUserMedia =
-  navigator.getUserMedia ||
-  navigator['webkitGetUserMedia'] ||
-  navigator['mozGetUserMedia']
+function stopMyAudioStream(stream) {
+  console.log('stream', stream)
+  const tracks = stream.getTracks()
+  console.log('tracks', tracks)
+  const audioTrack = tracks.find((track) => track.kind === 'audio')
+  console.log('audioTrack', audioTrack)
+  audioTrack.enabled = !audioTrack.enabled
+}
 
 //
 //

@@ -1,31 +1,30 @@
 import React, { useContext, useRef } from 'react'
 import { SocketContactContext } from '../../utils/context/SocketContact'
 import { imgError } from '../../utils/functions/returnAvatarIsImgError'
-import Ringtone from '../../assets/sound/Redmi-Note-8-Pro.mp3'
+import RingtoneIncomingCall from '../../assets/sound/Redmi-Note-8-Pro.mp3'
 import { useEffect } from 'react'
 import Croix from '../../assets/svg/croix.svg'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 import { PeerContext } from '../../utils/context/PeerContext'
 
 export default function Toast() {
-  const { setIsToastOpen, setIsCallOpen, isToastOpen } =
-    useContext(ThemeContext)
-  const musique = useRef()
-  const { actuallyContactId, allUsers } = useContext(SocketContactContext)
-  const { setIsCallAccepted, setIsCallAcceptedByMe, pickUp } =
-    useContext(PeerContext)
+  const { setIsToastOpen } = useContext(ThemeContext)
+  const ringtone = useRef()
+  const { allUsers } = useContext(SocketContactContext)
+  const { pickUp, call } = useContext(PeerContext)
 
-  const contact =
-    allUsers && allUsers.find((e) => e.userId === actuallyContactId)
+  // this contact is defined by the id of the peer contact who is calling
+  const contact = allUsers && allUsers.find((e) => e.userId === call.peer)
 
-  useEffect(() => {
-    if (musique.current && isToastOpen) {
-      musique.current.play()
-    }
-  }, [musique.current])
   return (
     <>
-      <audio src={Ringtone} type="audio/mpeg" loop ref={musique}></audio>
+      <audio
+        src={RingtoneIncomingCall}
+        type="audio/mpeg"
+        autoPlay
+        loop
+        ref={ringtone}
+      ></audio>
 
       <div
         className="col-11 col-lg-3 rounded shadow py-2"
@@ -63,8 +62,7 @@ export default function Toast() {
         <div className="d-flex justify-content-between">
           <button
             onClick={() => {
-              setIsCallAcceptedByMe(false)
-              alert('je raccroche')
+              setIsToastOpen(false)
             }}
             className="btn btn-danger btn-sm "
           >
