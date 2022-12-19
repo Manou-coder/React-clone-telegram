@@ -12,6 +12,8 @@ import { ThemeContext } from './ThemeContext'
 
 export const PeerContext = createContext()
 
+let video = true
+
 export const PeerProvider = ({ children }) => {
   const { user } = UserAuth()
   const { actuallyContactId } = useContext(SocketContactContext)
@@ -62,6 +64,7 @@ export const PeerProvider = ({ children }) => {
       return
     }
     myPeer.on('call', (call) => {
+      console.log('call', call)
       // set the call in 'setCall'
       setCall(call)
       // open the toast to be able to hang up or answer
@@ -101,6 +104,7 @@ export const PeerProvider = ({ children }) => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((myStream) => {
+        console.log('video1', video)
         // save my streams
         setMyStream(myStream)
         // if the call is in audio only then deactivate the video of the stream
@@ -112,8 +116,10 @@ export const PeerProvider = ({ children }) => {
         })
         // open call display
         setIsCallOpen(true)
-        // create object of call
-        const call = myPeer.call(actuallyContactId, myStream)
+        // create object of call and send the type of video in metadata (from the variable above the 'peerProvider' component)
+        const call = myPeer.call(actuallyContactId, myStream, {
+          metadata: { video: video },
+        })
         // set the call in 'setCall'
         setCall(call)
         // I am calling and so the outgoing call music is activated
@@ -144,6 +150,13 @@ export const PeerProvider = ({ children }) => {
       .then((myStream) => {
         // save my stream
         setMyStream(myStream)
+        // if the call is in audio only then deactivate the video of the stream
+        setIsVideoCall((isVideoCall) => {
+          if (!isVideoCall) {
+            stopMyVideoStream(myStream)
+          }
+          return isVideoCall
+        })
         // define the call as accepted so that the application displays the stream instead of the call logo
         setIsCallAccepted(true)
         // listen to the contact's stream
@@ -188,13 +201,17 @@ export const PeerProvider = ({ children }) => {
     }
   }
 
+  /* small clarification concerning the two functions that will follow ('videoCall' and 'audioCall'): I needed to add a video variable to that of 'setIsVideoCall' because in the 'callTheContact' function I need the immediate result of this condition to send it in metadata, or with 'setIsVideoCall' the result is not immediate but only at the next rendering (see React doc) */
+
   function videoCall() {
+    video = true
     setIsVideoCall(true)
     setIsCameraActive(true)
     callTheContact()
   }
 
   function audioCall() {
+    video = false
     setIsVideoCall(false)
     setIsCameraActive(false)
     callTheContact()
