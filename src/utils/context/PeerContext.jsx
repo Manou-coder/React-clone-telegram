@@ -22,9 +22,11 @@ export const PeerProvider = ({ children }) => {
   const [isCallAcceptedByMe, setIsCallAcceptedByMe] = useState(false)
   const [call, setCall] = useState(null)
   const [myStream, setMyStream] = useState(null)
+  const [isCameraActive, setIsCameraActive] = useState(true)
+  const [isMicroActive, setIsMicroActive] = useState(true)
   const grandVideo = useRef()
   const smallVideo = useRef()
-  const musique2 = useRef()
+  const ringtone = useRef()
 
   // ---------------- PEER -----------------------
 
@@ -73,16 +75,16 @@ export const PeerProvider = ({ children }) => {
 
   // Functions
 
-  // Met la musique d'appel si unn contact est appele et enleve si on ferme la fenetre
+  // activates the ringtone for outgoing calls if I am calling a contact and deactivates it when the call is answered or rejected
   useEffect(() => {
-    if (musique2.current) {
+    if (ringtone.current) {
       if (isCalling) {
-        musique2.current.play()
+        ringtone.current.play()
       } else {
-        musique2.current.pause()
+        ringtone.current.pause()
       }
     }
-  }, [musique2, isCalling])
+  }, [ringtone, isCalling])
 
   // ------------- FUNCTIONS --------------
 
@@ -163,10 +165,12 @@ export const PeerProvider = ({ children }) => {
 
   function muteMyVideo() {
     stopMyVideoStream(myStream)
+    setIsCameraActive(!isCameraActive)
   }
 
   function muteMyAudio() {
     stopMyAudioStream(myStream)
+    setIsMicroActive(!isMicroActive)
   }
 
   return (
@@ -182,7 +186,7 @@ export const PeerProvider = ({ children }) => {
         setIsCallAcceptedByMe,
         grandVideo,
         smallVideo,
-        musique2,
+        ringtone,
         call,
         setCall,
         hangingUp,
@@ -190,6 +194,8 @@ export const PeerProvider = ({ children }) => {
         callTheContact,
         muteMyVideo,
         muteMyAudio,
+        isCameraActive,
+        isMicroActive,
       }}
     >
       {children}
