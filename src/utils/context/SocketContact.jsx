@@ -12,40 +12,21 @@ import {
   setAllMessagesIsReceivedInDB,
 } from '../../components/chat/Chat-Body/MessageBody'
 import { MessagesContext } from './MessagesContext'
-import Peer from 'peerjs'
+import { PeerContext } from './PeerContext'
 
 export const SocketContactContext = createContext()
 
 export const SocketContactProvider = ({ children }) => {
   // --------------------------------------------------------------------------------
-  const { user } = UserAuth()
-
-  const [actuallyContactId, setActuallyContactId] = useState('')
+  const { user, actuallyContactId, setActuallyContactId } = UserAuth()
+  const { hangingUp } = useContext(PeerContext)
+  const { setArrOfMessages } = useContext(MessagesContext)
+  // const [actuallyContactId, setActuallyContactId] = useState('')
   const [allUsers, setAllUsers] = useState(getFromStorage('allUsers', []))
   const [newMessages, setNewMessages] = useState(
     getFromStorage('newMessages', [])
   )
   const [myContacts, setMyContacts] = useState(getFromStorage('myContacts', []))
-  const { setArrOfMessages } = useContext(MessagesContext)
-  // const [myPeer, setMyPeer] = useState(null)
-
-  // // ---------------- PEER -----------------------
-
-  // useEffect(() => {
-  //   if (user !== null) {
-  //     setMyPeer((curr) => {
-  //       curr = new Peer(user.uid)
-  //       console.log('curr', curr)
-  //       curr.on('open', (id) => {
-  //         console.log('My peer ID is: ' + id)
-  //       })
-  //       curr.on('error', (error) => {
-  //         console.error(error)
-  //       })
-  //       return curr
-  //     })
-  //   }
-  // }, [user])
 
   // ----------------------------- ALL USERS --------------------
 
@@ -116,6 +97,25 @@ export const SocketContactProvider = ({ children }) => {
 
     return () => {
       socket.off('new user')
+    }
+  })
+
+  // SOCKET - call contact you
+  useEffect(() => {
+    socket.on('call contact you', (data) => {
+      // it's me, so nothing to do !!!!
+      if (data.from === user.uid) {
+        console.log("it's me !!!")
+        return
+      }
+      if (data.callStatus === 'finished') {
+        // alert('le contact a raccroché')
+        hangingUp()
+      }
+    })
+
+    return () => {
+      socket.off('call contact you')
     }
   })
 

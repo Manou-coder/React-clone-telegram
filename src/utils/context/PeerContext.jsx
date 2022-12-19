@@ -5,6 +5,7 @@ import { useContext } from 'react'
 import { useRef } from 'react'
 import { useEffect } from 'react'
 
+import { v4 as uuidv4 } from 'uuid'
 import socket from '../socket.io'
 import { UserAuth } from './AuthContext'
 import { SocketContactContext } from './SocketContact'
@@ -15,8 +16,8 @@ export const PeerContext = createContext()
 let video = true
 
 export const PeerProvider = ({ children }) => {
-  const { user } = UserAuth()
-  const { actuallyContactId } = useContext(SocketContactContext)
+  // je prend l'actually contact id a partir de userAuth car 'socketContact' est en dessous de 'PeerContext'
+  const { user, actuallyContactId } = UserAuth()
   const { setIsToastOpen, setIsCallOpen } = useContext(ThemeContext)
   const [myPeer, setMyPeer] = useState(null)
   const [isCalling, setIsCalling] = useState(false)
@@ -26,6 +27,7 @@ export const PeerProvider = ({ children }) => {
   const [myStream, setMyStream] = useState(null)
   const [isCameraActive, setIsCameraActive] = useState(true)
   const [isMicroActive, setIsMicroActive] = useState(true)
+  const [callObj, setCallObj] = useState(null)
   const grandVideo = useRef()
   const smallVideo = useRef()
   const ringtone = useRef()
@@ -93,13 +95,6 @@ export const PeerProvider = ({ children }) => {
 
   // call the contact
   function callTheContact() {
-    //
-    // // emit socket that I am calling
-    // socket.emit('callUser', {
-    //   from: user.uid,
-    //   to: actuallyContactId,
-    // })
-
     // request authorization to use the camera and the microphone and if so then call the contact
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
@@ -124,6 +119,10 @@ export const PeerProvider = ({ children }) => {
         setCall(call)
         // I am calling and so the outgoing call music is activated
         setIsCalling(true)
+        // if call exists so emit socket of this call
+        if (call) {
+          emitSocketCallContact(user.uid, actuallyContactId, setCallObj)
+        }
         // function that fires when the contact answers the call and sends a stream
         call.on('stream', (streamOfContact) => {
           // turn off the outgoing call music
@@ -183,6 +182,7 @@ export const PeerProvider = ({ children }) => {
     setIsCallAccepted(false)
     setMyStream(null)
     setCall(null)
+    emitSocketHangUp(user.uid, actuallyContactId, callObj, setCallObj)
   }
 
   function muteMyVideo() {
@@ -288,4 +288,23 @@ function changeVideoLocation(video1, video2) {
   const srcObjectVideo2 = video2.srcObject
   video1.srcObject = srcObjectVideo2
   video2.srcObject = srcObjectVideo1
+}
+
+function emitSocketCallContact(myId, contactId, setCallObj) {
+  const callObj = {
+    from: myId,
+    to: contactId,
+    id: uuidv4(),
+    videoCall: video,
+    callStatus: 'calling',
+    time: Date.now(),
+  }
+  setCallObj({ ...callObj })
+  socket.emit('call contact', callObj)
+}
+
+function emitSocketHangUp(myId, contactId, callObj, setCallObj) {
+  const newCallObj = { ...callObj, callStatus: 'finished', time: Date.now() }
+  setCallObj({ ...newCallObj })
+  socket.emit('call contact', newCallObj)
 }
