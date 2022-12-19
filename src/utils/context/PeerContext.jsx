@@ -19,8 +19,8 @@ export const PeerProvider = ({ children }) => {
   const [myPeer, setMyPeer] = useState(null)
   const [isCalling, setIsCalling] = useState(false)
   const [isCallAccepted, setIsCallAccepted] = useState(false)
-  const [isCallAcceptedByMe, setIsCallAcceptedByMe] = useState(false)
   const [call, setCall] = useState(null)
+  const [isVideoCall, setIsVideoCall] = useState(true)
   const [myStream, setMyStream] = useState(null)
   const [isCameraActive, setIsCameraActive] = useState(true)
   const [isMicroActive, setIsMicroActive] = useState(true)
@@ -101,8 +101,15 @@ export const PeerProvider = ({ children }) => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((myStream) => {
-        // save my stream
+        // save my streams
         setMyStream(myStream)
+        // if the call is in audio only then deactivate the video of the stream
+        setIsVideoCall((isVideoCall) => {
+          if (!isVideoCall) {
+            stopMyVideoStream(myStream)
+          }
+          return isVideoCall
+        })
         // open call display
         setIsCallOpen(true)
         // create object of call
@@ -161,6 +168,8 @@ export const PeerProvider = ({ children }) => {
     setIsCallOpen(false)
     setIsCalling(false)
     setIsCallAccepted(false)
+    setMyStream(null)
+    setCall(null)
   }
 
   function muteMyVideo() {
@@ -179,17 +188,25 @@ export const PeerProvider = ({ children }) => {
     }
   }
 
+  function videoCall() {
+    setIsVideoCall(true)
+    setIsCameraActive(true)
+    callTheContact()
+  }
+
+  function audioCall() {
+    setIsVideoCall(false)
+    setIsCameraActive(false)
+    callTheContact()
+  }
+
   return (
     <PeerContext.Provider
       value={{
-        myPeer,
-        setMyPeer,
         isCalling,
         setIsCalling,
         isCallAccepted,
         setIsCallAccepted,
-        isCallAcceptedByMe,
-        setIsCallAcceptedByMe,
         grandVideo,
         smallVideo,
         ringtone,
@@ -197,12 +214,14 @@ export const PeerProvider = ({ children }) => {
         setCall,
         hangingUp,
         pickUp,
-        callTheContact,
         muteMyVideo,
         muteMyAudio,
         swapVideo,
         isCameraActive,
         isMicroActive,
+        setIsVideoCall,
+        videoCall,
+        audioCall,
       }}
     >
       {children}
@@ -224,26 +243,11 @@ function addVideoStream(video, stream) {
   })
 }
 
-// // Remove all media streams (microphone and webcam will be disabled)
-// function stopStreamedVideo(videoElem) {
-//   console.log('videoElem', videoElem)
-//   const stream = videoElem.srcObject
-//   console.log('stream', stream)
-//   // recover all the media Streams
-//   const tracks = stream.getTracks()
-//   // then stop them as well as remove them
-//   tracks.forEach((track) => {
-//     track.stop()
-//     track.enabled = false
-//   })
-//   // remove the 'srcObject' from the video
-//   videoElem.srcObject = null
-// }
-
 function stopAllMyStreams(stream) {
+  // get all streams
   console.log('stream', stream)
   const tracks = stream.getTracks()
-  // then stop them as well as remove them
+  // stop them as well as remove them
   tracks.forEach((track) => {
     track.stop()
     track.enabled = false
@@ -251,20 +255,14 @@ function stopAllMyStreams(stream) {
 }
 
 function stopMyVideoStream(stream) {
-  console.log('stream', stream)
   const tracks = stream.getTracks()
-  console.log('tracks', tracks)
   const videoTrack = tracks.find((track) => track.kind === 'video')
-  console.log('videoTrack', videoTrack)
   videoTrack.enabled = !videoTrack.enabled
 }
 
 function stopMyAudioStream(stream) {
-  console.log('stream', stream)
   const tracks = stream.getTracks()
-  console.log('tracks', tracks)
   const audioTrack = tracks.find((track) => track.kind === 'audio')
-  console.log('audioTrack', audioTrack)
   audioTrack.enabled = !audioTrack.enabled
 }
 
@@ -274,52 +272,3 @@ function changeVideoLocation(video1, video2) {
   video1.srcObject = srcObjectVideo2
   video2.srcObject = srcObjectVideo1
 }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-// function sends message with peerjs
-
-// useEffect(() => {
-//   if (!myPeer || !conn) {
-//     console.log("il n'y a pas de conn ou de peer")
-//     return
-//   }
-//   console.log('conn exists!')
-//   // Handle incoming data connection
-//   myPeer.on('connection', (conn) => {
-//     console.log('incoming peer connection!')
-//     conn.on('data', (data) => {
-//       console.log(`received: ${data}`)
-//     })
-//     conn.on('open', () => {
-//       console.log('open')
-//       conn.send('hello!')
-//     })
-//   })
-
-//   return () => {
-//     myPeer.off('connection')
-//     conn.off('data')
-//   }
-// }, [myPeer, conn])
-
-// // I connect with the contact I am calling
-// const connectionToAnotherPeer = myPeer.connect(actuallyContactId)
-// // I set the connexion to 'setConn'
-// setConn(connectionToAnotherPeer)
-
-// connectionToAnotherPeer.on('data', (data) => {
-//   console.log(`received: ${data}`)
-// })
-// connectionToAnotherPeer.on('open', () => {
-//   connectionToAnotherPeer.send('hi!')
-// })

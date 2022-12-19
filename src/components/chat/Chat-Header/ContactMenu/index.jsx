@@ -6,10 +6,12 @@ import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
+import { PeerContext } from '../../../../utils/context/PeerContext'
 
-export default function ContactMenu({ callTheContact }) {
+export default function ContactMenu() {
   const { theme, setIsCallOpen } = useContext(ThemeContext)
   const { language } = useContext(LanguageContext)
+  const { videoCall, audioCall } = useContext(PeerContext)
 
   const bgColor =
     theme === 'light' ? 'rgb(255, 255, 255, 0.9)' : 'rgb(33, 37, 41, 0.9)'
@@ -79,7 +81,7 @@ export default function ContactMenu({ callTheContact }) {
             <div
               className={`row ${listItemMenuBgColor} py-2 m-0`}
               type="button"
-              onClick={() => callTheContact()}
+              onClick={() => audioCall()}
             >
               <div className="col-2 d-flex justify-content-center align-items-center">
                 <span className="d-flex">
@@ -97,7 +99,7 @@ export default function ContactMenu({ callTheContact }) {
             <div
               className={`row ${listItemMenuBgColor} py-2 m-0`}
               type="button"
-              onClick={() => callTheContact()}
+              onClick={() => videoCall()}
             >
               <div className="col-2 d-flex justify-content-center align-items-center">
                 <span className="d-flex">

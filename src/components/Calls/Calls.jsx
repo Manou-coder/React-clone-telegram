@@ -64,7 +64,7 @@ export default function Calls() {
             className="col-12 col-lg-4 rounded position-relative"
           >
             {/* CLOSE */}
-            <span onClick={() => setIsCallOpen(false)}>
+            <span onClick={() => hangingUp()}>
               <img
                 src={Croix}
                 alt="close"
@@ -207,7 +207,6 @@ export default function Calls() {
               />
               <ButtonPhone
                 onClick={() => hangingUp()}
-                // onClick={() => alert(':l;k,jnhbgfvdfcds')}
                 name={'telephone'}
                 buttonBgColor={'red'}
                 svgSrc={

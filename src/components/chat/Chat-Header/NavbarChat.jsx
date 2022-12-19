@@ -9,12 +9,12 @@ import Avatar from '../../../assets/img/avatar4.png'
 import { imgError } from '../../../utils/functions/returnAvatarIsImgError'
 import { PeerContext } from '../../../utils/context/PeerContext'
 
-export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
+export default function NavbarChat() {
   const { actuallyContactId, allUsers } = useContext(SocketContactContext)
 
-  const { setIsChatOpen, setIsCallOpen } = useContext(ThemeContext)
+  const { setIsChatOpen } = useContext(ThemeContext)
 
-  const { setIsCalling, callTheContact } = useContext(PeerContext)
+  const { videoCall, audioCall } = useContext(PeerContext)
 
   const contact =
     allUsers && allUsers.find((e) => e.userId === actuallyContactId)
@@ -162,7 +162,7 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
       </div>
       <div className="d-none d-lg-flex col-lg-1">
         <span
-          onClick={() => callTheContact()}
+          onClick={() => audioCall()}
           className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
         >
           {/* <i className="fa-solid fa-phone fa-lg"></i> */}
@@ -210,11 +210,7 @@ export default function NavbarChat({ setIconBarIsActive, iconBarIsActive }) {
             <path d="M64 360c30.9 0 56 25.1 56 56s-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56zm0-160c30.9 0 56 25.1 56 56s-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56zM120 96c0 30.9-25.1 56-56 56S8 126.9 8 96S33.1 40 64 40s56 25.1 56 56z" />
           </svg>
         </span>
-        <div ref={refComponent}>
-          {isComponentVisible && (
-            <ContactMenu callTheContact={callTheContact} />
-          )}
-        </div>
+        <div ref={refComponent}>{isComponentVisible && <ContactMenu />}</div>
       </div>
     </div>
   )

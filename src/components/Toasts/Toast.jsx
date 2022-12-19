@@ -6,9 +6,11 @@ import { useEffect } from 'react'
 import Croix from '../../assets/svg/croix.svg'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 import { PeerContext } from '../../utils/context/PeerContext'
+import { LanguageContext } from '../../utils/context/LanguageContext'
 
 export default function Toast() {
   const { setIsToastOpen } = useContext(ThemeContext)
+  const { language } = useContext(LanguageContext)
   const ringtone = useRef()
   const { allUsers } = useContext(SocketContactContext)
   const { pickUp, call } = useContext(PeerContext)
@@ -48,7 +50,7 @@ export default function Toast() {
           </div>
           <div className="col">
             <strong className="">
-              {contact && contact.displayName} vous appelle...
+              {contact && contact.displayName + ' ' + _isCallingYou[language]}
             </strong>
           </div>
           <div
@@ -66,7 +68,7 @@ export default function Toast() {
             }}
             className="btn btn-danger btn-sm "
           >
-            Raccrocher
+            {_hangUp[language]}
           </button>
           <button
             onClick={() => {
@@ -75,10 +77,29 @@ export default function Toast() {
             }}
             className="btn btn-success btn-sm "
           >
-            Décrocher
+            {_pickUp[language]}
           </button>
         </div>
       </div>
     </>
   )
+}
+
+// LANGUAGE
+
+const _pickUp = {
+  en: 'Pick Up',
+  fr: 'Décrocher',
+  il: 'לענות',
+}
+const _hangUp = {
+  en: 'Hang up',
+  fr: 'Raccrocher',
+  il: 'לסרב',
+}
+
+const _isCallingYou = {
+  en: 'is calling you...',
+  fr: 'vous appelle...',
+  il: 'מתקשר אליך...',
 }
