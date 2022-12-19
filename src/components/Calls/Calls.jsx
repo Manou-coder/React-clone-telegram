@@ -25,6 +25,7 @@ export default function Calls() {
     hangingUp,
     muteMyVideo,
     muteMyAudio,
+    swapVideo,
     isCameraActive,
     isMicroActive,
   } = useContext(PeerContext)
@@ -113,8 +114,9 @@ export default function Calls() {
                   position: 'absolute',
                   bottom: '5px',
                   right: '5px',
+                  minWidth: '130px',
                   width: '25%',
-                  height: '50%',
+                  height: '40%',
                   objectFit: 'cover',
                   borderRadius: '5px',
                 }}
@@ -175,6 +177,7 @@ export default function Calls() {
               />
               <ButtonPhone
                 name={'swap'}
+                onClick={() => swapVideo()}
                 buttonBgColor={'rgb(0,0,0, 0.2)'}
                 svgSrc={
                   <svg

@@ -173,6 +173,12 @@ export const PeerProvider = ({ children }) => {
     setIsMicroActive(!isMicroActive)
   }
 
+  function swapVideo() {
+    if (smallVideo.current && grandVideo.current) {
+      changeVideoLocation(smallVideo.current, grandVideo.current)
+    }
+  }
+
   return (
     <PeerContext.Provider
       value={{
@@ -194,6 +200,7 @@ export const PeerProvider = ({ children }) => {
         callTheContact,
         muteMyVideo,
         muteMyAudio,
+        swapVideo,
         isCameraActive,
         isMicroActive,
       }}
@@ -259,6 +266,13 @@ function stopMyAudioStream(stream) {
   const audioTrack = tracks.find((track) => track.kind === 'audio')
   console.log('audioTrack', audioTrack)
   audioTrack.enabled = !audioTrack.enabled
+}
+
+function changeVideoLocation(video1, video2) {
+  const srcObjectVideo1 = video1.srcObject
+  const srcObjectVideo2 = video2.srcObject
+  video1.srcObject = srcObjectVideo2
+  video2.srcObject = srcObjectVideo1
 }
 
 //
