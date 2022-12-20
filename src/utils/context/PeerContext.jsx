@@ -238,7 +238,7 @@ export const PeerProvider = ({ children }) => {
 
   useEffect(() => {
     if (isFinishedCall) {
-      if (setIsToastOpen) {
+      if (setIsToastOpen && !isCallAccepted) {
         setIsToastOpen(false)
       } else {
         hangingUp()
