@@ -27,8 +27,8 @@ root.render(
       <LanguageProvider>
         <ThemeProvider>
           <MessagesContextProvider>
-            <PeerProvider>
-              <SocketContactProvider>
+            <SocketContactProvider>
+              <PeerProvider>
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route
@@ -58,8 +58,8 @@ root.render(
                   </Route>
                   <Route path="*" element={<Error />} />
                 </Routes>
-              </SocketContactProvider>
-            </PeerProvider>
+              </PeerProvider>
+            </SocketContactProvider>
           </MessagesContextProvider>
         </ThemeProvider>
       </LanguageProvider>

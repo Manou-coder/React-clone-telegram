@@ -24,9 +24,6 @@ export default function Toast() {
     ? _video[language]
     : _audio[language]
 
-  console.log('isVideoCallFromContact', isVideoCallFromContact)
-  // alert(typeOfCall)
-
   return (
     <>
       <audio

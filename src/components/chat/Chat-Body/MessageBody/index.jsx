@@ -79,7 +79,7 @@ export default function MesssageBody() {
         msg.status = 'read'
       }
     })
-    console.log('allMessagesFromDB 2', allMessagesWithThisContactFromDB)
+    // console.log('allMessagesFromDB 2', allMessagesWithThisContactFromDB)
     // add to this array badge time and update the CHAT with this array
     const allMessagesWithThisContactFromDBWithBadge = addBadgeDateToArr(
       allMessagesWithThisContactFromDB
@@ -353,7 +353,7 @@ export async function setAllMessagesIsReceivedInDB(
   usersListFromSocket
 ) {
   // console.log('usersList', usersList)
-  console.log('actuallyContactId', actuallyContactId)
+  // console.log('actuallyContactId', actuallyContactId)
   const socketUser = usersListFromSocket.find(
     (user) => actuallyContactId === user.userId
   )
@@ -402,7 +402,11 @@ export async function setAllMessagesIsReceivedInDB(
 }
 
 function setAllMessagesIsReceived(myId, contactInDB, actuallyContactId, arr) {
-  console.log('arr', arr)
+  // console.log('arr', arr)
+  if (!arr) {
+    console.log('probleme a resoudre')
+    return
+  }
   let dateInMs = new Date().getTime()
   let newArr = [...arr]
   for (const msg of newArr) {

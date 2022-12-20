@@ -24,7 +24,7 @@ function Contacts({ inputLetters }) {
     a.displayName > b.displayName ? 1 : b.displayName > a.displayName ? -1 : 0
   )
 
-  console.log(' searchedContactList 2', searchedContactList)
+  // console.log(' searchedContactList 2', searchedContactList)
 
   return (
     <ul className="p-0 mt-2" style={{ listStyleType: 'none' }}>

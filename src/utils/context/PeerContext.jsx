@@ -16,8 +16,8 @@ export const PeerContext = createContext()
 let video = true
 
 export const PeerProvider = ({ children }) => {
-  // je prend l'actually contact id a partir de userAuth car 'socketContact' est en dessous de 'PeerContext'
-  const { user, actuallyContactId } = UserAuth()
+  const { user } = UserAuth()
+  const { actuallyContactId } = useContext(SocketContactContext)
   const { setIsToastOpen, setIsCallOpen } = useContext(ThemeContext)
   const [myPeer, setMyPeer] = useState(null)
   const [isCalling, setIsCalling] = useState(false)
@@ -28,6 +28,7 @@ export const PeerProvider = ({ children }) => {
   const [isCameraActive, setIsCameraActive] = useState(true)
   const [isMicroActive, setIsMicroActive] = useState(true)
   const [callObj, setCallObj] = useState(null)
+  const [isFinishedCall, setIsFinishedCall] = useState(false)
   const grandVideo = useRef()
   const smallVideo = useRef()
   const ringtone = useRef()
@@ -44,11 +45,11 @@ export const PeerProvider = ({ children }) => {
   // Log my Peer and catch error with him
   useEffect(() => {
     if (!myPeer) {
-      console.log("il n'y a pas de peer")
+      // console.log("il n'y a pas de peer")
       return
     }
     myPeer.on('open', (id) => {
-      console.log('My peer ID is: ' + id)
+      // console.log('My peer ID is: ' + id)
     })
     myPeer.on('error', (error) => {
       console.error(error)
@@ -66,7 +67,7 @@ export const PeerProvider = ({ children }) => {
       return
     }
     myPeer.on('call', (call) => {
-      console.log('call', call)
+      // console.log('call', call)
       // set the call in 'setCall'
       setCall(call)
       // open the toast to be able to hang up or answer
@@ -99,7 +100,6 @@ export const PeerProvider = ({ children }) => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((myStream) => {
-        console.log('video1', video)
         // save my streams
         setMyStream(myStream)
         // if the call is in audio only then deactivate the video of the stream
@@ -182,7 +182,8 @@ export const PeerProvider = ({ children }) => {
     setIsCallAccepted(false)
     setMyStream(null)
     setCall(null)
-    emitSocketHangUp(user.uid, actuallyContactId, callObj, setCallObj)
+    // socket
+    emitSocketHangUp(callObj, setCallObj)
   }
 
   function muteMyVideo() {
@@ -217,6 +218,35 @@ export const PeerProvider = ({ children }) => {
     callTheContact()
   }
 
+  // ----------------------------------- SOCKET ----------------------
+
+  // SOCKET - call contact you
+  useEffect(() => {
+    socket.on('call contact you', (data) => {
+      console.log('call data', data)
+      setCallObj({ ...data })
+      /*STRANGE - I have to use a new state 'isFinishedCall' because if I use the 'hangingUp' function directly then socket.io creates a new user. don't ask me why I have no idea.*/
+      if (data.callStatus === 'finished') {
+        setIsFinishedCall(true)
+      }
+    })
+
+    return () => {
+      socket.off('call contact you')
+    }
+  })
+
+  useEffect(() => {
+    if (isFinishedCall) {
+      if (setIsToastOpen) {
+        setIsToastOpen(false)
+      } else {
+        hangingUp()
+      }
+      setIsFinishedCall(false)
+    }
+  }, [isFinishedCall])
+
   return (
     <PeerContext.Provider
       value={{
@@ -247,7 +277,7 @@ export const PeerProvider = ({ children }) => {
 }
 
 function playMyVideo(video, stream) {
-  console.log('video', video)
+  // console.log('video', video)
   // the sound of my video is muted so that I cannot hear myself when I speak with the contact
   video.muted = true
   addVideoStream(video, stream)
@@ -262,7 +292,7 @@ function addVideoStream(video, stream) {
 
 function stopAllMyStreams(stream) {
   // get all streams
-  console.log('stream', stream)
+  // console.log('stream', stream)
   const tracks = stream.getTracks()
   // stop them as well as remove them
   tracks.forEach((track) => {
@@ -303,8 +333,13 @@ function emitSocketCallContact(myId, contactId, setCallObj) {
   socket.emit('call contact', callObj)
 }
 
-function emitSocketHangUp(myId, contactId, callObj, setCallObj) {
-  const newCallObj = { ...callObj, callStatus: 'finished', time: Date.now() }
-  setCallObj({ ...newCallObj })
+function emitSocketHangUp(callObj, setCallObj) {
+  const newCallObj = {
+    ...callObj,
+    callStatus: 'finished',
+    time: Date.now(),
+  }
+  console.log('newCallObj', newCallObj)
+  setCallObj(newCallObj)
   socket.emit('call contact', newCallObj)
 }

@@ -78,9 +78,6 @@ export const AuthContextProvider = ({ children }) => {
     }
   }, [])
 
-  // galere de derniere minute g mis ici le actually contact id bien que normalement il doit etre dans 'socketContact' parce que je dois utiler l'id dans peer context qui est au dessus de 'socketContact'
-  const [actuallyContactId, setActuallyContactId] = useState('')
-
   return (
     <AuthContext.Provider
       value={{
@@ -91,8 +88,6 @@ export const AuthContextProvider = ({ children }) => {
         signUp,
         signIn,
         userRef,
-        actuallyContactId,
-        setActuallyContactId,
       }}
     >
       {!loadingData && children}

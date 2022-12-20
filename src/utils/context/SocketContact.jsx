@@ -12,16 +12,14 @@ import {
   setAllMessagesIsReceivedInDB,
 } from '../../components/chat/Chat-Body/MessageBody'
 import { MessagesContext } from './MessagesContext'
-import { PeerContext } from './PeerContext'
 
 export const SocketContactContext = createContext()
 
 export const SocketContactProvider = ({ children }) => {
   // --------------------------------------------------------------------------------
-  const { user, actuallyContactId, setActuallyContactId } = UserAuth()
-  const { hangingUp } = useContext(PeerContext)
+  const { user } = UserAuth()
   const { setArrOfMessages } = useContext(MessagesContext)
-  // const [actuallyContactId, setActuallyContactId] = useState('')
+  const [actuallyContactId, setActuallyContactId] = useState('')
   const [allUsers, setAllUsers] = useState(getFromStorage('allUsers', []))
   const [newMessages, setNewMessages] = useState(
     getFromStorage('newMessages', [])
@@ -59,6 +57,7 @@ export const SocketContactProvider = ({ children }) => {
   useEffect(() => {
     if (user !== null) {
       startSocket(user.uid)
+      console.log('start socket')
     }
   }, [user])
 
@@ -100,30 +99,11 @@ export const SocketContactProvider = ({ children }) => {
     }
   })
 
-  // SOCKET - call contact you
-  useEffect(() => {
-    socket.on('call contact you', (data) => {
-      // it's me, so nothing to do !!!!
-      if (data.from === user.uid) {
-        console.log("it's me !!!")
-        return
-      }
-      if (data.callStatus === 'finished') {
-        // alert('le contact a raccroché')
-        hangingUp()
-      }
-    })
-
-    return () => {
-      socket.off('call contact you')
-    }
-  })
-
   // -------------------------- Functions Internes ------------------------------
 
   async function setAllUsersFromDB() {
     const allUsers = await getAllUsersFromDB()
-    console.log('allUsers', allUsers)
+    // console.log('allUsers', allUsers)
     setInStorage('allUsers', allUsers)
     setAllUsers((curr) => {
       curr = JSON.parse(JSON.stringify(allUsers))
@@ -133,7 +113,7 @@ export const SocketContactProvider = ({ children }) => {
 
   async function setMyContactsFromDB(myId, setMyContacts) {
     const myContactsFromDB = await getMyContactsFromDB(myId)
-    console.log('myContactsFromDB', myContactsFromDB)
+    // console.log('myContactsFromDB', myContactsFromDB)
     setInStorage('myContacts', myContactsFromDB)
     setMyContacts(myContactsFromDB)
   }
@@ -188,8 +168,6 @@ export const SocketContactProvider = ({ children }) => {
         newMessages,
         setNewMessages,
         setAllUsersFromDB,
-        // myPeer,
-        // setMyPeer,
       }}
     >
       {children}
