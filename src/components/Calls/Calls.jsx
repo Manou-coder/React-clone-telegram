@@ -19,6 +19,7 @@ export default function Calls() {
   const { user } = UserAuth()
   const { actuallyContactId, allUsers } = useContext(SocketContactContext)
   const {
+    call,
     isCallAccepted,
     ringtone,
     grandVideo,
@@ -33,8 +34,11 @@ export default function Calls() {
   } = useContext(PeerContext)
   const { language } = useContext(LanguageContext)
 
-  const contact =
-    allUsers && allUsers.find((e) => e.userId === actuallyContactId)
+  // const contact =
+  //   allUsers && allUsers.find((e) => e.userId === actuallyContactId)
+
+  // this contact is defined by the id of the peer contact who is calling
+  const contact = allUsers && allUsers.find((e) => e.userId === call.peer)
 
   const displayVideo = isCallAccepted ? '' : 'd-none'
   const displayContact = isCallAccepted ? 'd-none' : ''
