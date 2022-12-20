@@ -18,7 +18,8 @@ let video = true
 export const PeerProvider = ({ children }) => {
   const { user } = UserAuth()
   const { actuallyContactId } = useContext(SocketContactContext)
-  const { setIsToastOpen, setIsCallOpen } = useContext(ThemeContext)
+  const { setIsToastOpen, setIsCallOpen, isToastOpen } =
+    useContext(ThemeContext)
   const [myPeer, setMyPeer] = useState(null)
   const [isCalling, setIsCalling] = useState(false)
   const [isCallAccepted, setIsCallAccepted] = useState(false)
@@ -29,6 +30,7 @@ export const PeerProvider = ({ children }) => {
   const [isMicroActive, setIsMicroActive] = useState(true)
   const [callObj, setCallObj] = useState(null)
   const [isFinishedCall, setIsFinishedCall] = useState(false)
+  const [isContactHangingUp, setIsContactHangingUp] = useState(false)
   const grandVideo = useRef()
   const smallVideo = useRef()
   const ringtone = useRef()
@@ -186,6 +188,12 @@ export const PeerProvider = ({ children }) => {
     emitSocketHangUp(callObj, setCallObj)
   }
 
+  //  hanging up the phone in Toast
+  function hangingUpToast() {
+    setIsToastOpen(false)
+    emitSocketHangUp(callObj, setCallObj)
+  }
+
   function muteMyVideo() {
     stopMyVideoStream(myStream)
     setIsCameraActive(!isCameraActive)
@@ -238,10 +246,15 @@ export const PeerProvider = ({ children }) => {
 
   useEffect(() => {
     if (isFinishedCall) {
-      if (setIsToastOpen && !isCallAccepted) {
+      if (isToastOpen) {
         setIsToastOpen(false)
       } else {
-        hangingUp()
+        setIsContactHangingUp(true)
+        setTimeout(() => {
+          hangingUp()
+          setIsContactHangingUp(false)
+        }, 2000)
+        // hangingUp()
       }
       setIsFinishedCall(false)
     }
@@ -269,6 +282,8 @@ export const PeerProvider = ({ children }) => {
         setIsVideoCall,
         videoCall,
         audioCall,
+        isContactHangingUp,
+        hangingUpToast,
       }}
     >
       {children}

@@ -13,7 +13,8 @@ export default function Toast() {
   const { language } = useContext(LanguageContext)
   const ringtone = useRef()
   const { allUsers } = useContext(SocketContactContext)
-  const { pickUp, call, setIsVideoCall } = useContext(PeerContext)
+  const { pickUp, call, setIsVideoCall, hangingUpToast } =
+    useContext(PeerContext)
 
   // this contact is defined by the id of the peer contact who is calling
   const contact = allUsers && allUsers.find((e) => e.userId === call.peer)
@@ -123,7 +124,8 @@ export default function Toast() {
           </div>
           <button
             onClick={() => {
-              setIsToastOpen(false)
+              // setIsToastOpen(false)
+              hangingUpToast()
             }}
             className="btn btn-danger btn-sm "
           >
