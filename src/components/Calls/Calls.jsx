@@ -64,7 +64,9 @@ export default function Calls() {
           {/* isContactHangingUp */}
           {isContactHangingUp && (
             <div style={{ zIndex: '30000', position: 'absolute' }}>
-              <h2 className="text-white">{`${contact.displayName} ${_hangUp[language]}`}</h2>
+              <h2 className="text-white">{`${contact && contact.displayName} ${
+                _hangUp[language]
+              }`}</h2>
             </div>
           )}
           {/* media query in style.css (change height for 100% to 80%) */}

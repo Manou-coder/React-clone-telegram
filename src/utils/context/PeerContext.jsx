@@ -98,6 +98,8 @@ export const PeerProvider = ({ children }) => {
 
   // call the contact
   function callTheContact() {
+    // test
+    setIsContactHangingUp(false)
     // request authorization to use the camera and the microphone and if so then call the contact
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
@@ -144,6 +146,8 @@ export const PeerProvider = ({ children }) => {
 
   // pick up the phone
   function pickUp() {
+    // test
+    setIsContactHangingUp(false)
     // open call display (it has to be here and not in navigator so that the muted is not null)
     setIsCallOpen(true)
     navigator.mediaDevices
@@ -177,7 +181,9 @@ export const PeerProvider = ({ children }) => {
 
   //  hanging up the phone
   function hangingUp() {
-    call.close()
+    if (call) {
+      call.close()
+    }
     stopAllMyStreams(myStream)
     setIsCallOpen(false)
     setIsCalling(false)
