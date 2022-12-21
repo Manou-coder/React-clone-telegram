@@ -18,7 +18,8 @@ import {
   updatetAllMessagesWhithThisContactInDB,
 } from '../../../../firebase-config'
 import { MessagesContext } from '../../../../utils/context/MessagesContext'
-import ButtonScroll from '../../ButtonScroll'
+import ButtonScroll from '../../ScrollButton'
+import ScrollButton from '../../ScrollButton'
 
 let firstTime
 
@@ -28,6 +29,7 @@ export default function MesssageBody() {
   const { setNewMessages, actuallyContactId } = useContext(SocketContactContext)
   const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
   const [isLoading, setLoading] = useState(true)
+  const scrollDiv = useRef()
   const lastMessageRef = useRef(null)
 
   useEffect(() => {
@@ -249,6 +251,7 @@ export default function MesssageBody() {
         scrollbarWidth: 'none',
         width: '100%',
       }}
+      ref={scrollDiv}
     >
       {isLoading ? (
         <div className="w-100 h-100 d-flex justify-content-center align-items-center">
@@ -288,7 +291,7 @@ export default function MesssageBody() {
             )
           })}
 
-          <ButtonScroll lastMessageRef={lastMessageRef} />
+          <ScrollButton lastMessageRef={lastMessageRef} scrollDiv={scrollDiv} />
 
           <div className="mt-4" ref={lastMessageRef}></div>
 

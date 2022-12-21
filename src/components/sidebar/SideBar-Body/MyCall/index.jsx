@@ -15,6 +15,8 @@ import { imgError } from '../../../../utils/functions/returnAvatarIsImgError'
 import { MessagesContext } from '../../../../utils/context/MessagesContext'
 import { addZero } from '../../../../utils/functions/addZero'
 import { svgSend } from '../../../../utils/functions/svgSend'
+import { format, formatDistance, formatRelative, subDays } from 'date-fns'
+import { enUS, he, fr } from 'date-fns/locale'
 
 function MyCall({ contactId, startTime, isOutgoingCall, videoCall, id }) {
   //   const { user } = UserAuth()
@@ -39,16 +41,49 @@ function MyCall({ contactId, startTime, isOutgoingCall, videoCall, id }) {
   // LANGUAGE
   const { language } = useContext(LanguageContext)
 
-  //   const _isTyping = {
-  //     en: 'Is typing...',
-  //     fr: "En train d'écrire...",
-  //     il: 'כותב/ת',
-  //   }
+  const _at = {
+    en: 'at',
+    fr: 'à',
+    il: 'ב',
+  }
 
   const contact = allUsers && allUsers.find((e) => e.userId === contactId)
 
+  const localeLanguage = () => {
+    if (language === 'il') {
+      return he
+    } else if (language === 'fr') {
+      return fr
+    } else {
+      return enUS
+    }
+  }
+
   const logoRotate = isOutgoingCall ? 'rotate(315deg)' : 'rotate(135deg)'
   const logoFill = isOutgoingCall ? '#31a24c' : 'red'
+
+  function calculDate(dateToStart) {
+    const relativeFormatDate = formatRelative(
+      new Date(dateToStart),
+      new Date(),
+      {
+        locale: localeLanguage(),
+      }
+    )
+    // console.log('relativeFormatDate', relativeFormatDate)
+    if (!relativeFormatDate.includes('/')) {
+      return relativeFormatDate
+    } else {
+      const normalFormatDate = format(
+        new Date(startTime),
+        `eeee d LLLL ${_at[language]} HH:mm`,
+        {
+          locale: localeLanguage(),
+        }
+      )
+      return normalFormatDate
+    }
+  }
 
   return (
     <li
@@ -105,7 +140,20 @@ function MyCall({ contactId, startTime, isOutgoingCall, videoCall, id }) {
                 <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
               </svg>
             </span>
-            <p className={`m-0 ${colorName}`}>18 decembre a 16:16</p>
+            {/* <p className={`m-0 ${colorName}`}>18 decembre a 16:16</p> */}
+            <p className={`m-0 ${colorName}`}>
+              {/* {formatRelative(subDays(new Date(), 5), new Date(), {
+                locale: fr,
+              })}
+              {format(
+                new Date(startTime),
+                `eeee d LLLL ${_at[language]} HH:mm`,
+                {
+                  locale: localeLanguage(),
+                }
+              )} */}
+              {calculDate(startTime)}
+            </p>
           </div>
         </div>
         <div
