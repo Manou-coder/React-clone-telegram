@@ -348,7 +348,7 @@ function emitSocketCallContact(myId, contactId, setCallObj) {
     id: uuidv4(),
     videoCall: video,
     callStatus: 'calling',
-    time: Date.now(),
+    startTime: Date.now(),
   }
   setCallObj({ ...callObj })
   socket.emit('call contact', callObj)
@@ -358,7 +358,7 @@ function emitSocketHangUp(callObj, setCallObj) {
   const newCallObj = {
     ...callObj,
     callStatus: 'finished',
-    time: Date.now(),
+    // time: Date.now(),
   }
   console.log('newCallObj', newCallObj)
   setCallObj(newCallObj)

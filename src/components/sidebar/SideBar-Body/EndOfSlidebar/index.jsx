@@ -1,10 +1,9 @@
-import Contacts from '../Contacts'
 import '../../../../utils/style/EndOfSlidebar.css'
-import Calls from '../Calls'
 import { useContext, useState } from 'react'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import MyContacts from '../MyContacts'
 import { SocketContactContext } from '../../../../utils/context/SocketContact'
+import MyCalls from '../MyCalls'
 
 function EndOfSlidebar({ inputLetters, setInputLetters, isContactsOpen }) {
   // DARK MODE
@@ -28,7 +27,7 @@ function EndOfSlidebar({ inputLetters, setInputLetters, isContactsOpen }) {
             setInputLetters={setInputLetters}
           />
         ) : (
-          <Calls />
+          <MyCalls />
         )}
       </div>
     </div>

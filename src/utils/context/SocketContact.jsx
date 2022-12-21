@@ -103,7 +103,7 @@ export const SocketContactProvider = ({ children }) => {
 
   async function setAllUsersFromDB() {
     const allUsers = await getAllUsersFromDB()
-    // console.log('allUsers', allUsers)
+    console.log('allUsers', allUsers)
     setInStorage('allUsers', allUsers)
     setAllUsers((curr) => {
       curr = JSON.parse(JSON.stringify(allUsers))
