@@ -8,6 +8,7 @@ import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
 import Avatar from '../../../assets/img/avatar4.png'
 import { imgError } from '../../../utils/functions/returnAvatarIsImgError'
 import { PeerContext } from '../../../utils/context/PeerContext'
+import { calculDate } from '../../../utils/functions/date'
 
 export default function NavbarChat() {
   const { actuallyContactId, allUsers } = useContext(SocketContactContext)
@@ -33,29 +34,15 @@ export default function NavbarChat() {
   const iconColor = theme === 'light' ? 'black' : '#909294'
   const iconBars = theme === 'light' ? 'icon-bars-light' : ' icon-bars-dark'
 
-  // console.log('socketContact', socketContact)
-
   const connectionStatus = () => {
-    // console.log('type of', typeof contact.isConnect)
     if (contact && typeof contact.isConnect === 'number') {
       const date = new Date(contact.isConnect)
-      const hoursAndMinutes = date.getHours() + ':' + addZero(date.getMinutes())
-      // console.log(hoursAndMinutes) // 👉️ 8:33
-      // new Date().toLocaleTimeString()
-      return _lastSeen[language] + ' ' + hoursAndMinutes
+      return `${_lastSeen[language]} ${calculDate(date, language)}`
     }
     if (contact && contact.isConnect) {
       return _online[language]
     } else {
       return _offline[language]
-    }
-  }
-
-  function addZero(number) {
-    if (number < 10) {
-      return '0' + number
-    } else {
-      return number
     }
   }
 
@@ -69,9 +56,9 @@ export default function NavbarChat() {
   }
 
   const _lastSeen = {
-    en: 'Last seen at',
-    fr: 'Dernière vu à',
-    il: 'נראה לאחרונה ב',
+    en: 'Last seen',
+    fr: 'Dernière vue',
+    il: 'נראה לאחרונה',
   }
 
   const _online = {
@@ -114,8 +101,8 @@ export default function NavbarChat() {
 
   return (
     <div
-      className={`row w-100 sticky-top ${bgColor} align-items-center m-0 mb-1`}
-      style={{ minHeight: '58px' }}
+      className={`d-flex ${bgColor} align-items-center m-0 mb-1`}
+      style={{ height: '58px' }}
     >
       <div
         className="col-2 h-100 d-lg-none d-flex align-items-center justify-content-center p-0"
@@ -145,15 +132,24 @@ export default function NavbarChat() {
           alt="..."
         ></img>
       </div>
-      <div className="col">
+      <div className="col-6 col-lg-7">
         <div>
-          <h3 className={`mb-0 fs-5 lh-1 ${colorName}`}>
+          <h3 className={`m-0 fs-5 lh-1 ${colorName}`}>
             {/* {socketContact.displayName} */}
             {contact && contact.displayName}
           </h3>
         </div>
-        <div>
-          <p className={`mb-0 fw-light pt-0 lh-1 ${colorInfo}`}>
+        <div style={{ marginTop: '3px' }}>
+          <p
+            style={{
+              height: '20px',
+              width: '100%',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+            }}
+            className={`mb-0 fw-light pt-0 lh-1 ${colorInfo}`}
+          >
             {contact && contact.isTyping
               ? _isTyping[language]
               : connectionStatus()}
@@ -210,7 +206,7 @@ export default function NavbarChat() {
         </span>
       </div>
       <div
-        className="col-2 col-lg-1 d-flex justify-content-center align-items-center position-relative"
+        className="col-2 col-lg-1 justify-content-center align-items-center position-relative"
         onClick={() => handleClickRefButton()}
       >
         <span className={`arrow ${arrowHover}`} ref={refButton}>

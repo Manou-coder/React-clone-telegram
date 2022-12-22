@@ -10,7 +10,7 @@ export default function ScrollButton({ lastMessageRef, scrollDiv }) {
   const scrollButton = useRef()
 
   const fillButton =
-    theme === 'light' ? 'rgb(0, 0, 0, 0.3)' : 'rgb(256, 256, 256, 0.3)'
+    theme === 'light' ? 'rgb(0, 0, 0, 0.3)' : 'rgb(255, 153, 0, 0.5)'
 
   // fades the scroll button when the div is scrolled and fades the scroll button when the div is in its normal state
   useEffect(() => {
