@@ -20,6 +20,7 @@ import {
 import { MessagesContext } from '../../../../utils/context/MessagesContext'
 import ButtonScroll from '../../ScrollButton'
 import ScrollButton from '../../ScrollButton'
+import { set } from 'date-fns/esm'
 
 let firstTime
 
@@ -28,8 +29,9 @@ export default function MesssageBody() {
   const { isChatOpen } = useContext(ThemeContext)
   const { setNewMessages, actuallyContactId } = useContext(SocketContactContext)
   const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
-  const [isLoading, setLoading] = useState(true)
-  const scrollDiv = useRef()
+  const [isLoading, setisLoading] = useState(true)
+  const scrollDiv = useRef(null)
+  const messagesDiv = useRef(null)
   const lastMessageRef = useRef(null)
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export default function MesssageBody() {
       setArrOfMessages(allMessagesWithThisContactFromStorageWithBadge)
     } else {
       // start loading
-      setLoading(true)
+      setisLoading(true)
     }
     // set it's downloaded for the first time (that the scroll is auto and not 'smooth')
     firstTime = true
@@ -71,7 +73,7 @@ export default function MesssageBody() {
     // check if was not messages then stop loading and return
     if (!allMessagesWithThisContactFromDB) {
       console.log('No messages!!!')
-      setLoading(false)
+      setisLoading(false)
       return
     }
 
@@ -102,7 +104,7 @@ export default function MesssageBody() {
       statusContact: 'read',
     })
     // stop loading
-    setLoading(false)
+    setisLoading(false)
   }
 
   useEffect(() => {
@@ -234,14 +236,21 @@ export default function MesssageBody() {
 
   // --------------------------- SROLL EFFECT --------------------------
   useEffect(() => {
-    if (firstTime) {
+    console.log('firstTime', firstTime)
+    if (firstTime && messagesDiv.current) {
       // 👇️ scroll to bottom QUICKLY first time to download all messages
+      messagesDiv.current.style.visibility = 'hidden'
       lastMessageRef.current?.scrollIntoView(false)
-    } else {
+      setTimeout(() => {
+        messagesDiv.current.style.visibility = 'visible'
+        firstTime = false
+      }, 250)
+    } else if (!firstTime && messagesDiv.current) {
       // 👇️ scroll to bottom SLOWLY every time messages change
       lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
+      // messagesDiv.current.style.backgroundColor = 'blue'
     }
-  }, [arrOfMessages])
+  }, [arrOfMessages, messagesDiv.current])
 
   return (
     <div
@@ -267,7 +276,11 @@ export default function MesssageBody() {
           </div>
         </div>
       ) : (
-        <div className="container d-flex flex-column" style={{ width: '90%' }}>
+        <div
+          className="container d-flex flex-column"
+          style={{ width: '90%' }}
+          ref={messagesDiv}
+        >
           {/* <!-- this div is meant to put a space between the message bubbles and the nav bar --> */}
           <div className="w-100" style={{ padding: '12px 0px' }}></div>
           {/* ------------------------------------MESSAGES-HERE------------------------------------------- */}
