@@ -15,7 +15,32 @@ export default function Message({
   const { language } = useContext(LanguageContext)
   const { theme } = useContext(ThemeContext)
   const justifyContentMsg = myMessage ? 'end' : 'start'
-  const bgColorMsg = myMessage ? '#d9ffb5' : 'white'
+  // const bgColorMsg = myMessage ? '#d9ffb5' : 'white'
+  const bgColorMsg = () => {
+    if (theme === 'light') {
+      if (myMessage) {
+        return '#d9ffb5'
+      } else {
+        return 'white'
+      }
+    } else {
+      if (myMessage) {
+        return '#d9ffb5'
+      } else {
+        return '#212529'
+      }
+    }
+  }
+  const textColorMsg = () => {
+    if (theme !== 'light') {
+      if (myMessage) {
+        return ''
+      } else {
+        return 'rgb(256, 256,256, 0.8)'
+      }
+    }
+  }
+
   const bgColorBadgeTime =
     theme === 'light' ? 'rgb(255, 255, 255, 0.6)' : '#212529'
   const textColorBadgeTime = theme === 'light' ? '' : 'white'
@@ -144,14 +169,13 @@ export default function Message({
             style={{
               color: textColorBadgeTime,
               backgroundColor: bgColorBadgeTime,
-              // boxShadow: ' 1px 1px 1px gray',
-              // position: 'relative',
-              // minWidth: '62px',
             }}
           >
             <span
               style={{
                 fontSize: '0.9em',
+                position: 'relative',
+                top: '-1px',
               }}
             >
               {explainTheDate(badgeTime)}
@@ -167,8 +191,9 @@ export default function Message({
           <div
             className="rounded"
             style={{
-              backgroundColor: bgColorMsg,
-              boxShadow: ' 1px 1px 1px gray',
+              backgroundColor: bgColorMsg(),
+              color: textColorMsg(),
+              boxShadow: theme === 'light' ? ' 1px 1px 1px gray' : '',
               position: 'relative',
               minWidth: '62px',
             }}
@@ -181,8 +206,9 @@ export default function Message({
               }}
             >
               <p
-                className="span-2 pb-0 px-1 mb-0 text-start"
+                className="pb-0 px-1 mb-0 text-start"
                 style={{
+                  // fontWeight: theme !== 'light' && !myMessage && '300',
                   maxWidth: '500px',
                 }}
               >
