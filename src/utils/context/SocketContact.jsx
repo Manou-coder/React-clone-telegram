@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import {
   getAllUsersFromDB,
   getHasNewMessagesFromDB,
+  getMyCallsFromDB,
   getMyContactsFromDB,
 } from '../../firebase-config'
 import { UserAuth } from './AuthContext'
@@ -25,6 +26,7 @@ export const SocketContactProvider = ({ children }) => {
     getFromStorage('newMessages', [])
   )
   const [myContacts, setMyContacts] = useState(getFromStorage('myContacts', []))
+  const [myCalls, setMyCalls] = useState(getFromStorage('myCalls', []))
 
   // ----------------------------- ALL USERS --------------------
 
@@ -39,6 +41,15 @@ export const SocketContactProvider = ({ children }) => {
   useEffect(() => {
     if (user !== null) {
       setMyContactsFromDB(user.uid, setMyContacts)
+    }
+  }, [user])
+
+  // ----------------------------- MY CALLS --------------------
+
+  // get and set 'MyContacts' from DB for the first time
+  useEffect(() => {
+    if (user !== null) {
+      setMyCallsFromDB(user.uid, setMyCalls)
     }
   }, [user])
 
@@ -118,6 +129,26 @@ export const SocketContactProvider = ({ children }) => {
     setMyContacts(myContactsFromDB)
   }
 
+  async function setMyCallsFromDB(myId, setMyCalls) {
+    const myCallsFromDB = await getMyCallsFromDB(myId)
+    console.log('myCallsFromDB', myCallsFromDB)
+    setInStorage('myCalls', myCallsFromDB)
+    setMyCalls(myCallsFromDB)
+  }
+
+  function updateMyCallsInChat(call) {
+    const callsList = [...myCalls]
+    let sameCall = callsList.find((element) => element.id === call.id)
+    console.log('sameCall', sameCall)
+    if (sameCall) {
+      sameCall = call
+    } else {
+      callsList.push(call)
+    }
+    setInStorage('myCalls', callsList)
+    setMyCalls(callsList)
+  }
+
   async function setNewMessagesInChatFromDB(myId) {
     const newMessages = await getHasNewMessagesFromDB(myId)
     // console.log('newMessages', newMessages)
@@ -168,6 +199,9 @@ export const SocketContactProvider = ({ children }) => {
         newMessages,
         setNewMessages,
         setAllUsersFromDB,
+        myCalls,
+        setMyCalls,
+        updateMyCallsInChat,
       }}
     >
       {children}

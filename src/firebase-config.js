@@ -343,3 +343,70 @@ export const updatetAllMessagesWhithThisContactInDB = async (
 }
 
 //  ----------------------------------------------------------
+
+// -----3------------ MY CALLS----------------
+
+// create users calls
+const createUsersCallsDB = async (userId) => {
+  const docRef = doc(db, 'usersCalls', userId)
+  try {
+    await setDoc(docRef, { myId: userId })
+    console.log('usersCalls created!')
+  } catch (error) {
+    console.dir(error)
+  }
+}
+
+// get MyCalls
+export const getMyCallsFromDB = async (myId) => {
+  const docRef = doc(db, 'usersCalls', myId)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    const myCalls = docSnap.data().myCalls
+    return myCalls
+  } else {
+    console.log('No such document!')
+    createUsersCallsDB(myId)
+  }
+}
+
+// update MyCalls
+export const updateMyCallsInDB = async (myId, call) => {
+  const docRef = doc(db, 'usersCalls', myId)
+  try {
+    await updateDoc(docRef, {
+      myCalls: call,
+    })
+    console.log('doc updated !!')
+  } catch (error) {
+    console.dir(error)
+  }
+}
+
+const myCallsList = [
+  {
+    from: 'kBmSu9b4EeVhdQC1fzZgXlK1ac02',
+    to: 'hJTBGfiYe9P458qvBF03gIhme7G3',
+    videoCall: true,
+    startTime: 1671613549568,
+    id: '1234',
+  },
+  {
+    from: 'hJTBGfiYe9P458qvBF03gIhme7G3',
+    to: 'kBmSu9b4EeVhdQC1fzZgXlK1ac02',
+    videoCall: false,
+    startTime: 1671613549568,
+    id: '1234',
+  },
+  {
+    from: 'h2WmrHC0qvdfF7SMg6EcVblIipE3',
+    to: 'kBmSu9b4EeVhdQC1fzZgXlK1ac02',
+    videoCall: true,
+    startTime: 1671999999999,
+    id: '1234',
+  },
+]
+
+// updateMyCallsInDB('kBmSu9b4EeVhdQC1fzZgXlK1ac02', myCallsList)
+
+//  ----------------------------------------------------------

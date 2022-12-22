@@ -17,7 +17,8 @@ let video = true
 
 export const PeerProvider = ({ children }) => {
   const { user } = UserAuth()
-  const { actuallyContactId } = useContext(SocketContactContext)
+  const { actuallyContactId, setMyCalls, updateMyCallsInChat } =
+    useContext(SocketContactContext)
   const { setIsToastOpen, setIsCallOpen, isToastOpen } =
     useContext(ThemeContext)
   const [myPeer, setMyPeer] = useState(null)
@@ -192,12 +193,15 @@ export const PeerProvider = ({ children }) => {
     setCall(null)
     // socket
     emitSocketHangUp(callObj, setCallObj)
+    // add call in myCalls
+    updateMyCallsInChat(callObj)
   }
 
   //  hanging up the phone in Toast
   function hangingUpToast() {
     setIsToastOpen(false)
     emitSocketHangUp(callObj, setCallObj)
+    updateMyCallsInChat(callObj)
   }
 
   function muteMyVideo() {
@@ -242,6 +246,8 @@ export const PeerProvider = ({ children }) => {
       /*STRANGE - I have to use a new state 'isFinishedCall' because if I use the 'hangingUp' function directly then socket.io creates a new user. don't ask me why I have no idea.*/
       if (data.callStatus === 'finished') {
         setIsFinishedCall(true)
+        // add call in myCalls
+        updateMyCallsInChat(callObj)
       }
     })
 
@@ -260,7 +266,6 @@ export const PeerProvider = ({ children }) => {
           hangingUp()
           setIsContactHangingUp(false)
         }, 2000)
-        // hangingUp()
       }
       setIsFinishedCall(false)
     }

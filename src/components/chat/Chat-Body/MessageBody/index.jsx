@@ -236,7 +236,6 @@ export default function MesssageBody() {
 
   // --------------------------- SROLL EFFECT --------------------------
   useEffect(() => {
-    console.log('firstTime', firstTime)
     if (firstTime && messagesDiv.current) {
       // 👇️ scroll to bottom QUICKLY first time to download all messages
       messagesDiv.current.style.visibility = 'hidden'
@@ -248,7 +247,6 @@ export default function MesssageBody() {
     } else if (!firstTime && messagesDiv.current) {
       // 👇️ scroll to bottom SLOWLY every time messages change
       lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
-      // messagesDiv.current.style.backgroundColor = 'blue'
     }
   }, [arrOfMessages, messagesDiv.current])
 

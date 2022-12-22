@@ -71,3 +71,35 @@ export default function useComponentVisible(initialIsVisible) {
 
   return { refComponent, refButton, isComponentVisible, setIsComponentVisible }
 }
+
+export function useComponentVisibleRightClick(initialIsVisible) {
+  const [isComponentVisible, setIsComponentVisible] = useState(initialIsVisible)
+  const refComponent = useRef(null)
+  const refButton = useRef(null)
+
+  const handleClickOutside = (event) => {
+    if (
+      refComponent.current &&
+      !refComponent.current.contains(event.target) &&
+      !refButton.current.contains(event.target)
+    ) {
+      //   console.log('Clicked Outside...')
+      setIsComponentVisible(false)
+    } else if (refButton.current && refButton.current.contains(event.target)) {
+      //   console.log('Clicked refButton..')
+    } else {
+      //   console.log('Clicked refComponent..')
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside, true)
+    document.addEventListener('contextmenu', handleClickOutside, true)
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true)
+      document.removeEventListener('contextmenu', handleClickOutside, true)
+    }
+  }, [])
+
+  return { refComponent, refButton, isComponentVisible, setIsComponentVisible }
+}

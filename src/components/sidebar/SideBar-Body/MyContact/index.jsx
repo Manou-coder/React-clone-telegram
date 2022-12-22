@@ -50,7 +50,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
       return curr
     })
   }
-
+  //
   // DARK MODE
   const { theme } = useContext(ThemeContext)
 
