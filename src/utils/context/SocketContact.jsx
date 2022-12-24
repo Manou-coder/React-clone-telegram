@@ -138,12 +138,14 @@ export const SocketContactProvider = ({ children }) => {
 
   function updateMyCallsInChat(call) {
     const callsList = [...myCalls]
+    // check if call exists
     let sameCall = callsList.find((element) => element.id === call.id)
     console.log('sameCall', sameCall)
+    // if it exists so modify it else add this call to callsList
     if (sameCall) {
       sameCall = call
     } else {
-      callsList.push(call)
+      callsList.unshift(call)
     }
     setInStorage('myCalls', callsList)
     setMyCalls(callsList)

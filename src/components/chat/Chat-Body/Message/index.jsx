@@ -3,6 +3,11 @@ import Check from '../../../../assets/img/check.svg'
 import { UserAuth } from '../../../../utils/context/AuthContext'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
+import { useComponentVisibleRightClick } from '../../../../utils/functions/useHandleClickOutside'
+import MessageMenu from '../MessageMenu'
+
+let offsetX = 0
+let offsetY = 0
 
 export default function Message({
   content,
@@ -10,6 +15,7 @@ export default function Message({
   time,
   status,
   badgeTime,
+  messageId,
 }) {
   const { user } = UserAuth()
   const { language } = useContext(LanguageContext)
@@ -160,6 +166,21 @@ export default function Message({
     il: 'היום',
   }
 
+  // Message Menu
+
+  const { refComponent, refButton, isComponentVisible, setIsComponentVisible } =
+    useComponentVisibleRightClick(false)
+
+  const handleClickRefButton = (e) => {
+    console.log('e', e)
+    e.preventDefault()
+    offsetX = e.nativeEvent.offsetX
+    offsetY = e.nativeEvent.offsetY
+    console.log('offsetX', offsetX)
+    console.log('offsetY', offsetY)
+    setIsComponentVisible(!isComponentVisible)
+  }
+
   return (
     <div>
       {isBadgeTime ? (
@@ -189,6 +210,8 @@ export default function Message({
           className={`w-100 d-flex justify-content-${justifyContentMsg} mb-1`}
         >
           <div
+            ref={refButton}
+            onContextMenu={(e) => handleClickRefButton(e)}
             className="rounded"
             style={{
               backgroundColor: bgColorMsg(),
@@ -198,6 +221,19 @@ export default function Message({
               minWidth: '62px',
             }}
           >
+            <div ref={refComponent}>
+              {isComponentVisible && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: offsetY,
+                    left: offsetX,
+                  }}
+                >
+                  <MessageMenu messageId={messageId} />
+                </div>
+              )}
+            </div>
             <div
               style={{
                 overflowWrap: 'break-word',
@@ -213,8 +249,6 @@ export default function Message({
                 }}
               >
                 {content}
-                {/* <br />
-            {status} */}
               </p>
             </div>
             <div

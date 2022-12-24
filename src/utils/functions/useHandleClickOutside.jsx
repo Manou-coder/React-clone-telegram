@@ -78,17 +78,25 @@ export function useComponentVisibleRightClick(initialIsVisible) {
   const refButton = useRef(null)
 
   const handleClickOutside = (event) => {
-    if (
-      refComponent.current &&
-      !refComponent.current.contains(event.target) &&
-      !refButton.current.contains(event.target)
-    ) {
-      //   console.log('Clicked Outside...')
-      setIsComponentVisible(false)
-    } else if (refButton.current && refButton.current.contains(event.target)) {
-      //   console.log('Clicked refButton..')
-    } else {
-      //   console.log('Clicked refComponent..')
+    // use try catch because sometimes 'contains' has not defined
+    try {
+      if (
+        refComponent.current &&
+        !refComponent.current.contains(event.target) &&
+        !refButton.current.contains(event.target)
+      ) {
+        //   console.log('Clicked Outside...')
+        setIsComponentVisible(false)
+      } else if (
+        refButton.current &&
+        refButton.current.contains(event.target)
+      ) {
+        //   console.log('Clicked refButton..')
+      } else {
+        //   console.log('Clicked refComponent..')
+      }
+    } catch (error) {
+      // console.log(error)
     }
   }
 

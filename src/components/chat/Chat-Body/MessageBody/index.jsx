@@ -295,7 +295,7 @@ export default function MesssageBody() {
                 }
                 myMessage={arrOfMessages[i].from === user.uid ? true : false}
                 time={arrOfMessages[i].time}
-                id={arrOfMessages[i].id}
+                messageId={arrOfMessages[i].id}
                 key={arrOfMessages[i].id}
                 badgeTime={arrOfMessages[i].badgeTime}
               />

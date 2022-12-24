@@ -9,12 +9,11 @@ import {
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
 import { imgError } from '../../../../utils/functions/returnAvatarIsImgError'
 import { calculDate } from '../../../../utils/functions/date'
-import useComponentVisible, {
-  useComponentVisibleRightClick,
-} from '../../../../utils/functions/useHandleClickOutside'
+import { useComponentVisibleRightClick } from '../../../../utils/functions/useHandleClickOutside'
 import CallMenu from '../CallMenu'
 
-let clientX = 0
+let offsetX = 0
+let offsetY = 0
 let clientY = 0
 
 function MyCall({ contactId, startTime, isOutgoingCall, videoCall, callId }) {
@@ -47,35 +46,43 @@ function MyCall({ contactId, startTime, isOutgoingCall, videoCall, callId }) {
 
   const handleClickRefButton = (e) => {
     e.preventDefault()
-    clientX = e.clientX
     clientY = e.clientY
+    offsetX = e.nativeEvent.offsetX
+    offsetY = e.nativeEvent.offsetY
+    console.log('offsetX', offsetX)
+    console.log('offsetY', offsetY)
     setIsComponentVisible(!isComponentVisible)
   }
 
   return (
     <div>
-      <div ref={refComponent}>
-        {isComponentVisible && (
-          <div
-            style={{
-              position: 'absolute',
-              top: clientY,
-              left: clientX,
-            }}
-          >
-            <CallMenu callId={callId} />
-          </div>
-        )}
-      </div>
-
       <li
         className={`w-100 py-2 m-0 rounded ${bgContact}`}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: 'pointer', position: 'relative' }}
         onClick={() => handleClickCall()}
         ref={refButton}
         onContextMenu={(e) => handleClickRefButton(e)}
       >
-        <div className="row m-0 align-items-center">
+        <div ref={refComponent}>
+          {isComponentVisible && (
+            <div
+              style={{
+                position: 'fixed',
+                top: clientY - 100,
+                left: language !== 'il' && offsetX,
+                right: language === 'il' && offsetX,
+                zIndex: '50000',
+              }}
+            >
+              <CallMenu callId={callId} />
+            </div>
+          )}
+        </div>
+        <div
+          className="row m-0 align-items-center"
+          // IMPORTANT the style of "pointer-events = none" is used so that the offsetX and offsetY are not calculated from this event
+          style={{ pointerEvents: 'none' }}
+        >
           <div className="col-2">
             <div
               style={{
