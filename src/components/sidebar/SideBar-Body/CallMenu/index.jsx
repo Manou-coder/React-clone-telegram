@@ -55,8 +55,6 @@ export default function CallMenu({ callId }) {
         width: '300px',
         zIndex: '1021',
         height: '96px',
-        // top: '-76px',
-        // right: rightPosition,
         backgroundColor: bgColor,
         color: textColor,
       }}

@@ -69,8 +69,9 @@ function MyCall({ contactId, startTime, isOutgoingCall, videoCall, callId }) {
               style={{
                 position: 'fixed',
                 top: clientY - 100,
-                left: language !== 'il' && offsetX,
-                right: language === 'il' && offsetX,
+                left: language !== 'il' && offsetX + 10,
+                // I have not succeeded in setting the offset x in the language 'il'
+                right: language === 'il' && 20,
                 zIndex: '50000',
               }}
             >

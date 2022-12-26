@@ -30,6 +30,7 @@ export default function MesssageBody() {
   const { setNewMessages, actuallyContactId } = useContext(SocketContactContext)
   const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
   const [isLoading, setisLoading] = useState(true)
+  const [arrOfSelectedMessages, setArrOfSelectedMessages] = useState([])
   const scrollDiv = useRef(null)
   const messagesDiv = useRef(null)
   const lastMessageRef = useRef(null)
@@ -296,8 +297,11 @@ export default function MesssageBody() {
                 myMessage={arrOfMessages[i].from === user.uid ? true : false}
                 time={arrOfMessages[i].time}
                 messageId={arrOfMessages[i].id}
+                type={arrOfMessages[i].type}
                 key={arrOfMessages[i].id}
                 badgeTime={arrOfMessages[i].badgeTime}
+                arrOfSelectedMessages={arrOfSelectedMessages}
+                setArrOfSelectedMessages={setArrOfSelectedMessages}
               />
             )
           })}
