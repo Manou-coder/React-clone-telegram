@@ -290,10 +290,7 @@ export default function MesssageBody() {
               <Message
                 from={arrOfMessages[i].from}
                 status={arrOfMessages[i].status}
-                content={
-                  arrOfMessages[i].content + ' ' + i
-                  //  + ' ' + arrOfMessages[i].id
-                }
+                content={arrOfMessages[i].content + ' ' + i}
                 myMessage={arrOfMessages[i].from === user.uid ? true : false}
                 time={arrOfMessages[i].time}
                 messageId={arrOfMessages[i].id}

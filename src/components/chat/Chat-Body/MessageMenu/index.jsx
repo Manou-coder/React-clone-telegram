@@ -84,8 +84,11 @@ export default function MessageMenu({
     if (deletedMessage) {
       // delete the contents of these messages and change their status to 'deleted message'
       deletedMessage.forEach((msg) => {
-        msg.type = 'deleted message'
-        msg.content = ''
+        // only change my messages (we must not delete for the contact the messages that he wrote himself)
+        if (msg.from === user.uid) {
+          msg.type = 'deleted message'
+          msg.content = ''
+        }
       })
       // update in DB only for actually contact
       updatetAllMessagesWhithThisContactInDB(
