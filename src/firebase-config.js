@@ -9,7 +9,13 @@ import {
   arrayUnion,
   deleteDoc,
 } from 'firebase/firestore'
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import {
+  deleteObject,
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+} from 'firebase/storage'
 
 // const firebaseConfig = {
 //   apiKey: process.env.REACT_APP_FIREBASE_APP_API_KEY,
@@ -398,7 +404,7 @@ export const updateMyCallsInDB = async (myId, call) => {
 
 //  ----------------------------------------------------------
 
-// -----3------------ DELETE MY ACCOUNT ----------------
+// -----5------------ DELETE MY ACCOUNT ----------------
 
 export const deleteMyUsers = async (myId) => {
   const docRef = doc(db, 'users', myId)
@@ -435,3 +441,16 @@ export const setMyStatusInUsersList = async (myId) => {
   }
   await updateAllUsersFromDB(allUsersFromDB)
 }
+
+export const deleteMyProfileImage = async (storageRef, file) => {
+  storageRef = ref(storage, storageRef)
+  try {
+    const snapshot = await deleteObject(storageRef)
+    console.log('snaphot', snapshot)
+  } catch (error) {
+    console.dir(error)
+  }
+}
+
+// deleteMyProfileImage(`profile/${'h2WmrHC0qvdfF7SMg6EcVblIipE3'}`)
+// deleteMyUsersCalls('h2WmrHC0qvdfF7SMg6EcVblIipE3')

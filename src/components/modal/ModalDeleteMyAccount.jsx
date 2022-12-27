@@ -1,6 +1,7 @@
 import React, { useContext, useRef } from 'react'
 import { useState } from 'react'
 import {
+  deleteMyProfileImage,
   deleteMyUsers,
   deleteMyUsersCalls,
   deleteMyUsersMessages,
@@ -20,10 +21,11 @@ export default function ModalDeleteMyAccount() {
 
   async function deleteMyAccount() {
     setIsLoading(true)
-    // await deleteMyUsers(user.uid)
+    await deleteMyUsers(user.uid)
     await deleteMyUsersCalls(user.uid)
     await deleteMyUsersMessages(user.uid)
     await setMyStatusInUsersList(user.uid)
+    await deleteMyProfileImage(`profile/${user.uid}`)
     await deleteMyAccountFromFirebaseAuth()
     closeModal.current.click()
     setIsLoading(false)

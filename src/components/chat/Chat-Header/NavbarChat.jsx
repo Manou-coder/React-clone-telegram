@@ -149,7 +149,7 @@ export default function NavbarChat() {
           </svg>
         </span>
       </div>
-      <div className="col-2 col-lg-1 py-1">
+      <div className="col-2 col-lg-1 py-1 d-flex justify-content-center">
         <img
           style={{ height: '50px', width: '50px' }}
           src={contact && contact.photoURL}
