@@ -8,8 +8,8 @@ import { useState } from 'react'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
 import { PeerContext } from '../../../../utils/context/PeerContext'
 
-export default function ContactMenu() {
-  const { theme, setIsCallOpen } = useContext(ThemeContext)
+export default function ContactMenu({ contact }) {
+  const { theme, setModalName } = useContext(ThemeContext)
   const { language } = useContext(LanguageContext)
   const { videoCall, audioCall } = useContext(PeerContext)
 
@@ -39,6 +39,12 @@ export default function ContactMenu() {
     il: 'שיחת וידאו',
   }
 
+  const _youCannotCall = {
+    en: 'You cannot call a deleted account.',
+    fr: 'Vous ne pouvez pas appeler un compte supprimé.',
+    il: 'אתה לא יכול להתקשר לחשבון שנמחק.',
+  }
+
   const rightPosition = language === 'il' ? '-125px' : '35px'
 
   return (
@@ -64,6 +70,7 @@ export default function ContactMenu() {
               type="button"
               data-bs-toggle="modal"
               data-bs-target="#staticBackdrop"
+              onClick={() => setModalName('delete chat')}
             >
               <div className="col-2 d-flex justify-content-center align-items-center">
                 <span className="d-flex">
@@ -81,7 +88,12 @@ export default function ContactMenu() {
             <div
               className={`row ${listItemMenuBgColor} py-2 m-0`}
               type="button"
-              onClick={() => audioCall()}
+              onClick={() => {
+                if (contact && contact.isDeleted) {
+                  return alert(_youCannotCall[language])
+                }
+                audioCall()
+              }}
             >
               <div className="col-2 d-flex justify-content-center align-items-center">
                 <span className="d-flex">
@@ -99,7 +111,12 @@ export default function ContactMenu() {
             <div
               className={`row ${listItemMenuBgColor} py-2 m-0`}
               type="button"
-              onClick={() => videoCall()}
+              onClick={() => {
+                if (contact && contact.isDeleted) {
+                  return alert(_youCannotCall[language])
+                }
+                videoCall()
+              }}
             >
               <div className="col-2 d-flex justify-content-center align-items-center">
                 <span className="d-flex">

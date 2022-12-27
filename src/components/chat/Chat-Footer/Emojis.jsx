@@ -52,10 +52,12 @@ export default function Emojis({ textareaRef, setMessageInput }) {
             className="grid-item"
             key={i}
             onClick={() => {
-              // console.log('textareaRef', textareaRef.current.value)
-              textareaRef.current.focus()
-              textareaRef.current.value += emoji
-              setMessageInput((curr) => curr + emoji)
+              // if the account is deleted then textareaRef is disabled then do not add emojis
+              if (textareaRef.current.disabled !== true) {
+                textareaRef.current.focus()
+                textareaRef.current.value += emoji
+                setMessageInput((curr) => curr + emoji)
+              }
             }}
           >
             {emoji}

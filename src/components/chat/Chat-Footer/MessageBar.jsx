@@ -14,10 +14,26 @@ import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
 
 export default function MessageBar() {
   const { user } = UserAuth()
-  const { actuallyContactId } = useContext(SocketContactContext)
+  const { actuallyContactId, allUsers } = useContext(SocketContactContext)
   const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
+  const { language } = useContext(LanguageContext)
   const [messageInput, setMessageInput] = useState('')
   const textareaRef = useRef()
+
+  // deleted account
+
+  const _youCannot = {
+    en: 'You cannot send a message to a deleted account.',
+    fr: 'Vous ne pouvez pas envoyer de message a un compte supprimé.',
+    il: 'אינך יכול לשלוח הודעה לחשבון שנמחק.',
+  }
+  const contact =
+    allUsers && allUsers.find((e) => e.userId === actuallyContactId)
+
+  if (textareaRef.current && contact.isDeleted) {
+    textareaRef.current.placeholder = _youCannot[language]
+    textareaRef.current.disabled = true
+  }
 
   // Socket function
   function socketEmitPrivateMessage() {
@@ -120,7 +136,6 @@ export default function MessageBar() {
   const iconBars = theme === 'light' ? 'icon-bars-light' : ' icon-bars-dark'
 
   // LANGUAGE
-  const { language } = useContext(LanguageContext)
 
   const _message = {
     en: 'Message...',

@@ -8,6 +8,8 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  deleteUser,
+  getAuth,
 } from 'firebase/auth'
 import { auth, createUserInDB, db, readDoc, unsub } from '../../firebase-config'
 import { useNavigate } from 'react-router-dom'
@@ -67,6 +69,16 @@ export const AuthContextProvider = ({ children }) => {
     navigate('/')
   }
 
+  const deleteMyAccountFromFirebaseAuth = async () => {
+    try {
+      const auth = getAuth()
+      const user = auth.currentUser
+      await deleteUser(user)
+    } catch (error) {
+      console.dir(error)
+    }
+  }
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser)
@@ -88,6 +100,7 @@ export const AuthContextProvider = ({ children }) => {
         signUp,
         signIn,
         userRef,
+        deleteMyAccountFromFirebaseAuth,
       }}
     >
       {!loadingData && children}

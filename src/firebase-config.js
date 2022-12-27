@@ -7,6 +7,7 @@ import {
   getDoc,
   updateDoc,
   arrayUnion,
+  deleteDoc,
 } from 'firebase/firestore'
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 
@@ -146,7 +147,7 @@ export const updateHasNewMessagesInDB = async (myId, contactId, operation) => {
 
 // -----------------------------------------------------
 
-// ------ 3 --------------------- USERSLIST -------------------------
+// ------ 4 --------------------- USERSLIST -------------------------
 
 export const saveUserInContactsList = async (userId, data) => {
   createUsersMessagesDB(userId)
@@ -208,6 +209,18 @@ export const getAllUsersFromDB = async () => {
   } else {
     console.log('no such document')
     return null
+  }
+}
+
+export const updateAllUsersFromDB = async (data) => {
+  const docRef = doc(db, 'usersList', 'usersList')
+  try {
+    await updateDoc(docRef, {
+      users: data,
+    })
+    console.log('doc updated !!')
+  } catch (error) {
+    console.dir(error)
   }
 }
 
@@ -383,30 +396,42 @@ export const updateMyCallsInDB = async (myId, call) => {
   }
 }
 
-const myCallsList = [
-  {
-    from: 'kBmSu9b4EeVhdQC1fzZgXlK1ac02',
-    to: 'hJTBGfiYe9P458qvBF03gIhme7G3',
-    videoCall: true,
-    startTime: 1671613549568,
-    id: '1234',
-  },
-  {
-    from: 'hJTBGfiYe9P458qvBF03gIhme7G3',
-    to: 'kBmSu9b4EeVhdQC1fzZgXlK1ac02',
-    videoCall: false,
-    startTime: 1671613549568,
-    id: '1234',
-  },
-  {
-    from: 'h2WmrHC0qvdfF7SMg6EcVblIipE3',
-    to: 'kBmSu9b4EeVhdQC1fzZgXlK1ac02',
-    videoCall: true,
-    startTime: 1671999999999,
-    id: '1234',
-  },
-]
-
-// updateMyCallsInDB('kBmSu9b4EeVhdQC1fzZgXlK1ac02', myCallsList)
-
 //  ----------------------------------------------------------
+
+// -----3------------ DELETE MY ACCOUNT ----------------
+
+export const deleteMyUsers = async (myId) => {
+  const docRef = doc(db, 'users', myId)
+  try {
+    await deleteDoc(docRef)
+  } catch (error) {
+    console.dir(error)
+  }
+}
+
+export const deleteMyUsersMessages = async (myId) => {
+  const docRef = doc(db, 'usersMessages', myId)
+  try {
+    await deleteDoc(docRef)
+  } catch (error) {
+    console.dir(error)
+  }
+}
+
+export const deleteMyUsersCalls = async (myId) => {
+  const docRef = doc(db, 'usersCalls', myId)
+  try {
+    await deleteDoc(docRef)
+  } catch (error) {
+    console.dir(error)
+  }
+}
+
+export const setMyStatusInUsersList = async (myId) => {
+  const allUsersFromDB = await getAllUsersFromDB()
+  const meInUsersList = allUsersFromDB.find((user) => user.userId === myId)
+  if (meInUsersList) {
+    meInUsersList.isDeleted = true
+  }
+  await updateAllUsersFromDB(allUsersFromDB)
+}

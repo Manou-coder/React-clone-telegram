@@ -76,11 +76,14 @@ export default function MessageMenu({
     // get all messages from this contact with me, from the contact's db.
     const messagesOfActuallyContactInDB =
       await getAllMessagesWhithThisContactFromDB(actuallyContactId, user.uid)
+    //if we haven't received anything from the contact's db (maybe his account is deleted) then return
+    if (!messagesOfActuallyContactInDB) {
+      return
+    }
     // create array of messages with only messages that have the same id as those in the 'arrOfSelectedMessages'
     const deletedMessage = messagesOfActuallyContactInDB.filter((message) =>
       arrOfSelectedMessages.includes(message.id)
     )
-    console.log('deletedMessage', deletedMessage)
     if (deletedMessage) {
       // delete the contents of these messages and change their status to 'deleted message'
       deletedMessage.forEach((msg) => {

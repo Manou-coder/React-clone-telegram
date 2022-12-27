@@ -19,6 +19,9 @@ function Contacts({ inputLetters }) {
   // remove me of the list of contacts
   searchedContactList = searchedContactList.filter((e) => e.userId !== user.uid)
 
+  // remove account deleted of the list of contacts
+  searchedContactList = searchedContactList.filter((e) => !e.isDeleted)
+
   // sort contacts by numeric alphabet order
   searchedContactList = searchedContactList.sort((a, b) =>
     a.displayName > b.displayName ? 1 : b.displayName > a.displayName ? -1 : 0

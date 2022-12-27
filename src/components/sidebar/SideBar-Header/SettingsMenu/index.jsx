@@ -27,11 +27,8 @@ const UlMenu = styled.ul`
 `
 
 export default function SettingsMenu({ canvasOption, setCanvasOption }) {
-  // console.log('setCanvasOption', setCanvasOption)
-  // console.log('canvasOption', canvasOption)
-
-  // const navigate = useNavigate()
-  const { logOut } = UserAuth()
+  const { logOut, deleteMyAccount } = UserAuth()
+  const { setModalName } = useContext(ThemeContext)
   async function handleLogOut() {
     await logOut()
     // navigate('../')
@@ -137,6 +134,12 @@ export default function SettingsMenu({ canvasOption, setCanvasOption }) {
     en: 'Log Out',
     fr: 'Se déconnecter',
     il: 'להתנתק',
+  }
+
+  const _deleteMyAccount = {
+    en: 'Delete my account',
+    fr: 'Supprimer mon compte',
+    il: 'מחק את חשבון שלי',
   }
 
   const { setAllUsersFromDB } = useContext(SocketContactContext)
@@ -253,7 +256,6 @@ export default function SettingsMenu({ canvasOption, setCanvasOption }) {
           </div>
         </li>
         <li className="mx-2" onClick={(e) => handleClickDarkMode(e)}>
-          {/* <li className="mx-2" onClick={(e) => toggleTheme()}> */}
           <div className={`row ${listItemMenuBgColor} py-2`}>
             <div className="col-1">
               <i className="fa-solid fa-moon"></i>
@@ -276,6 +278,21 @@ export default function SettingsMenu({ canvasOption, setCanvasOption }) {
             </div>
             <div className="col ps-4">
               <span>{_logOut[language]}</span>
+            </div>
+          </div>
+        </li>
+        <li
+          className="mx-2"
+          onClick={() => setModalName('delete my account')}
+          data-bs-toggle="modal"
+          data-bs-target="#staticBackdrop"
+        >
+          <div className={`row ${listItemMenuBgColor} py-2 text-danger`}>
+            <div className="col-1">
+              <i className="fa-solid fa-trash"></i>
+            </div>
+            <div className="col ps-4 fw-bold">
+              <span>{_deleteMyAccount[language]}</span>
             </div>
           </div>
         </li>

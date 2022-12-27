@@ -1,11 +1,24 @@
 import React, { useContext } from 'react'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 import ModalDeleteChat from './ModalDeleteChat'
+import ModalDeleteMyAccount from './ModalDeleteMyAccount'
 
 export default function Modal() {
-  const { theme } = useContext(ThemeContext)
+  const { theme, modalName } = useContext(ThemeContext)
   const bgColor = theme === 'light' ? '' : '#212529'
   const textColor = theme === 'light' ? '' : 'white'
+
+  function chooseModal(modalName) {
+    if (modalName === 'delete chat') {
+      return <ModalDeleteChat />
+    } else if (modalName === 'delete messages') {
+      return null
+    } else if (modalName === 'delete my account') {
+      return <ModalDeleteMyAccount />
+    } else {
+      return null
+    }
+  }
   return (
     <div
       className="modal fade"
@@ -21,7 +34,8 @@ export default function Modal() {
           className="modal-content"
           style={{ backgroundColor: bgColor, color: textColor }}
         >
-          <ModalDeleteChat />
+          {chooseModal(modalName)}
+          {/* <ModalDeleteChat /> */}
         </div>
       </div>
     </div>

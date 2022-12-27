@@ -68,7 +68,6 @@ export const SocketContactProvider = ({ children }) => {
   useEffect(() => {
     if (user !== null) {
       startSocket(user.uid)
-      console.log('start socket')
     }
   }, [user])
 
@@ -131,9 +130,14 @@ export const SocketContactProvider = ({ children }) => {
 
   async function setMyCallsFromDB(myId, setMyCalls) {
     const myCallsFromDB = await getMyCallsFromDB(myId)
-    console.log('myCallsFromDB', myCallsFromDB)
-    setInStorage('myCalls', myCallsFromDB)
-    setMyCalls(myCallsFromDB)
+    // console.log('myCallsFromDB', myCallsFromDB)
+    if (myCallsFromDB) {
+      setInStorage('myCalls', myCallsFromDB)
+      setMyCalls(myCallsFromDB)
+    } else {
+      setInStorage('myCalls', [])
+      setMyCalls([])
+    }
   }
 
   function updateMyCallsInChat(call) {
@@ -192,8 +196,6 @@ export const SocketContactProvider = ({ children }) => {
       value={{
         actuallyContactId,
         setActuallyContactId,
-        // actuallyContact,
-        // setActuallyContact,
         allUsers,
         setAllUsers,
         myContacts,

@@ -9,6 +9,7 @@ export const ThemeProvider = ({ children }) => {
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isCallOpen, setIsCallOpen] = useState(false)
   const [isToastOpen, setIsToastOpen] = useState(false)
+  const [modalName, setModalName] = useState(null)
 
   function checkDarkMode() {
     if (localStorage.getItem('mode')) {
@@ -50,6 +51,8 @@ export const ThemeProvider = ({ children }) => {
         setIsCallOpen,
         isToastOpen,
         setIsToastOpen,
+        modalName,
+        setModalName,
       }}
     >
       {children}

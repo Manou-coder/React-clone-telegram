@@ -3,24 +3,27 @@ import { useContext } from 'react'
 import { SocketContactContext } from '../../../../utils/context/SocketContact'
 import MyCall from '../MyCall'
 
-function MyCalls({ inputLetters }) {
+function MyCalls() {
   const { user } = UserAuth()
-  const { myCalls, allUsers } = useContext(SocketContactContext)
+  const { myCalls } = useContext(SocketContactContext)
+
+  console.log('myCalls', myCalls)
 
   return (
     <ul className="p-0 mt-2" style={{ listStyleType: 'none' }}>
-      {myCalls.map((e, i) => (
-        <MyCall
-          contactId={
-            myCalls[i].from === user.uid ? myCalls[i].to : myCalls[i].from
-          }
-          isOutgoingCall={myCalls[i].from === user.uid}
-          startTime={myCalls[i].startTime}
-          videoCall={myCalls[i].videoCall}
-          callId={myCalls[i].id}
-          key={myCalls[i].id}
-        />
-      ))}
+      {myCalls &&
+        myCalls.map((e, i) => (
+          <MyCall
+            contactId={
+              myCalls[i].from === user.uid ? myCalls[i].to : myCalls[i].from
+            }
+            isOutgoingCall={myCalls[i].from === user.uid}
+            startTime={myCalls[i].startTime}
+            videoCall={myCalls[i].videoCall}
+            callId={myCalls[i].id}
+            key={myCalls[i].id}
+          />
+        ))}
     </ul>
   )
 }

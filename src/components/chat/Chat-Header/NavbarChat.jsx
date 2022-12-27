@@ -73,8 +73,34 @@ export default function NavbarChat() {
     il: 'לא מקוון',
   }
 
+  const _accountDeleted = {
+    en: 'Account deleted',
+    fr: 'Compte supprimé',
+    il: 'החשבון נמחק',
+  }
+
+  const _youCannotCall = {
+    en: 'You cannot call a deleted account.',
+    fr: 'Vous ne pouvez pas appeler un compte supprimé.',
+    il: 'אתה לא יכול להתקשר לחשבון שנמחק.',
+  }
+
   const arrowHover =
     theme === 'light' ? 'arrow-hover-light' : 'arrow-hover-dark'
+
+  function connectionInfo() {
+    if (!contact) {
+      return
+    }
+    if (contact.isDeleted) {
+      return _accountDeleted[language]
+    }
+    if (contact.isTyping) {
+      return _isTyping[language]
+    } else {
+      return connectionStatus()
+    }
+  }
 
   // Detect click outside React component
 
@@ -135,7 +161,6 @@ export default function NavbarChat() {
       <div className="col-6 col-lg-7">
         <div>
           <h3 className={`m-0 fs-5 lh-1 ${colorName}`}>
-            {/* {socketContact.displayName} */}
             {contact && contact.displayName}
           </h3>
         </div>
@@ -150,15 +175,18 @@ export default function NavbarChat() {
             }}
             className={`mb-0 fw-light pt-0 lh-1 ${colorInfo}`}
           >
-            {contact && contact.isTyping
-              ? _isTyping[language]
-              : connectionStatus()}
+            {connectionInfo()}
           </p>
         </div>
       </div>
       <div className="d-none d-lg-flex col-lg-1">
         <span
-          onClick={() => audioCall()}
+          onClick={() => {
+            if (contact && contact.isDeleted) {
+              return alert(_youCannotCall[language])
+            }
+            audioCall()
+          }}
           className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
         >
           {/* <i className="fa-solid fa-phone fa-lg"></i> */}
@@ -174,7 +202,12 @@ export default function NavbarChat() {
       </div>
       <div className="d-none d-lg-flex col-lg-1">
         <span
-          onClick={() => videoCall()}
+          onClick={() => {
+            if (contact && contact.isDeleted) {
+              return alert(_youCannotCall[language])
+            }
+            videoCall()
+          }}
           className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
         >
           {/* <i className="fa-solid fa-video fa-lg"></i> */}
@@ -222,7 +255,9 @@ export default function NavbarChat() {
             <path d="M64 360c30.9 0 56 25.1 56 56s-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56zm0-160c30.9 0 56 25.1 56 56s-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56zM120 96c0 30.9-25.1 56-56 56S8 126.9 8 96S33.1 40 64 40s56 25.1 56 56z" />
           </svg>
         </span>
-        <div ref={refComponent}>{isComponentVisible && <ContactMenu />}</div>
+        <div ref={refComponent}>
+          {isComponentVisible && <ContactMenu contact={contact} />}
+        </div>
       </div>
     </div>
   )
