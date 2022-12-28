@@ -37,16 +37,9 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
     setActuallyContactId(contact.userId)
     setActuallyContactIdInStorage(contact.userId)
     setIsChatOpen(true)
-    updateHasNewMessagesInDB(user.uid, actuallyContactId, 'suppr')
-    // updateHasNewMessagesInDB(user.uid, socketContact.userId, 'add')
+    updateHasNewMessagesInDB(user.uid, contact.userId, 'suppr')
     setNewMessages((curr) => {
-      // console.log('contact.userId', contact.userId)
-      // console.log('curr', curr)
-      // console.log('curr[contact.userId', curr[contact.userId])
-
       curr[contact.userId] = 0
-      // console.log('curr[contact.userId 2', curr[contact.userId])
-      // console.log('curr', curr)
       return curr
     })
   }

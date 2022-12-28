@@ -128,7 +128,9 @@ function Contact({ name1, name2, name3, contact, description, photoURL }) {
         </div>
         <div className="col-2 p-0">
           <span className={`badge rounded-pill bg-primary`}>
-            {newMessages[contact.userId] > 0 && newMessages[contact.userId]}
+            {contact && newMessages && newMessages[contact.userId] > 0
+              ? newMessages[contact.userId]
+              : null}
           </span>
         </div>
       </div>

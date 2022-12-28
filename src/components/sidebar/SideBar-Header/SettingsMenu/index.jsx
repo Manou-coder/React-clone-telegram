@@ -26,7 +26,7 @@ const UlMenu = styled.ul`
   margin-bottom: 0;
 `
 
-export default function SettingsMenu({ canvasOption, setCanvasOption }) {
+export default function SettingsMenu({ offCanvas, setOffCanvas }) {
   const { logOut, deleteMyAccount } = UserAuth()
   const { setModalName } = useContext(ThemeContext)
   async function handleLogOut() {
@@ -153,7 +153,10 @@ export default function SettingsMenu({ canvasOption, setCanvasOption }) {
       }}
     >
       <UlMenu>
-        <li className="mx-2" onClick={() => setCanvasOption('profile')}>
+        <li
+          className="mx-2"
+          onClick={() => setOffCanvas({ ...offCanvas, name: 'myProfile' })}
+        >
           <div
             className={`row ${listItemMenuBgColor} py-2`}
             data-bs-toggle="offcanvas"
@@ -167,7 +170,10 @@ export default function SettingsMenu({ canvasOption, setCanvasOption }) {
             </div>
           </div>
         </li>
-        <li className="mx-2" onClick={() => setCanvasOption('contacts')}>
+        <li
+          className="mx-2"
+          onClick={() => setOffCanvas({ ...offCanvas, name: 'Contacts' })}
+        >
           <div
             className={`row ${listItemMenuBgColor} py-2`}
             data-bs-toggle="offcanvas"

@@ -7,22 +7,27 @@ import { UserAuth } from '../../utils/context/AuthContext'
 import { camelCase } from 'lodash'
 import {
   downloadImage,
-  readDoc,
-  saveUserInContactsList,
-  setUserinDB,
+  getAllUsersFromUsersListDB,
+  getMyProfileFromDB,
+  saveMyProfileInUsersListDB,
+  setMyProfileInDB,
 } from '../../firebase-config'
 import { updateDoc } from 'firebase/firestore'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
 import { uploadImage } from '../../firebase-config'
+import { useContext } from 'react'
+import { LanguageContext } from '../../utils/context/LanguageContext'
 
 export default function Profile() {
   const navigate = useNavigate()
   const { user, userRef } = UserAuth()
+  const { language } = useContext(LanguageContext)
   //states
   const [userDB, setUserDB] = useState({})
   const [isProfileAvatar, setisProfileAvatar] = useState(null)
+  const [validation, setValidation] = useState('')
   //refs
   const profileName = useRef(null)
   const profileUserName = useRef(null)
@@ -33,7 +38,7 @@ export default function Profile() {
   //check if the user has already created a profile and if so, direct referral to the chat page
   useEffect(() => {
     if (user != null) {
-      readDoc(user.uid)
+      getMyProfileFromDB(user.uid)
         .then((res) => {
           // console.log('res', res)
           if (res) {
@@ -80,7 +85,7 @@ export default function Profile() {
 
   // retrieve the profile picture that was uploaded into the db
   async function getProfilePictureInDB() {
-    const userDB = await readDoc(user.uid)
+    const userDB = await getMyProfileFromDB(user.uid)
     setUserDB(userDB)
     console.log('userDB', userDB)
     if (userDB && userDB.photoURL !== '') {
@@ -97,7 +102,7 @@ export default function Profile() {
     await updateDoc(userRef, {
       photoURL: urlAvatar,
     })
-    const userDB = await readDoc(user.uid)
+    const userDB = await getMyProfileFromDB(user.uid)
     isProfileAvatar.src = userDB.photoURL
     setLoadingAvatar(false)
   }
@@ -107,15 +112,26 @@ export default function Profile() {
     // console.log(userDB)
     e.preventDefault()
     setLoadingForm(true)
+    const allUsers = await getAllUsersFromUsersListDB()
+    if (allUsers) {
+      const isSameUserName = allUsers.find(
+        (user) => user.userName === profileUserName.current.value
+      )
+      if (isSameUserName) {
+        setLoadingForm(false)
+        setValidation(_thisUsername[language])
+        return
+      }
+    }
 
-    await setUserinDB(user.uid, {
+    await setMyProfileInDB(user.uid, {
       displayName: profileName.current.value,
       userName: profileUserName.current.value,
       photoURL: isProfileAvatar.src,
       isProfileCreated: true,
     })
 
-    await saveUserInContactsList(user.uid, {
+    await saveMyProfileInUsersListDB(user.uid, {
       displayName: profileName.current.value,
       userName: profileUserName.current.value,
       userId: user.uid,
@@ -149,10 +165,25 @@ export default function Profile() {
   const [loadingAvatar, setLoadingAvatar] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
 
+  const _thisUsername = {
+    en: 'This username is already used. Please enter a new username to continue.',
+    fr: "Ce nom d'utilisateur est déjà utilisé. Veuillez entrer un nouveau nom d'utilisateur pour continuer.",
+    il: 'שם המשתמש הזה כבר בשימוש. אנא הזן שם משתמש חדש כדי להמשיך.',
+  }
+
+  function handleClickAnywhere() {
+    if (validation !== '') {
+      setValidation('')
+    }
+  }
+
   return (
     <div>
       {showProfile && (
-        <div className="container-fluid vh-100 p-0 d-flex justify-content-center align-items-center wallpapper-black">
+        <div
+          className="container-fluid vh-100 p-0 d-flex justify-content-center align-items-center wallpapper-black"
+          onClick={() => handleClickAnywhere()}
+        >
           <div
             className="p-4 bg-white rounded d-flex"
             style={{ width: '300px', minWidth: '250px' }}
@@ -381,6 +412,9 @@ export default function Profile() {
                       className="form-control"
                       id="Username"
                     />
+                    {validation !== '' && (
+                      <p className="text-danger mt-1">{validation}</p>
+                    )}
                   </div>
                   <button className="btn btn-primary mt-4 w-100">Submit</button>
                   <div className="row justify-content-center">

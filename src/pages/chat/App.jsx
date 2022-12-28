@@ -21,21 +21,21 @@ function App({ children }) {
   return (
     <div className={`container-fluid vh-100 vw-100 p-0 ${bgColor}`}>
       <div className="row vh-100 vw-100 m-0">
-        {myContacts && (
-          <>
-            <Sidebar />
-            {actuallyContactId ? (
-              <Chat />
-            ) : (
-              // <div
-              //   className={`col-lg-8 p-0 vh-100 bg-succes position-relative ${wallpaper}`}
-              // ></div>
-              <DefaultChat />
-            )}
-            {/* toasts */}
-            {isToastOpen && <Toast />}
-          </>
-        )}
+        {/* {myContacts && ( */}
+        <>
+          <Sidebar />
+          {actuallyContactId ? (
+            <Chat />
+          ) : (
+            // <div
+            //   className={`col-lg-8 p-0 vh-100 bg-succes position-relative ${wallpaper}`}
+            // ></div>
+            <DefaultChat />
+          )}
+          {/* toasts */}
+          {isToastOpen && <Toast />}
+        </>
+        {/* )} */}
       </div>
       {/* <!-- Modal --> */}
       <Modal />

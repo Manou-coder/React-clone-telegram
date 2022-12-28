@@ -6,7 +6,7 @@ import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import useComponentVisible from '../../../../utils/functions/useHandleClickOutside'
 import SettingsMenu from '../SettingsMenu'
 
-function NavBar({ inputLetters, setInputLetters, setCanvasOption }) {
+function NavBar({ inputLetters, setInputLetters, setOffCanvas }) {
   const { theme } = useContext(ThemeContext)
   const [borderColor, setBorderColor] = useState(false)
 
@@ -75,9 +75,7 @@ function NavBar({ inputLetters, setInputLetters, setCanvasOption }) {
           </svg>
         </span>
         <div ref={refComponent}>
-          {isComponentVisible && (
-            <SettingsMenu setCanvasOption={setCanvasOption} />
-          )}
+          {isComponentVisible && <SettingsMenu setOffCanvas={setOffCanvas} />}
         </div>
       </div>
       <div className="col d-flex justify-content-center">

@@ -3,41 +3,48 @@ import Avatar from '../../assets/img/avatar4.png'
 import { useRef } from 'react'
 import {
   downloadImage,
-  readDoc,
-  saveUserInContactsList,
-  setUserinDB,
+  getAllUsersFromUsersListDB,
+  getMyProfileFromDB,
+  saveMyProfileInUsersListDB,
+  setMyProfileInDB,
+  updateMyProfileInUsersListDB,
   uploadImage,
 } from '../../firebase-config'
 import { UserAuth } from '../../utils/context/AuthContext'
 import { updateDoc } from 'firebase/firestore'
 import Check from '../../assets/img/check.svg'
+import { imgError } from '../../utils/functions/returnAvatarIsImgError'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 import { LanguageContext } from '../../utils/context/LanguageContext'
 
-export default function OffCanvasProfile() {
+export default function OffCanvasProfile({ offCanvas, setOffCanvas }) {
   const { user, userRef } = UserAuth()
-  const [userDB, setUserDB] = useState({})
-  useEffect(() => {
-    getUserDB()
-  }, [user])
+  const [validation, setValidation] = useState('')
+  const [loadingAvatar, setLoadingAvatar] = useState(false)
+  const [loadingForm, setLoadingForm] = useState(false)
+  const [isCheck, setIscheck] = useState(false)
+  const profileName = useRef(null)
+  const profileAvatar = useRef(null)
+  const profileUserName = useRef(null)
+  const inputAvatar = useRef(null)
+  const check = useRef(null)
 
   useEffect(() => {
-    // console.log(profileAvatar)
-    if (profileAvatar.current) {
-      baba()
+    if (offCanvas.name === 'myProfile' && profileAvatar.current) {
+      // console.log('offCanvas', offCanvas)
+      showMyProfile()
     }
-  }, [])
+  }, [offCanvas])
 
-  // console.log(userDB)
-
-  async function baba() {
-    const coucou = await readDoc(user.uid)
-    const { displayName, userName, photoURL } = coucou
+  async function showMyProfile() {
+    const myProfileInDB = await getMyProfileFromDB(user.uid)
+    // console.log('myProfileInDB', myProfileInDB)
+    if (!myProfileInDB) {
+      return
+    }
+    const { displayName, userName, photoURL } = myProfileInDB
     // console.log(displayName, userName, photoURL)
-    setUserDB(coucou)
-    // console.log('coucou', coucou)
-    // console.log('coucou.photoURL', coucou.photoURL)
-    if (coucou.photoURL !== '') {
+    if (myProfileInDB.photoURL !== '') {
       profileAvatar.current.src = photoURL
     } else {
       profileAvatar.current.src = Avatar
@@ -46,50 +53,52 @@ export default function OffCanvasProfile() {
     profileUserName.current.value = userName
   }
 
-  const offCanvas = useRef()
-  const profileName = useRef(null)
-  const profileAvatar = useRef(null)
-  const profileUserName = useRef(null)
-  const inputAvatar = useRef(null)
-  const check = useRef(null)
-
-  async function getUserDB() {
-    const userDB = readDoc(user.uid)
-    // console.log('userDB', userDB)
-  }
-
   //Loading data information of user DB
 
   const uploadAvatar = async (e) => {
     e.preventDefault()
     // console.log('AVATAR', inputAvatar.current.files[0])
     setLoadingAvatar(true)
-    const bobo = await uploadImage(
-      `profile/${user.uid}`,
-      inputAvatar.current.files[0]
-    )
-    // console.log('bobo', bobo)
+    await uploadImage(`profile/${user.uid}`, inputAvatar.current.files[0])
+    // it's important to download the image because without it we can't get the full url of firebase
     const urlAvatar = await downloadImage(`profile/${user.uid}`)
-    // console.log('URL', urlAvatar)
-    // console.log('userRef', userRef)
+    // update in my DB
     await updateDoc(userRef, {
       photoURL: urlAvatar,
     })
-    const userDB = await readDoc(user.uid)
-    // console.log('coco', userDB.photoURL)
-    profileAvatar.current.src = userDB.photoURL
+    await setMyProfileInDB(user.uid, { photoURL: urlAvatar })
+    // update in usersList in DB
+    await updateMyProfileInUsersListDB(user.uid, { photoURL: urlAvatar })
+    // change the profile avatar with the new url avatar
+    profileAvatar.current.src = urlAvatar
     setLoadingAvatar(false)
   }
 
   async function createProfile(e) {
-    // console.log(userDB)
     e.preventDefault()
     setLoadingForm(true)
-    await setUserinDB(user.uid, {
+    const allUsers = await getAllUsersFromUsersListDB()
+    if (!allUsers) {
+      console.log('no find all users')
+      return
+    }
+    // searches for a user from the userList who has the same userName
+    const isSameUserName = allUsers.find(
+      (user) => user.userName === profileUserName.current.value
+    )
+    // if this username is already in use and it is not my own username return an error in 'validation'
+    if (isSameUserName && isSameUserName.userId !== user.uid) {
+      console.log('find same user')
+      setLoadingForm(false)
+      setValidation(_thisUsername[language])
+      return
+    }
+    await setMyProfileInDB(user.uid, {
       displayName: profileName.current.value,
       userName: profileUserName.current.value,
     })
-    await saveUserInContactsList(user.uid, {
+    // here it is different from the form of 'profile.jsx' because the function is 'update' and not 'save'
+    await updateMyProfileInUsersListDB(user.uid, {
       displayName: profileName.current.value,
       userName: profileUserName.current.value,
       userId: user.uid,
@@ -116,10 +125,6 @@ export default function OffCanvasProfile() {
       setIscheck(false)
     }, 1000)
   }
-
-  const [loadingAvatar, setLoadingAvatar] = useState(false)
-  const [loadingForm, setLoadingForm] = useState(false)
-  const [isCheck, setIscheck] = useState(false)
 
   // DARK MODE
   const { theme } = useContext(ThemeContext)
@@ -166,8 +171,23 @@ export default function OffCanvasProfile() {
     il: 'שלח',
   }
 
+  const _thisUsername = {
+    en: 'This username is already used. Please enter a new username to continue.',
+    fr: "Ce nom d'utilisateur est déjà utilisé. Veuillez entrer un nouveau nom d'utilisateur pour continuer.",
+    il: 'שם המשתמש הזה כבר בשימוש. אנא הזן שם משתמש חדש כדי להמשיך.',
+  }
+
+  function handleClickAnywhere() {
+    if (validation !== '') {
+      setValidation('')
+    }
+  }
+
   return (
-    <div className={`offcanvas-body ${bgColor2}`}>
+    <div
+      className={`offcanvas-body ${bgColor2}`}
+      onClick={() => handleClickAnywhere()}
+    >
       <div className="profile-body d-flex flex-column justify-content-center container">
         <form className="mt-2" onSubmit={(e) => uploadAvatar(e)}>
           <div className="position-relative">
@@ -212,6 +232,7 @@ export default function OffCanvasProfile() {
                 </div>
                 <img
                   onClick={() => addFile()}
+                  onError={(e) => imgError(e.target)}
                   ref={profileAvatar}
                   style={{
                     height: '175px',
@@ -381,6 +402,9 @@ export default function OffCanvasProfile() {
               className={`form-control ${bgColor1} ${textColor}`}
               id="Username"
             />
+            {validation !== '' && (
+              <p className="text-danger mt-1">{validation}</p>
+            )}
           </div>
           <button className="btn btn-primary mt-4 w-100">
             {_submit[language]}

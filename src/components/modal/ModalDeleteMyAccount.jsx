@@ -12,7 +12,7 @@ import { LanguageContext } from '../../utils/context/LanguageContext'
 import { SocketContactContext } from '../../utils/context/SocketContact'
 
 export default function ModalDeleteMyAccount() {
-  const { user, deleteMyAccountFromFirebaseAuth } = UserAuth()
+  const { user, setUser, deleteMyAccountFromFirebaseAuth } = UserAuth()
   const { setMyContacts, actuallyContactId, allUsers, setActuallyContactId } =
     useContext(SocketContactContext)
   const { language } = useContext(LanguageContext)
@@ -21,13 +21,19 @@ export default function ModalDeleteMyAccount() {
 
   async function deleteMyAccount() {
     setIsLoading(true)
-    await deleteMyUsers(user.uid)
+    localStorage.clear()
     await deleteMyUsersCalls(user.uid)
     await deleteMyUsersMessages(user.uid)
     await setMyStatusInUsersList(user.uid)
     await deleteMyProfileImage(`profile/${user.uid}`)
-    await deleteMyAccountFromFirebaseAuth()
-    closeModal.current.click()
+    try {
+      closeModal.current.click()
+      await deleteMyAccountFromFirebaseAuth()
+      await deleteMyUsers(user.uid)
+      // setUser(null)
+    } catch (error) {
+      alert('Your account was not deleted, please try again!s')
+    }
     setIsLoading(false)
   }
 

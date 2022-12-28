@@ -18,35 +18,29 @@ const Arrow = styled.span`
   }
 `
 
-export default function OffCanvas({ canvasOption }) {
-  const offCanvas = useRef()
+export default function OffCanvas({ offCanvas, setOffCanvas }) {
+  const { language } = useContext(LanguageContext)
+  const { theme } = useContext(ThemeContext)
+  const offCanvasRef = useRef()
 
   function autosizeSideBar() {
     const divSidebar = document.querySelector('._sidebar')
     // console.log('divSidebar', divSidebar)
 
-    if (divSidebar && offCanvas.current) {
+    if (divSidebar && offCanvasRef.current) {
       let widthDivSidebar = divSidebar.offsetWidth
       // console.log('widthDivSidebar', widthDivSidebar)
-      offCanvas.current.style.width = `${widthDivSidebar + 1}px`
-      offCanvas.current.style.border = `none`
+      offCanvasRef.current.style.width = `${widthDivSidebar + 1}px`
+      offCanvasRef.current.style.border = `none`
     }
   }
   autosizeSideBar()
 
   // DARK MODE
-  const { theme } = useContext(ThemeContext)
   const bgColor1 = theme === 'light' ? 'bg-white' : 'bg-black'
   const bgColor2 = theme === 'light' ? 'bg-light' : 'bg-dark'
 
-  const [coucou, setCoucou] = useState('')
-
-  useEffect(() => {
-    setCoucou(canvasOption)
-  }, [canvasOption, coucou, setCoucou])
-
   // LANGUAGE
-  const { language } = useContext(LanguageContext)
 
   const _myProfile = {
     en: 'My Profile',
@@ -68,7 +62,7 @@ export default function OffCanvas({ canvasOption }) {
   return (
     <>
       <div
-        ref={offCanvas}
+        ref={offCanvasRef}
         className={`offcanvas ${offCanvasDirection}`}
         tabIndex="-1"
         id="offcanvasProfile"
@@ -86,7 +80,7 @@ export default function OffCanvas({ canvasOption }) {
                 className="offcanvas-title text-primary"
                 id="offcanvasExampleLabel"
               >
-                {coucou === 'profile'
+                {offCanvas.name === 'myProfile'
                   ? _myProfile[language]
                   : _contacts[language]}
               </h5>
@@ -94,7 +88,14 @@ export default function OffCanvas({ canvasOption }) {
           </div>
         </div>
         <div className={`offcanvas-body ${bgColor2}`}>
-          {coucou === 'profile' ? <OffCanvasProfile /> : <OffCanvasContacts />}
+          {offCanvas.name === 'myProfile' ? (
+            <OffCanvasProfile
+              offCanvas={offCanvas}
+              setOffCanvas={setOffCanvas}
+            />
+          ) : (
+            <OffCanvasContacts />
+          )}
         </div>
       </div>
     </>

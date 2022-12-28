@@ -11,7 +11,7 @@ import {
 import { UserAuth } from '../../../../utils/context/AuthContext'
 import {
   getAllMessagesWhithThisContactFromDB,
-  getAllUsersFromDB,
+  getAllUsersFromUsersListDB,
   getMessagesWithThisContact,
   setMessagesWithThisContact,
   updateHasNewMessagesInDB,
@@ -375,7 +375,7 @@ export async function setAllMessagesIsReceivedInDB(
   // console.log('socketUser', socketUser)
 
   // const usersListFromDB = await getUsersListFromDB()
-  const allUsers = await getAllUsersFromDB()
+  const allUsers = await getAllUsersFromUsersListDB()
   // console.log('usersListFromDB', usersListFromDB)
 
   const timeNowInMs = Date.now()

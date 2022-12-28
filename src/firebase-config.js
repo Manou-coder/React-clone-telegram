@@ -100,7 +100,7 @@ export const createUserInDB = async (user) => {
     myContacts: [],
     hasNewMessages: {},
   }
-  await readDoc(uid)
+  await getMyProfileFromDB(uid)
     .then((res) => {
       if (res) {
         return console.log('yet saved')
@@ -113,7 +113,7 @@ export const createUserInDB = async (user) => {
     .catch((err) => console.dir(err))
 }
 
-export const setUserinDB = async (userId, data) => {
+export const setMyProfileInDB = async (userId, data) => {
   const docRef = doc(db, 'users', userId)
   try {
     const docSnap = await setDoc(docRef, data, { merge: true })
@@ -123,7 +123,7 @@ export const setUserinDB = async (userId, data) => {
   }
 }
 
-export const readDoc = async (userId) => {
+export const getMyProfileFromDB = async (userId) => {
   const docRef = doc(db, 'users', userId)
   const docSnap = await getDoc(docRef)
 
@@ -136,18 +136,36 @@ export const readDoc = async (userId) => {
   }
 }
 
+// export const updateHasNewMessagesInDB = async (myId, contactId, operation) => {
+//   const hasNewMessages = await getHasNewMessagesFromDB(myId)
+//   // if hasNewMessages[contactId] not exists create it
+//   if (hasNewMessages[contactId] === undefined) {
+//     hasNewMessages[contactId] = 0
+//   }
+//   // if operation = add then add 1 else set to 0
+//   if (operation === 'add') {
+//     hasNewMessages[contactId] += 1
+//   } else if (operation === 'suppr') {
+//     hasNewMessages[contactId] = 0
+//   }
+//   finallyUpdateHasNewMessagesInDB(myId, hasNewMessages)
+// }
+
 export const updateHasNewMessagesInDB = async (myId, contactId, operation) => {
+  // console.log('contactId', contactId)
   const hasNewMessages = await getHasNewMessagesFromDB(myId)
-  // console.log('hasNewMessages', hasNewMessages)
+  // console.log('contactId', hasNewMessages)
+  // console.log('hasNewMessages[contactId] 1', hasNewMessages[contactId])
   if (operation === 'add') {
-    // console.log('hasNewMessages[contactId]', hasNewMessages[contactId])
-    hasNewMessages[contactId] =
-      hasNewMessages[contactId] === undefined
-        ? 1
-        : hasNewMessages[contactId] + 1
+    if (hasNewMessages[contactId] === undefined) {
+      hasNewMessages[contactId] = 1
+    } else {
+      hasNewMessages[contactId] += 1
+    }
   } else if (operation === 'suppr') {
     hasNewMessages[contactId] = 0
   }
+  // console.log('hasNewMessages[contactId] 2', hasNewMessages[contactId])
   finallyUpdateHasNewMessagesInDB(myId, hasNewMessages)
 }
 
@@ -155,7 +173,7 @@ export const updateHasNewMessagesInDB = async (myId, contactId, operation) => {
 
 // ------ 4 --------------------- USERSLIST -------------------------
 
-export const saveUserInContactsList = async (userId, data) => {
+export const saveMyProfileInUsersListDB = async (userId, data) => {
   createUsersMessagesDB(userId)
   const docRef = doc(db, 'usersList', 'usersList')
   const docSnap = await getDoc(docRef)
@@ -194,20 +212,7 @@ export const saveUserInContactsList = async (userId, data) => {
   }
 }
 
-export const readAllUsers = async () => {
-  const docRef = doc(db, 'usersList', 'usersList')
-  const docSnap = await getDoc(docRef)
-
-  if (docSnap.exists()) {
-    // console.log('Document data:', docSnap.data())
-    return docSnap.data()
-  } else {
-    console.log('No such document!')
-    return null
-  }
-}
-
-export const getAllUsersFromDB = async () => {
+export const getAllUsersFromUsersListDB = async () => {
   const docRef = doc(db, 'usersList', 'usersList')
   const docSnap = await getDoc(docRef)
   if (docSnap.exists()) {
@@ -218,7 +223,25 @@ export const getAllUsersFromDB = async () => {
   }
 }
 
-export const updateAllUsersFromDB = async (data) => {
+export const updateMyProfileInUsersListDB = async (myId, data) => {
+  const allUsersFromUsersList = await getAllUsersFromUsersListDB()
+  if (!allUsersFromUsersList) {
+    console.log('no find allUsersFromUsersList!')
+    return
+  }
+  const indexOfmyProfile = allUsersFromUsersList.findIndex(
+    (user) => user.userId === myId
+  )
+  if (indexOfmyProfile < 0) {
+    console.log('no find your index profile!')
+    return
+  }
+  const myProfileInUsersList = allUsersFromUsersList[indexOfmyProfile]
+  allUsersFromUsersList[indexOfmyProfile] = { ...myProfileInUsersList, ...data }
+  await updateAllUsersInUsersListDB(allUsersFromUsersList)
+}
+
+export const updateAllUsersInUsersListDB = async (data) => {
   const docRef = doc(db, 'usersList', 'usersList')
   try {
     await updateDoc(docRef, {
@@ -428,18 +451,19 @@ export const deleteMyUsersCalls = async (myId) => {
   const docRef = doc(db, 'usersCalls', myId)
   try {
     await deleteDoc(docRef)
+    console.log('userCall Supprimé')
   } catch (error) {
     console.dir(error)
   }
 }
 
 export const setMyStatusInUsersList = async (myId) => {
-  const allUsersFromDB = await getAllUsersFromDB()
+  const allUsersFromDB = await getAllUsersFromUsersListDB()
   const meInUsersList = allUsersFromDB.find((user) => user.userId === myId)
   if (meInUsersList) {
     meInUsersList.isDeleted = true
   }
-  await updateAllUsersFromDB(allUsersFromDB)
+  await updateAllUsersInUsersListDB(allUsersFromDB)
 }
 
 export const deleteMyProfileImage = async (storageRef, file) => {
@@ -451,6 +475,3 @@ export const deleteMyProfileImage = async (storageRef, file) => {
     console.dir(error)
   }
 }
-
-// deleteMyProfileImage(`profile/${'h2WmrHC0qvdfF7SMg6EcVblIipE3'}`)
-// deleteMyUsersCalls('h2WmrHC0qvdfF7SMg6EcVblIipE3')

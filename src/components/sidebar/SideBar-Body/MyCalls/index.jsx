@@ -7,7 +7,7 @@ function MyCalls() {
   const { user } = UserAuth()
   const { myCalls } = useContext(SocketContactContext)
 
-  console.log('myCalls', myCalls)
+  // console.log('myCalls', myCalls)
 
   return (
     <ul className="p-0 mt-2" style={{ listStyleType: 'none' }}>

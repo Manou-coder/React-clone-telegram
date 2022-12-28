@@ -10,8 +10,18 @@ import {
   signInWithEmailAndPassword,
   deleteUser,
   getAuth,
+  reauthenticateWithCredential,
+  reauthenticateWithPopup,
+  updatePassword,
+  EmailAuthProvider,
 } from 'firebase/auth'
-import { auth, createUserInDB, db, readDoc, unsub } from '../../firebase-config'
+import {
+  auth,
+  createUserInDB,
+  db,
+  getMyProfileFromDB,
+  unsub,
+} from '../../firebase-config'
 import { useNavigate } from 'react-router-dom'
 
 const AuthContext = createContext()
@@ -58,7 +68,7 @@ export const AuthContextProvider = ({ children }) => {
   //   try {
   //     const res = await signInWithPopup(auth, provider)
   //     console.log('manou', res)
-  //     const baba = readDoc(res.user.uid)
+  //     const baba = getMyProfileFromDB(res.user.uid)
   //     console.log('baba', baba)
   //   } catch (error) {
   //     console.dir(error)
@@ -69,13 +79,31 @@ export const AuthContextProvider = ({ children }) => {
     navigate('/')
   }
 
+  // const googleProvider = new GoogleAuthProvider()
+
+  // function reauthWithGoogle() {
+  //   return reauthenticateWith(auth, googleProvider).catch((err) =>
+  //     console.log(err)
+  //   )
+  // }
   const deleteMyAccountFromFirebaseAuth = async () => {
     try {
-      const auth = getAuth()
-      const user = auth.currentUser
       await deleteUser(user)
     } catch (error) {
       console.dir(error)
+      const password = prompt('password')
+      const email = user.email
+      const authCredential = EmailAuthProvider.credential(email, password)
+      const credential = await signInWithCredential(auth, authCredential)
+      console.log('credential', credential)
+      await deleteUser(credential.user)
+        .then(() => {
+          console.log('account is finally deleted!')
+        })
+        .catch((error) => {
+          console.dir(error)
+          alert('Your account was not deleted, please try again!')
+        })
     }
   }
 
@@ -95,6 +123,7 @@ export const AuthContextProvider = ({ children }) => {
       value={{
         googleSignIn,
         logOut,
+        setUser,
         user,
         signInWithCredential,
         signUp,

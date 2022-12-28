@@ -14,6 +14,9 @@ export default function ScrollButton({ lastMessageRef, scrollDiv }) {
 
   // fades the scroll button when the div is scrolled and fades the scroll button when the div is in its normal state
   useEffect(() => {
+    if (!scrollDiv.current.scrollHeight) {
+      return
+    }
     if (scrollDiv.current && scrollButton.current) {
       // use try catch because sometimes 'scrollHeight' has not defined
       try {
@@ -29,7 +32,7 @@ export default function ScrollButton({ lastMessageRef, scrollDiv }) {
           }
         }, 100)
       } catch (error) {
-        // console.log(error);
+        console.log(error)
       }
     }
   }, [scrollDiv.current, scrollButton.current])

@@ -31,6 +31,7 @@ export default function Calls() {
     isCameraActive,
     isMicroActive,
     isContactHangingUp,
+    isContactNotAnswer,
   } = useContext(PeerContext)
   const { language } = useContext(LanguageContext)
 
@@ -38,6 +39,9 @@ export default function Calls() {
   //   allUsers && allUsers.find((e) => e.userId === actuallyContactId)
 
   // this contact is defined by the id of the peer contact who is calling
+  if (!call) {
+    return
+  }
   const contact = allUsers && allUsers.find((e) => e.userId === call.peer)
 
   const displayVideo = isCallAccepted ? '' : 'd-none'
@@ -159,7 +163,13 @@ export default function Calls() {
                 />
                 <div className="text-center text-light">
                   <h1>{contact && contact.displayName}</h1>
-                  <h3>Appel en cours ...</h3>
+                  <h3>
+                    {!isContactNotAnswer
+                      ? _callInProgress[language]
+                      : `${contact && contact.displayName} ${
+                          _DoNotAnswer[language]
+                        }`}
+                  </h3>
                 </div>
               </div>
             </div>
@@ -296,4 +306,16 @@ const _hangUp = {
   en: 'Hang up',
   fr: 'a raccroché',
   il: 'ניתק',
+}
+
+const _callInProgress = {
+  en: 'Call in progress ...',
+  fr: 'Appel en cours ...',
+  il: 'מתקשר ...',
+}
+
+const _DoNotAnswer = {
+  en: 'do not answer',
+  fr: 'ne répond pas',
+  il: 'לא עונה',
 }

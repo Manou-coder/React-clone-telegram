@@ -32,6 +32,7 @@ export const PeerProvider = ({ children }) => {
   const [callObj, setCallObj] = useState(null)
   const [isFinishedCall, setIsFinishedCall] = useState(false)
   const [isContactHangingUp, setIsContactHangingUp] = useState(false)
+  const [isContactNotAnswer, setIsContactNotAnswer] = useState(false)
   const grandVideo = useRef()
   const smallVideo = useRef()
   const ringtone = useRef()
@@ -99,6 +100,8 @@ export const PeerProvider = ({ children }) => {
 
   // call the contact
   function callTheContact() {
+    // hanging up after 10 sec if call not answering
+    hangingUpNotAnswer()
     // test
     setIsContactHangingUp(false)
     // request authorization to use the camera and the microphone and if so then call the contact
@@ -204,6 +207,38 @@ export const PeerProvider = ({ children }) => {
     updateMyCallsInChat(callObj)
   }
 
+  // hanging up if contact not answer
+  function hangingUpNotAnswer() {
+    setTimeout(() => {
+      setIsCallAccepted((call) => {
+        if (!call) {
+          setIsContactNotAnswer(true)
+          setIsCalling(false)
+        }
+        setTimeout(() => {
+          if (call) {
+            call.close()
+          }
+          setMyStream((myStream) => {
+            stopAllMyStreams(myStream)
+            return myStream
+          })
+          setIsCallAccepted(false)
+          setMyStream(null)
+          setCall(null)
+          setCallObj((callObj) => {
+            emitSocketHangUp(callObj, setCallObj)
+            updateMyCallsInChat(callObj)
+            return callObj
+          })
+          setIsCallOpen(false)
+          setIsContactNotAnswer(false)
+        }, 2000)
+        return call
+      })
+    }, 10000)
+  }
+
   function muteMyVideo() {
     stopMyVideoStream(myStream)
     setIsCameraActive(!isCameraActive)
@@ -295,6 +330,7 @@ export const PeerProvider = ({ children }) => {
         audioCall,
         isContactHangingUp,
         hangingUpToast,
+        isContactNotAnswer,
       }}
     >
       {children}
@@ -317,6 +353,10 @@ function addVideoStream(video, stream) {
 }
 
 function stopAllMyStreams(stream) {
+  if (!stream) {
+    console.log('no stream!')
+    return
+  }
   // get all streams
   // console.log('stream', stream)
   const tracks = stream.getTracks()

@@ -1,7 +1,7 @@
 import React, { useState, createContext, useContext } from 'react'
 import { useEffect } from 'react'
 import {
-  getAllUsersFromDB,
+  getAllUsersFromUsersListDB,
   getHasNewMessagesFromDB,
   getMyCallsFromDB,
   getMyContactsFromDB,
@@ -32,7 +32,9 @@ export const SocketContactProvider = ({ children }) => {
 
   // set 'allUsers' whith allUsers in app from DB
   useEffect(() => {
-    setAllUsersFromDB()
+    if (user !== null) {
+      setAllUsersFromDB()
+    }
   }, [])
 
   // ----------------------------- MY CONTACTS --------------------
@@ -68,6 +70,8 @@ export const SocketContactProvider = ({ children }) => {
   useEffect(() => {
     if (user !== null) {
       startSocket(user.uid)
+    } else {
+      socket.close()
     }
   }, [user])
 
@@ -112,7 +116,7 @@ export const SocketContactProvider = ({ children }) => {
   // -------------------------- Functions Internes ------------------------------
 
   async function setAllUsersFromDB() {
-    const allUsers = await getAllUsersFromDB()
+    const allUsers = await getAllUsersFromUsersListDB()
     console.log('allUsers', allUsers)
     setInStorage('allUsers', allUsers)
     setAllUsers((curr) => {

@@ -13,8 +13,9 @@ function Sidebar() {
   const [inputLetters, setInputLetters] = useState('')
   const [isContactsOpen, setContactsOpen] = useState(true)
   const [iconBarIsActive, setIconBarIsActive] = useState(false)
-  const [canvasOption, setCanvasOption] = useState('profile')
-  const [actualFlag, setActualFlag] = useState('')
+  const [offCanvas, setOffCanvas] = useState({
+    offCanvas: 'my Profile',
+  })
 
   //CHECK INTERNET CONNECTION
 
@@ -58,14 +59,14 @@ function Sidebar() {
         position: 'relative',
       }}
     >
-      {iconBarIsActive && <SettingsMenu setCanvasOption={setCanvasOption} />}
-      <OffCanvas canvasOption={canvasOption} />
+      {iconBarIsActive && <SettingsMenu setOffCanvas={setOffCanvas} />}
+      <OffCanvas offCanvas={offCanvas} setOffCanvas={setOffCanvas} />
       <Navbar
         inputLetters={inputLetters}
         setInputLetters={setInputLetters}
         iconBarIsActive={iconBarIsActive}
         setIconBarIsActive={setIconBarIsActive}
-        setCanvasOption={setCanvasOption}
+        setOffCanvas={setOffCanvas}
       />
       {isOffline && <Offline />}
       <SlideMenu

@@ -3,7 +3,7 @@ import './Home.css'
 import Ilustration from '../../assets/img/27.svg'
 import { UserAuth } from '../../utils/context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { auth, createUserInDB, readDoc } from '../../firebase-config'
+import { auth, createUserInDB, getMyProfileFromDB } from '../../firebase-config'
 import { GoogleAuthProvider } from 'firebase/auth'
 import SignUpModal from './components/SignUpModal'
 import SignInModal from './components/SignInModal'
@@ -17,7 +17,7 @@ export default function Home() {
 
   useEffect(() => {
     if (user) {
-      readDoc(user.uid)
+      getMyProfileFromDB(user.uid)
         .then((res) => {
           console.log('res', res)
           if (res) {
