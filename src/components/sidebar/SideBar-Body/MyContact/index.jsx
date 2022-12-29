@@ -15,6 +15,7 @@ import { imgError } from '../../../../utils/functions/returnAvatarIsImgError'
 import { MessagesContext } from '../../../../utils/context/MessagesContext'
 import { addZero } from '../../../../utils/functions/addZero'
 import { svgSend } from '../../../../utils/functions/svgSend'
+import { useEffect } from 'react'
 
 function MyContact({ name1, name2, name3, contact, description, photoURL }) {
   const { user } = UserAuth()
@@ -25,11 +26,57 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
     newMessages,
     setActuallyContactId,
   } = useContext(SocketContactContext)
-  const { setArrOfMessages } = useContext(MessagesContext)
+  const { setArrOfMessages, updateMessageStorage } = useContext(MessagesContext)
   const { setIsChatOpen } = useContext(ThemeContext)
+  const [lastMessage, setLastMessage] = useState({})
 
   // console.log('contact', contact)
   // console.log('description', description)
+
+  useEffect(() => {
+    if (!updateMessageStorage) {
+      return
+    }
+    if (updateMessageStorage.contactId === contact.userId) {
+      console.log('recu message de la part de ' + contact.displayName)
+      const allMessagesWithThisContact = getFromStorage(contact.userId)
+      // console.log('lastMessageWithThisContact', lastMessageWithThisContact)
+      if (
+        !allMessagesWithThisContact &&
+        allMessagesWithThisContact.length <= 0
+      ) {
+        console.log('error: no found message in storage with this contact!')
+      }
+      setLastMessage((curr) => {
+        if (
+          !allMessagesWithThisContact[allMessagesWithThisContact.length - 1]
+        ) {
+          return
+        }
+        curr = JSON.parse(
+          JSON.stringify(
+            allMessagesWithThisContact[allMessagesWithThisContact.length - 1]
+          )
+        )
+        console.log('curr', curr)
+        return curr
+      })
+    }
+  }, [updateMessageStorage])
+
+  useEffect(() => {
+    if (!contact) {
+      return
+    }
+    // console.log('rerender')
+    const allMessagesWithThisContact = getFromStorage(contact.userId)
+    if (allMessagesWithThisContact && allMessagesWithThisContact.length > 0) {
+      setLastMessage(
+        allMessagesWithThisContact[allMessagesWithThisContact.length - 1]
+      )
+      // console.log('lastMessageWithThisContact', lastMessageWithThisContact)
+    }
+  }, [])
 
   function handleClickContact() {
     // empty the arrOfMessages
@@ -58,15 +105,6 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
     en: 'Is typing...',
     fr: "En train d'écrire...",
     il: 'כותב/ת',
-  }
-
-  const allMessagesWithThisContact = getFromStorage(contact.userId)
-
-  let lastMessageWithThisContact = null
-  if (allMessagesWithThisContact && allMessagesWithThisContact.length > 0) {
-    lastMessageWithThisContact =
-      allMessagesWithThisContact[allMessagesWithThisContact.length - 1]
-    // console.log('lastMessageWithThisContact', lastMessageWithThisContact)
   }
 
   function readableDate(timeInMs) {
@@ -130,8 +168,9 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
                 }}
                 className={`mb-0 fw-light pt-0 lh-1 ${colorInfo}`}
               >
-                {lastMessageWithThisContact &&
-                  lastMessageWithThisContact.content}
+                {/* {lastMessageWithThisContact &&
+                  lastMessageWithThisContact.content} */}
+                {lastMessage && lastMessage.content}
               </p>
             )}
           </div>
@@ -143,12 +182,13 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
           <div className="d-flex justify-content-center pe-2">
             <div className="d-flex justify-content-between w-100">
               <span className={`${colorInfo}`}>
-                {lastMessageWithThisContact &&
-                  svgSend(lastMessageWithThisContact.status)}
+                {/* {lastMessage && svgSend(lastMessage.status)} */}
+                {lastMessage && lastMessage.from === user.uid
+                  ? svgSend(lastMessage.status)
+                  : null}
               </span>
               <span className={`${colorInfo}`}>
-                {lastMessageWithThisContact &&
-                  readableDate(lastMessageWithThisContact.time)}
+                {lastMessage && readableDate(lastMessage.time)}
               </span>
             </div>
           </div>
@@ -157,6 +197,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
               // style={{ height: '20.5px' }}
               className={`badge rounded-pill bg-primary`}
             >
+              {/* {newMessages[contact.userId] > 0 && newMessages[contact.userId]} */}
               {newMessages[contact.userId] > 0 && newMessages[contact.userId]}
             </span>
           </div>

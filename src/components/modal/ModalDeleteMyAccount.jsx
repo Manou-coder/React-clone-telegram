@@ -30,9 +30,8 @@ export default function ModalDeleteMyAccount() {
       closeModal.current.click()
       await deleteMyAccountFromFirebaseAuth()
       await deleteMyUsers(user.uid)
-      // setUser(null)
     } catch (error) {
-      alert('Your account was not deleted, please try again!s')
+      alert('Your account was not deleted, please try again!')
     }
     setIsLoading(false)
   }
@@ -53,8 +52,14 @@ export default function ModalDeleteMyAccount() {
 
   const _theDeletionOf = {
     en: '(The deletion of your account will be permanent and all your data will be lost.)',
-    fr: '(La suppression de votre compte sera définitive et toutes vos données seront perdus.)',
+    fr: '(La suppression de votre compte sera définitive et toutes vos données seront perdues.)',
     il: '(מחיקת החשבון שלך תהיה לצמיתות וכל הנתונים שלך יאבדו.)',
+  }
+
+  const _pleaseEnterYourPassword = {
+    en: 'Please enter your password :',
+    fr: 'Veuillez entrer votre mot de passe :',
+    il: 'הזן את סיסמתך בבקשה :',
   }
 
   const _cancel = {

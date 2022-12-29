@@ -91,7 +91,7 @@ export const AuthContextProvider = ({ children }) => {
       await deleteUser(user)
     } catch (error) {
       console.dir(error)
-      const password = prompt('password')
+      const password = prompt('Please enter your password :')
       const email = user.email
       const authCredential = EmailAuthProvider.credential(email, password)
       const credential = await signInWithCredential(auth, authCredential)

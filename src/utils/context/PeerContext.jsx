@@ -17,7 +17,7 @@ let video = true
 
 export const PeerProvider = ({ children }) => {
   const { user } = UserAuth()
-  const { actuallyContactId, setMyCalls, updateMyCallsInChat } =
+  const { actuallyContactId, updateMyCallsInChat } =
     useContext(SocketContactContext)
   const { setIsToastOpen, setIsCallOpen, isToastOpen } =
     useContext(ThemeContext)
@@ -236,7 +236,7 @@ export const PeerProvider = ({ children }) => {
         }, 2000)
         return call
       })
-    }, 10000)
+    }, 12000)
   }
 
   function muteMyVideo() {
@@ -405,7 +405,7 @@ function emitSocketHangUp(callObj, setCallObj) {
     callStatus: 'finished',
     // time: Date.now(),
   }
-  console.log('newCallObj', newCallObj)
+  // console.log('newCallObj', newCallObj)
   setCallObj(newCallObj)
   socket.emit('call contact', newCallObj)
 }

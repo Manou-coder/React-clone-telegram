@@ -15,7 +15,6 @@ export default function searchContact(arr, inputLetters) {
   }
   if (inputLetters.trim() === '') {
     arr = arr.map((e) => JSON.stringify(e))
-    arr = arr.sort()
     arr = arr.map((e) => JSON.parse(e))
     return arr
   }

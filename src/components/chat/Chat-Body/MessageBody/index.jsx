@@ -18,9 +18,7 @@ import {
   updatetAllMessagesWhithThisContactInDB,
 } from '../../../../firebase-config'
 import { MessagesContext } from '../../../../utils/context/MessagesContext'
-import ButtonScroll from '../../ScrollButton'
 import ScrollButton from '../../ScrollButton'
-import { set } from 'date-fns/esm'
 
 let firstTime
 
@@ -28,13 +26,19 @@ export default function MesssageBody() {
   const { user } = UserAuth()
   const { isChatOpen } = useContext(ThemeContext)
   const { setNewMessages, actuallyContactId } = useContext(SocketContactContext)
-  const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
+  const {
+    arrOfMessages,
+    setArrOfMessages,
+    updateMessageStorage,
+    setUpdateMessageStorage,
+  } = useContext(MessagesContext)
   const [isLoading, setisLoading] = useState(true)
   const [arrOfSelectedMessages, setArrOfSelectedMessages] = useState([])
   const scrollDiv = useRef(null)
   const messagesDiv = useRef(null)
   const lastMessageRef = useRef(null)
 
+  // socket emit if i read all messages
   useEffect(() => {
     if (actuallyContactId && isChatOpen) {
       socket.emit('receiver status is read', {
@@ -109,9 +113,10 @@ export default function MesssageBody() {
   }
 
   useEffect(() => {
-    if (actuallyContactId) {
-      getAllMessagesFromDB()
+    if (!actuallyContactId) {
+      return
     }
+    getAllMessagesFromDB()
   }, [actuallyContactId])
 
   // ---------------------- SOCKETS -----------------------------------------
@@ -134,6 +139,16 @@ export default function MesssageBody() {
         }
       }
       checkMyStatus()
+
+      // NEW
+      setUpdateMessageStorage((curr) => {
+        return { ...curr, contactId: msg.from }
+      })
+      const allMessagesWhithThisContactFromStorage = getFromStorage(msg.from)
+      if (allMessagesWhithThisContactFromStorage) {
+        allMessagesWhithThisContactFromStorage.push(msg)
+      }
+      setInStorage(msg.from, allMessagesWhithThisContactFromStorage)
 
       firstTime = false
     })
@@ -191,11 +206,20 @@ export default function MesssageBody() {
       curr = JSON.parse(JSON.stringify(curr))
       return curr
     })
+    // // NEW
+    // setUpdateMessageStorage(msg.from)
+    // const allMessagesWhithThisContactFromStorage =
+    //   getFromStorage(actuallyContactId)
+    // if (allMessagesWhithThisContactFromStorage) {
+    //   allMessagesWhithThisContactFromStorage.push(msg)
+    // }
+    // setInStorage(actuallyContactId, allMessagesWhithThisContactFromStorage)
   }
 
   function setRead(msg) {
     msg.status = 'read'
     socket.emit('message read or received', { msg: msg })
+    // TO DO§!!! add badge time
     setArrOfMessages([...arrOfMessages, ...[msg]])
   }
 
@@ -318,6 +342,10 @@ export default function MesssageBody() {
 
 // function qui ajoute des badges de dates au tableau des messages
 export function addBadgeDateToArr(arr) {
+  if (!arr) {
+    console.log('no arr!')
+    return
+  }
   // console.log('arr1', arr)
   arr = arr.filter((e) => !e.badgeTime)
   // console.log('arr2', arr)

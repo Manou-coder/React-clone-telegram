@@ -19,31 +19,12 @@ function MyContacts({ inputLetters }) {
     }
   }
 
+  // console.log('myContacts', myContacts)
   // console.log('myContactsObj', myContactsObj)
 
-  // console.log('myContacts', myContacts)
-
-  let searchedContactList = searchContact(myContactsObj, inputLetters)
-  searchedContactList = searchedContactList.filter((e) => e.userId !== user.uid)
+  const searchedContactList = searchContact(myContactsObj, inputLetters)
+  // searchedContactList = searchedContactList.filter((e) => e.userId !== user.uid)
   // console.log('searchedContactList', searchedContactList)
-
-  // --------------------- INTERNES FUNCTIONS ---------------------
-
-  // async function setMyContactsFromDB() {
-  //   const myContactsFromDB = await getMyContactsFromDB(user.uid)
-  //   console.log('myContactsFromDB', myContactsFromDB)
-  //   // searches in 'allUsers' for contacts that have the same id as in 'myContactsFromDB' and adds them to 'myContacts'
-  //   const myContacts = []
-  //   for (const contactId of myContactsFromDB) {
-  //     for (const contact of allUsers) {
-  //       if (contactId === contact.userId) {
-  //         myContacts.push(contact)
-  //       }
-  //     }
-  //   }
-  //   // console.log('myContacts 5', myContacts)
-  //   setMyContacts(myContacts)
-  // }
 
   return (
     <ul className="p-0 mt-2" style={{ listStyleType: 'none' }}>

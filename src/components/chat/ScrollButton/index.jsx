@@ -19,8 +19,8 @@ export default function ScrollButton({ lastMessageRef, scrollDiv }) {
     }
     if (scrollDiv.current && scrollButton.current) {
       // use try catch because sometimes 'scrollHeight' has not defined
-      try {
-        setInterval(() => {
+      setInterval(() => {
+        try {
           const scrollHeight = scrollDiv.current.scrollHeight
           const scrollTop = scrollDiv.current.scrollTop
           const clientHeight = scrollDiv.current.clientHeight
@@ -30,10 +30,10 @@ export default function ScrollButton({ lastMessageRef, scrollDiv }) {
           } else {
             scrollButton.current.classList = 'fadeout'
           }
-        }, 100)
-      } catch (error) {
-        console.log(error)
-      }
+        } catch (error) {
+          // console.log(error)
+        }
+      }, 100)
     }
   }, [scrollDiv.current, scrollButton.current])
 

@@ -216,6 +216,7 @@ export default function Message({
                   <span
                     className="me-1"
                     style={{
+                      color: type === 'deleted message' && 'GrayText',
                       fontSize: '0.8em',
                       position: 'relative',
                       top: '4px',
