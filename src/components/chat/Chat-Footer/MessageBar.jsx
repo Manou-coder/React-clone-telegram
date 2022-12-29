@@ -15,7 +15,8 @@ import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
 export default function MessageBar() {
   const { user } = UserAuth()
   const { actuallyContactId, allUsers } = useContext(SocketContactContext)
-  const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
+  const { arrOfMessages, setArrOfMessages, setUpdateMessageStorage } =
+    useContext(MessagesContext)
   const { language } = useContext(LanguageContext)
   const [messageInput, setMessageInput] = useState('')
   const textareaRef = useRef()
@@ -66,6 +67,10 @@ export default function MessageBar() {
       return
     }
     socketEmitPrivateMessage()
+    // update for lastMessage in myContact
+    setUpdateMessageStorage((curr) => {
+      return { ...curr, contactId: actuallyContactId }
+    })
     textareaRef.current.value = ''
     setMessageInput('')
     autoResizeBar()

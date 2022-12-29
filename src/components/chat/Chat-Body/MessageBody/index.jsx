@@ -140,15 +140,16 @@ export default function MesssageBody() {
       }
       checkMyStatus()
 
-      // NEW
-      setUpdateMessageStorage((curr) => {
-        return { ...curr, contactId: msg.from }
-      })
+      // update in localStorage
       const allMessagesWhithThisContactFromStorage = getFromStorage(msg.from)
       if (allMessagesWhithThisContactFromStorage) {
         allMessagesWhithThisContactFromStorage.push(msg)
       }
       setInStorage(msg.from, allMessagesWhithThisContactFromStorage)
+      // update for lastMessage in myContact
+      setUpdateMessageStorage((curr) => {
+        return { ...curr, contactId: msg.from }
+      })
 
       firstTime = false
     })

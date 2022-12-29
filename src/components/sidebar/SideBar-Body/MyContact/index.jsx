@@ -148,7 +148,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
           className="col"
         >
           <div>
-            <h3 className={`mb-2 fs-5 lh-1 ${colorName}`}>
+            <h3 className={`mb-0 fs-5 lh-1 ${colorName}`}>
               {name1}
               <span style={{ color: colors.primary }}>{name2}</span>
               {name3}
@@ -156,7 +156,10 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
           </div>
           <div>
             {description ? (
-              <p className={`mb-0 pt-0 lh-1`} style={{ color: '#00ff00' }}>
+              <p
+                className={`mb-0 pt-0 lh-1`}
+                style={{ color: '#00ff00', height: '24px' }}
+              >
                 {_isTyping[language]}
               </p>
             ) : (
@@ -166,7 +169,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                 }}
-                className={`mb-0 fw-light pt-0 lh-1 ${colorInfo}`}
+                className={`mb-0 fw-light pt-0 ${colorInfo}`}
               >
                 {/* {lastMessageWithThisContact &&
                   lastMessageWithThisContact.content} */}
@@ -182,7 +185,6 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
           <div className="d-flex justify-content-center pe-2">
             <div className="d-flex justify-content-between w-100">
               <span className={`${colorInfo}`}>
-                {/* {lastMessage && svgSend(lastMessage.status)} */}
                 {lastMessage && lastMessage.from === user.uid
                   ? svgSend(lastMessage.status)
                   : null}
@@ -193,12 +195,11 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
             </div>
           </div>
           <div className="d-flex justify-content-center">
-            <span
-              // style={{ height: '20.5px' }}
-              className={`badge rounded-pill bg-primary`}
-            >
-              {/* {newMessages[contact.userId] > 0 && newMessages[contact.userId]} */}
+            <span className={`badge rounded-pill bg-primary`}>
               {newMessages[contact.userId] > 0 && newMessages[contact.userId]}
+              {!newMessages[contact.userId] && newMessages[contact.userId] > 0
+                ? newMessages[contact.userId]
+                : null}
             </span>
           </div>
         </div>
