@@ -13,10 +13,12 @@ import {
   setAllMessagesIsReceivedInDB,
 } from '../../components/chat/Chat-Body/MessageBody'
 import { MessagesContext } from './MessagesContext'
+import { useNavigate } from 'react-router-dom'
 
 export const SocketContactContext = createContext()
 
 export const SocketContactProvider = ({ children }) => {
+  const navigate = useNavigate()
   // --------------------------------------------------------------------------------
   const { user } = UserAuth()
   const { setArrOfMessages } = useContext(MessagesContext)
@@ -27,6 +29,16 @@ export const SocketContactProvider = ({ children }) => {
   )
   const [myContacts, setMyContacts] = useState(getFromStorage('myContacts', []))
   const [myCalls, setMyCalls] = useState(getFromStorage('myCalls', []))
+
+  // ----------------------------- ALL USERS --------------------
+
+  // set 'allUsers' whith allUsers in app from DB
+  useEffect(() => {
+    if (user !== null && actuallyContactId === '') {
+      // navigate to / (its good for mobile)
+      navigate('/chat/')
+    }
+  }, [])
 
   // ----------------------------- ALL USERS --------------------
 

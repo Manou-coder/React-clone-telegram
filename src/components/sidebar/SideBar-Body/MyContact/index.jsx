@@ -16,8 +16,10 @@ import { MessagesContext } from '../../../../utils/context/MessagesContext'
 import { addZero } from '../../../../utils/functions/addZero'
 import { svgSend } from '../../../../utils/functions/svgSend'
 import { useEffect } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
 
 function MyContact({ name1, name2, name3, contact, description, photoURL }) {
+  const navigate = useNavigate()
   const { user } = UserAuth()
   const {
     setMyContacts,
@@ -80,6 +82,8 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
   }, [])
 
   function handleClickContact() {
+    // navigate to userName (its good for mobile)
+    navigate('/chat/' + contact.userName)
     // empty the arrOfMessages if it's differnent contact
     if (contact.userId !== actuallyContactId) {
       setArrOfMessages([])
