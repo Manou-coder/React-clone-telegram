@@ -207,14 +207,6 @@ export default function MesssageBody() {
       curr = JSON.parse(JSON.stringify(curr))
       return curr
     })
-    // // NEW
-    // setUpdateMessageStorage(msg.from)
-    // const allMessagesWhithThisContactFromStorage =
-    //   getFromStorage(actuallyContactId)
-    // if (allMessagesWhithThisContactFromStorage) {
-    //   allMessagesWhithThisContactFromStorage.push(msg)
-    // }
-    // setInStorage(actuallyContactId, allMessagesWhithThisContactFromStorage)
   }
 
   function setRead(msg) {
@@ -252,12 +244,16 @@ export default function MesssageBody() {
     setArrOfMessages(arrWhithBadge)
   }
 
-  // --------------------------- SET MESSAGES IN STORAGE --------------------------
+  // --------------------------- SET MESSAGES IN STORAGE AND UPDATE MESSAGE STORAGE--------------------------
   useEffect(() => {
     const arrOfMessagesWithinBadge = arrOfMessages.filter(
       (message) => message.status
     )
     setInStorage(actuallyContactId, arrOfMessagesWithinBadge)
+    // IMPORTANT - update for lastMessage in myContact
+    setUpdateMessageStorage((curr) => {
+      return { ...curr, contactId: actuallyContactId }
+    })
   }, [arrOfMessages])
 
   // --------------------------- SROLL EFFECT --------------------------

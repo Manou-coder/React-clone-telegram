@@ -26,7 +26,8 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
     newMessages,
     setActuallyContactId,
   } = useContext(SocketContactContext)
-  const { setArrOfMessages, updateMessageStorage } = useContext(MessagesContext)
+  const { setArrOfMessages, updateMessageStorage, setUpdateMessageStorage } =
+    useContext(MessagesContext)
   const { setIsChatOpen } = useContext(ThemeContext)
   const [lastMessage, setLastMessage] = useState({})
 
@@ -40,7 +41,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
     if (updateMessageStorage.contactId === contact.userId) {
       console.log('recu message de la part de ' + contact.displayName)
       const allMessagesWithThisContact = getFromStorage(contact.userId)
-      // console.log('lastMessageWithThisContact', lastMessageWithThisContact)
+      console.log('lastMessage', lastMessage)
       if (
         !allMessagesWithThisContact &&
         allMessagesWithThisContact.length <= 0
@@ -51,7 +52,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
         if (
           !allMessagesWithThisContact[allMessagesWithThisContact.length - 1]
         ) {
-          return
+          return curr
         }
         curr = JSON.parse(
           JSON.stringify(
@@ -79,8 +80,10 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
   }, [])
 
   function handleClickContact() {
-    // empty the arrOfMessages
-    setArrOfMessages([])
+    // empty the arrOfMessages if it's differnent contact
+    if (contact.userId !== actuallyContactId) {
+      setArrOfMessages([])
+    }
     setActuallyContactId(contact.userId)
     setActuallyContactIdInStorage(contact.userId)
     setIsChatOpen(true)
@@ -168,11 +171,10 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
+                  height: '24px',
                 }}
                 className={`mb-0 fw-light pt-0 ${colorInfo}`}
               >
-                {/* {lastMessageWithThisContact &&
-                  lastMessageWithThisContact.content} */}
                 {lastMessage && lastMessage.content}
               </p>
             )}

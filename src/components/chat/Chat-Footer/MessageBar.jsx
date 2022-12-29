@@ -3,7 +3,11 @@ import color from '../../../utils/style/color'
 import socket from '../../../utils/socket.io'
 import { ThemeContext } from '../../../utils/context/ThemeContext'
 import { LanguageContext } from '../../../utils/context/LanguageContext'
-import { SocketContactContext } from '../../../utils/context/SocketContact'
+import {
+  getFromStorage,
+  setInStorage,
+  SocketContactContext,
+} from '../../../utils/context/SocketContact'
 import { UserAuth } from '../../../utils/context/AuthContext'
 import { v4 as uuidv4 } from 'uuid'
 import { MessagesContext } from '../../../utils/context/MessagesContext'
@@ -15,8 +19,7 @@ import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
 export default function MessageBar() {
   const { user } = UserAuth()
   const { actuallyContactId, allUsers } = useContext(SocketContactContext)
-  const { arrOfMessages, setArrOfMessages, setUpdateMessageStorage } =
-    useContext(MessagesContext)
+  const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
   const { language } = useContext(LanguageContext)
   const [messageInput, setMessageInput] = useState('')
   const textareaRef = useRef()
@@ -67,10 +70,6 @@ export default function MessageBar() {
       return
     }
     socketEmitPrivateMessage()
-    // update for lastMessage in myContact
-    setUpdateMessageStorage((curr) => {
-      return { ...curr, contactId: actuallyContactId }
-    })
     textareaRef.current.value = ''
     setMessageInput('')
     autoResizeBar()
