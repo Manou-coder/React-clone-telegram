@@ -1,15 +1,24 @@
 import React, { useState, createContext } from 'react'
 import { useRef } from 'react'
 import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 
 export const ThemeContext = createContext()
 
 export const ThemeProvider = ({ children }) => {
+  const location = useLocation()
   const [theme, setTheme] = useState('')
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isCallOpen, setIsCallOpen] = useState(false)
   const [isToastOpen, setIsToastOpen] = useState(false)
   const [modalName, setModalName] = useState(null)
+
+  useEffect(() => {
+    console.log(location)
+    if (location.pathname === '/chat/') {
+      setIsChatOpen(false)
+    }
+  }, [location])
 
   function checkDarkMode() {
     if (localStorage.getItem('mode')) {
