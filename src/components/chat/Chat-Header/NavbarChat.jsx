@@ -127,7 +127,7 @@ export default function NavbarChat() {
 
   return (
     <div
-      className={`d-flex ${bgColor} align-items-center m-0 mb-1`}
+      className={`sticky-top d-flex ${bgColor} align-items-center m-0 mb-1`}
       style={{ height: '58px' }}
     >
       <div
