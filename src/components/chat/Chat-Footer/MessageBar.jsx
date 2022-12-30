@@ -171,7 +171,7 @@ export default function MessageBar() {
   }, [isComponentVisible])
 
   return (
-    <div className={`row position-sticky py-1 w-100 m-0 p-0 ${bgColor1}`}>
+    <div className={`row sticky-bottom py-1 w-100 m-0 p-0 ${bgColor1}`}>
       <div ref={refComponent}>
         {isComponentVisible && (
           <Emojis textareaRef={textareaRef} setMessageInput={setMessageInput} />
