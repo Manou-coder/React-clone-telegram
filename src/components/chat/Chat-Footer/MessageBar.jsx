@@ -110,7 +110,7 @@ export default function MessageBar() {
     textareaRef.current.focus()
     setMessageInput('')
     autoResizeBar()
-    // changeMyContactsOrder()
+    changeMyContactsOrder()
   }
 
   // Sends message when pressing the enter key unless the shift key has been pressed before
@@ -278,7 +278,7 @@ export default function MessageBar() {
                 autoResizeBar()
                 // console.log('input')
                 handleOnInputTyping()
-                resizeMessageBody()
+                // resizeMessageBody()
               }}
               onBlur={() => handleOnBlurTyping()}
               onChange={(e) => {
