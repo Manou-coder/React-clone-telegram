@@ -19,50 +19,53 @@ import Error from './pages/error/Error'
 
 import './utils/peerjs/peer'
 import { PeerProvider } from './utils/context/PeerContext'
+import { ErrorBoundary } from './ErrorBoundary'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <BrowserRouter>
-    <AuthContextProvider>
-      <LanguageProvider>
-        <ThemeProvider>
-          <MessagesContextProvider>
-            <SocketContactProvider>
-              <PeerProvider>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route
-                    path="profile"
-                    element={
-                      <Protected>
-                        <Profile />
-                      </Protected>
-                    }
-                  />
-                  <Route
-                    path="chat"
-                    element={
-                      <Protected>
-                        <App />
-                      </Protected>
-                    }
-                  >
+    <ErrorBoundary>
+      <AuthContextProvider>
+        <LanguageProvider>
+          <ThemeProvider>
+            <MessagesContextProvider>
+              <SocketContactProvider>
+                <PeerProvider>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
                     <Route
-                      path=":username"
+                      path="profile"
+                      element={
+                        <Protected>
+                          <Profile />
+                        </Protected>
+                      }
+                    />
+                    <Route
+                      path="chat"
                       element={
                         <Protected>
                           <App />
                         </Protected>
                       }
-                    />
-                  </Route>
-                  <Route path="*" element={<Error />} />
-                </Routes>
-              </PeerProvider>
-            </SocketContactProvider>
-          </MessagesContextProvider>
-        </ThemeProvider>
-      </LanguageProvider>
-    </AuthContextProvider>
+                    >
+                      <Route
+                        path=":username"
+                        element={
+                          <Protected>
+                            <App />
+                          </Protected>
+                        }
+                      />
+                    </Route>
+                    <Route path="*" element={<Error />} />
+                  </Routes>
+                </PeerProvider>
+              </SocketContactProvider>
+            </MessagesContextProvider>
+          </ThemeProvider>
+        </LanguageProvider>
+      </AuthContextProvider>
+    </ErrorBoundary>
   </BrowserRouter>
 )

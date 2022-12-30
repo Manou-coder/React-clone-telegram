@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useContext } from 'react'
 import { Outlet } from 'react-router-dom'
 import { ThemeContext } from '../../utils/context/ThemeContext'
@@ -17,21 +17,14 @@ function App({ children }) {
   const { theme, isCallOpen, isToastOpen } = useContext(ThemeContext)
   const bgColor = theme === 'light' ? 'bg-white' : 'bg-black'
   const { actuallyContactId, myContacts } = useContext(SocketContactContext)
-
+  // throw new Error()
   return (
     <div className={`container-fluid vh-100 vw-100 p-0 ${bgColor}`}>
       <div className="row vh-100 vw-100 m-0">
         {/* {myContacts && ( */}
         <>
           <Sidebar />
-          {actuallyContactId ? (
-            <Chat />
-          ) : (
-            // <div
-            //   className={`col-lg-8 p-0 vh-100 bg-succes position-relative ${wallpaper}`}
-            // ></div>
-            <DefaultChat />
-          )}
+          {actuallyContactId ? <Chat /> : <DefaultChat />}
           {/* toasts */}
           {isToastOpen && <Toast />}
         </>
