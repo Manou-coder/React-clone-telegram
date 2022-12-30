@@ -26,8 +26,19 @@ export default function MessageBar() {
   } = useContext(SocketContactContext)
   const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
   const { language } = useContext(LanguageContext)
+  const { messageBarRef, messageBodyRef } = useContext(ThemeContext)
   const [messageInput, setMessageInput] = useState('')
   const textareaRef = useRef()
+
+  // checkDimensions()
+
+  // window.onresize = checkDimensions
+
+  // function checkDimensions(prevHeight) {
+  //   console.log(
+  //     'Window dimensions: ' + window.innerWidth + ' x ' + window.innerHeight
+  //   )
+  // }
 
   // change my contact order
 
@@ -96,9 +107,10 @@ export default function MessageBar() {
     }
     socketEmitPrivateMessage()
     textareaRef.current.value = ''
+    textareaRef.current.focus()
     setMessageInput('')
     autoResizeBar()
-    changeMyContactsOrder()
+    // changeMyContactsOrder()
   }
 
   // Sends message when pressing the enter key unless the shift key has been pressed before
@@ -196,8 +208,26 @@ export default function MessageBar() {
     }
   }, [isComponentVisible])
 
+  // resize message body
+
+  function resizeMessageBody() {
+    if (!messageBodyRef.current || !messageBarRef.current) {
+      return
+    }
+    console.log(
+      'messageBodyRef.current.style.height',
+      messageBodyRef.current.style.height
+    )
+    const messageOffsetTop = messageBarRef.current.offsetTop
+    console.log('messageOffsetTop', messageOffsetTop)
+    messageBodyRef.current.style.height = messageOffsetTop - 58 + 'px'
+  }
+
   return (
-    <div className={`row sticky-bottom py-1 w-100 m-0 p-0 ${bgColor1}`}>
+    <div
+      className={`row sticky-bottom py-1 w-100 m-0 p-0 ${bgColor1}`}
+      ref={messageBarRef}
+    >
       <div ref={refComponent}>
         {isComponentVisible && (
           <Emojis textareaRef={textareaRef} setMessageInput={setMessageInput} />
@@ -246,9 +276,9 @@ export default function MessageBar() {
               ref={textareaRef}
               onInput={() => {
                 autoResizeBar()
-                // handleTyping()
                 // console.log('input')
                 handleOnInputTyping()
+                resizeMessageBody()
               }}
               onBlur={() => handleOnBlurTyping()}
               onChange={(e) => {

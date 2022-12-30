@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { ThemeContext } from '../../../utils/context/ThemeContext'
 import './index.css'
 
-export default function ScrollButton({ lastMessageRef, scrollDiv }) {
+export default function ScrollButton({ lastMessageRef, messageBodyRef }) {
   // DARK MODE
   const { theme } = useContext(ThemeContext)
   const scrollButton = useRef()
@@ -14,16 +14,16 @@ export default function ScrollButton({ lastMessageRef, scrollDiv }) {
 
   // fades the scroll button when the div is scrolled and fades the scroll button when the div is in its normal state
   useEffect(() => {
-    if (!scrollDiv.current.scrollHeight) {
+    if (!messageBodyRef.current.scrollHeight) {
       return
     }
-    if (scrollDiv.current && scrollButton.current) {
+    if (messageBodyRef.current && scrollButton.current) {
       // use try catch because sometimes 'scrollHeight' has not defined
       setInterval(() => {
         try {
-          const scrollHeight = scrollDiv.current.scrollHeight
-          const scrollTop = scrollDiv.current.scrollTop
-          const clientHeight = scrollDiv.current.clientHeight
+          const scrollHeight = messageBodyRef.current.scrollHeight
+          const scrollTop = messageBodyRef.current.scrollTop
+          const clientHeight = messageBodyRef.current.clientHeight
           // if the height of the scroll div minus the position of the scroll is greater than or equal to the initial height of the scroll div then makes the button appear otherwise makes the button disappear (the addition of 60 to the clientHeight is so that the button does not appears too early)
           if (scrollHeight - Math.round(scrollTop) >= clientHeight + 60) {
             scrollButton.current.classList = 'fadein'
@@ -35,7 +35,7 @@ export default function ScrollButton({ lastMessageRef, scrollDiv }) {
         }
       }, 100)
     }
-  }, [scrollDiv.current, scrollButton.current])
+  }, [messageBodyRef.current, scrollButton.current])
 
   return (
     <div>

@@ -24,7 +24,7 @@ let firstTime
 
 export default function MesssageBody() {
   const { user } = UserAuth()
-  const { isChatOpen } = useContext(ThemeContext)
+  const { isChatOpen, messageBarRef, messageBodyRef } = useContext(ThemeContext)
   const { setNewMessages, actuallyContactId } = useContext(SocketContactContext)
   const {
     arrOfMessages,
@@ -34,7 +34,6 @@ export default function MesssageBody() {
   } = useContext(MessagesContext)
   const [isLoading, setisLoading] = useState(true)
   const [arrOfSelectedMessages, setArrOfSelectedMessages] = useState([])
-  const scrollDiv = useRef(null)
   const messagesDiv = useRef(null)
   const lastMessageRef = useRef(null)
 
@@ -272,15 +271,32 @@ export default function MesssageBody() {
     }
   }, [arrOfMessages, messagesDiv.current])
 
+  // --------------------------- MESSAGE MOBILE EFFECT --------------------------
+  useEffect(() => {
+    if (firstTime && messagesDiv.current) {
+      // 👇️ scroll to bottom QUICKLY first time to download all messages
+      messagesDiv.current.style.visibility = 'hidden'
+      lastMessageRef.current?.scrollIntoView(false)
+      setTimeout(() => {
+        messagesDiv.current.style.visibility = 'visible'
+        firstTime = false
+      }, 250)
+    } else if (!firstTime && messagesDiv.current) {
+      // 👇️ scroll to bottom SLOWLY every time messages change
+      lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [arrOfMessages, messagesDiv.current])
+
   return (
     <div
-      className={`col h-100`}
+      className={`message-body`}
       style={{
         overflowY: 'scroll',
         scrollbarWidth: 'none',
+        height: '100%',
         width: '100%',
       }}
-      ref={scrollDiv}
+      ref={messageBodyRef}
     >
       {isLoading ? (
         <div className="w-100 h-100 d-flex justify-content-center align-items-center">
@@ -324,7 +340,10 @@ export default function MesssageBody() {
             )
           })}
 
-          <ScrollButton lastMessageRef={lastMessageRef} scrollDiv={scrollDiv} />
+          <ScrollButton
+            lastMessageRef={lastMessageRef}
+            messageBodyRef={messageBodyRef}
+          />
 
           <div className="mt-4" ref={lastMessageRef}></div>
 

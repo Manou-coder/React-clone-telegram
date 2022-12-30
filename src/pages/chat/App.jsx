@@ -18,8 +18,22 @@ function App({ children }) {
   const bgColor = theme === 'light' ? 'bg-white' : 'bg-black'
   const { actuallyContactId, myContacts } = useContext(SocketContactContext)
   // throw new Error()
+
+  checkDimensions()
+
+  window.onresize = checkDimensions
+
+  function checkDimensions(prevHeight) {
+    console.log(
+      'Window dimensions: ' + window.innerWidth + ' x ' + window.innerHeight
+    )
+    return window.innerHeight
+  }
   return (
-    <div className={`container-fluid vh-100 vw-100 p-0 ${bgColor}`}>
+    <div
+      className={`container-fluid vh-100 vw-100 p-0 ${bgColor}`}
+      style={{ height: checkDimensions() }}
+    >
       <div className="row vh-100 vw-100 m-0">
         {/* {myContacts && ( */}
         <>

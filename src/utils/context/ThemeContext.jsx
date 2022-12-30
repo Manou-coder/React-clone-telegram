@@ -7,6 +7,8 @@ export const ThemeContext = createContext()
 
 export const ThemeProvider = ({ children }) => {
   const location = useLocation()
+  const messageBarRef = useRef()
+  const messageBodyRef = useRef()
   const [theme, setTheme] = useState('')
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isCallOpen, setIsCallOpen] = useState(false)
@@ -62,6 +64,8 @@ export const ThemeProvider = ({ children }) => {
         setIsToastOpen,
         modalName,
         setModalName,
+        messageBarRef,
+        messageBodyRef,
       }}
     >
       {children}
