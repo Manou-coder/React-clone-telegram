@@ -41,9 +41,9 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
       return
     }
     if (updateMessageStorage.contactId === contact.userId) {
-      console.log('recu message de la part de ' + contact.displayName)
+      // console.log('recu message de la part de ' + contact.displayName)
       const allMessagesWithThisContact = getFromStorage(contact.userId)
-      console.log('lastMessage', lastMessage)
+      // console.log('lastMessage', lastMessage)
       if (
         !allMessagesWithThisContact &&
         allMessagesWithThisContact.length <= 0
@@ -61,7 +61,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
             allMessagesWithThisContact[allMessagesWithThisContact.length - 1]
           )
         )
-        console.log('curr', curr)
+        // console.log('curr', curr)
         return curr
       })
     }

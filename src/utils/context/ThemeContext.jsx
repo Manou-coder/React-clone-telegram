@@ -14,7 +14,7 @@ export const ThemeProvider = ({ children }) => {
   const [modalName, setModalName] = useState(null)
 
   useEffect(() => {
-    console.log(location)
+    // console.log(location)
     if (location.pathname === '/chat/') {
       setIsChatOpen(false)
     }

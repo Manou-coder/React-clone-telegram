@@ -308,11 +308,11 @@ export const getMyContactsFromDB = async (myId) => {
 }
 
 // update MyContacts
-export const updateMyContactsInDB = async (myId, contactId) => {
+export const updateMyContactsInDB = async (myId, myContacts) => {
   const docRef = doc(db, 'users', myId)
   try {
     await updateDoc(docRef, {
-      myContacts: contactId,
+      myContacts: myContacts,
     })
     console.log('doc updated !!')
   } catch (error) {

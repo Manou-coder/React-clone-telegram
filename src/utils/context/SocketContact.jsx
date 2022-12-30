@@ -5,6 +5,7 @@ import {
   getHasNewMessagesFromDB,
   getMyCallsFromDB,
   getMyContactsFromDB,
+  updateMyContactsInDB,
 } from '../../firebase-config'
 import { UserAuth } from './AuthContext'
 import socket from '../socket.io'
@@ -144,6 +145,11 @@ export const SocketContactProvider = ({ children }) => {
     setMyContacts(myContactsFromDB)
   }
 
+  function updateMyContactsInDBAndStorage(myId, myContacts) {
+    setInStorage('myContacts', myContacts)
+    updateMyContactsInDB(myId, myContacts)
+  }
+
   async function setMyCallsFromDB(myId, setMyCalls) {
     const myCallsFromDB = await getMyCallsFromDB(myId)
     // console.log('myCallsFromDB', myCallsFromDB)
@@ -222,6 +228,7 @@ export const SocketContactProvider = ({ children }) => {
         myCalls,
         setMyCalls,
         updateMyCallsInChat,
+        updateMyContactsInDBAndStorage,
       }}
     >
       {children}

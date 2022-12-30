@@ -18,11 +18,36 @@ import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
 
 export default function MessageBar() {
   const { user } = UserAuth()
-  const { actuallyContactId, allUsers } = useContext(SocketContactContext)
+  const {
+    actuallyContactId,
+    allUsers,
+    setMyContacts,
+    updateMyContactsInDBAndStorage,
+  } = useContext(SocketContactContext)
   const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
   const { language } = useContext(LanguageContext)
   const [messageInput, setMessageInput] = useState('')
   const textareaRef = useRef()
+
+  // change my contact order
+
+  function changeMyContactsOrder() {
+    setMyContacts((myContacts) => {
+      if (!myContacts) {
+        return myContacts
+      }
+      const positionOfThisContact = myContacts.findIndex(
+        (contactId) => contactId === actuallyContactId
+      )
+      if (!positionOfThisContact <= 0) {
+        const thisContact = myContacts[positionOfThisContact]
+        myContacts.splice(positionOfThisContact, 1)
+        myContacts.unshift(thisContact)
+        updateMyContactsInDBAndStorage(user.uid, myContacts)
+      }
+      return [...myContacts]
+    })
+  }
 
   // deleted account
 
@@ -73,6 +98,7 @@ export default function MessageBar() {
     textareaRef.current.value = ''
     setMessageInput('')
     autoResizeBar()
+    changeMyContactsOrder()
   }
 
   // Sends message when pressing the enter key unless the shift key has been pressed before
