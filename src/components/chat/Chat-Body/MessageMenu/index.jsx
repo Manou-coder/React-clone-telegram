@@ -31,13 +31,13 @@ export default function MessageMenu({
   const _deleteForMe = {
     en: 'Delete for me',
     fr: 'Supprimer pour moi',
-    il: 'למחוק לכולם',
+    il: 'מחק בשבילי',
   }
 
   const _deleteForAll = {
     en: 'Delete for all',
     fr: 'Supprimer pour tous',
-    il: 'מחק את כל השיחות',
+    il: 'מחק לכולם',
   }
 
   const _selectedMesssageMany = {
