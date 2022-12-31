@@ -24,9 +24,9 @@ function App({ children }) {
   window.onresize = checkDimensions
 
   function checkDimensions(prevHeight) {
-    console.log(
-      'Window dimensions: ' + window.innerWidth + ' x ' + window.innerHeight
-    )
+    // console.log(
+    //   'Window dimensions: ' + window.innerWidth + ' x ' + window.innerHeight
+    // )
     return window.innerHeight
   }
   return (

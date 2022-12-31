@@ -30,18 +30,6 @@ export default function MessageBar() {
   const [messageInput, setMessageInput] = useState('')
   const textareaRef = useRef()
 
-  // checkDimensions()
-
-  // window.onresize = checkDimensions
-
-  // function checkDimensions(prevHeight) {
-  //   console.log(
-  //     'Window dimensions: ' + window.innerWidth + ' x ' + window.innerHeight
-  //   )
-  // }
-
-  // change my contact order
-
   function changeMyContactsOrder() {
     setMyContacts((myContacts) => {
       if (!myContacts) {
