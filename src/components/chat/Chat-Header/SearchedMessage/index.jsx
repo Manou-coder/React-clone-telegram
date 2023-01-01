@@ -33,7 +33,6 @@ export default function SearchedMessage({ message, resetSearchedMessages }) {
     messageInDOM.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
-      inline: 'center',
     })
     setTimeout(() => {
       children.style.backgroundColor = 'GrayText'
