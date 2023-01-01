@@ -1,15 +1,6 @@
 import { useContext, useState } from 'react'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
-import colors from '../../../../utils/style/color'
-import Avatar from '../../../../assets/img/avatar4.png'
-import {
-  setActuallyContactIdInStorage,
-  SocketContactContext,
-} from '../../../../utils/context/SocketContact'
-import {
-  updateHasNewMessagesInDB,
-  updateMyContactsInDB,
-} from '../../../../firebase-config'
+import { SocketContactContext } from '../../../../utils/context/SocketContact'
 import { UserAuth } from '../../../../utils/context/AuthContext'
 import { imgError } from '../../../../utils/functions/returnAvatarIsImgError'
 
@@ -33,7 +24,6 @@ export default function SearchedMessage({ message, resetSearchedMessages }) {
     const messageBodyHeight =
       messageBodyRef.current.getBoundingClientRect().height
     const middle = messageBodyHeight / 2
-    // console.log('middle', middle)
     messageBodyRef.current.scroll({
       top: messageInDOM.offsetTop - middle,
       behavior: 'smooth',

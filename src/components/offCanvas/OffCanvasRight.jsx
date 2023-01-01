@@ -59,20 +59,20 @@ export default function OffCanvasRight() {
   }, [inputLetters])
 
   const searchMessageList = () => {
-    // console.log('inputLetters', inputLetters)
+    console.log('inputLetters', inputLetters)
     if (!inputLetters) {
       console.log('aucune lettre')
-      return []
+      setArrOfSearchedMessages([])
+      return
     }
-    const searchedMessages = arrOfMessages.filter((msg) => {
-      if (msg.content) {
-        const content = msg.content
-        if (content.includes(inputLetters)) {
-          return msg
-        }
-      }
-    })
-    setArrOfSearchedMessages(searchedMessages)
+    try {
+      const regex = new RegExp(inputLetters, 'i')
+      console.log('regex', regex)
+      const searchedMessages = arrOfMessages.filter((msg) =>
+        regex.test(msg.content)
+      )
+      setArrOfSearchedMessages(searchedMessages)
+    } catch (error) {}
   }
 
   function resetSearchedMessages() {
