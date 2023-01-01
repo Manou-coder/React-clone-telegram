@@ -16,7 +16,7 @@ import { imgError } from '../../../../utils/functions/returnAvatarIsImgError'
 export default function SearchedMessage({ message, resetSearchedMessages }) {
   const { user } = UserAuth()
   const { allUsers } = useContext(SocketContactContext)
-  const { theme } = useContext(ThemeContext)
+  const { theme, messageBodyRef } = useContext(ThemeContext)
 
   // console.log('contact', contact)
 
@@ -30,9 +30,13 @@ export default function SearchedMessage({ message, resetSearchedMessages }) {
     if (!messageInDOM) {
       return
     }
-    messageInDOM.scrollIntoView({
+    const messageBodyHeight =
+      messageBodyRef.current.getBoundingClientRect().height
+    const middle = messageBodyHeight / 2
+    // console.log('middle', middle)
+    messageBodyRef.current.scroll({
+      top: messageInDOM.offsetTop - middle,
       behavior: 'smooth',
-      block: 'center',
     })
     setTimeout(() => {
       children.style.backgroundColor = 'GrayText'
