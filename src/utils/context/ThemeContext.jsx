@@ -14,6 +14,8 @@ export const ThemeProvider = ({ children }) => {
   const [isCallOpen, setIsCallOpen] = useState(false)
   const [isToastOpen, setIsToastOpen] = useState(false)
   const [modalName, setModalName] = useState(null)
+  const [inputLetters, setInputLetters] = useState('')
+  const inputSearchMessageRef = useRef(null)
 
   useEffect(() => {
     // console.log(location)
@@ -66,6 +68,9 @@ export const ThemeProvider = ({ children }) => {
         setModalName,
         messageBarRef,
         messageBodyRef,
+        inputLetters,
+        setInputLetters,
+        inputSearchMessageRef,
       }}
     >
       {children}

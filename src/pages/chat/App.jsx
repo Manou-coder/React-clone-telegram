@@ -11,6 +11,7 @@ import Calls from '../../components/Calls/Calls'
 import Toast from '../../components/Toasts/Toast'
 import { useState } from 'react'
 import { PeerContext, PeerProvider } from '../../utils/context/PeerContext'
+import OffCanvasRight from '../../components/offCanvas/OffCanvasRight'
 
 function App({ children }) {
   // DARK MODE
@@ -48,6 +49,8 @@ function App({ children }) {
       <Modal />
       {/* call */}
       {isCallOpen && <Calls />}
+      {/* OFF CANVAS */}
+      <OffCanvasRight />
     </div>
   )
 }

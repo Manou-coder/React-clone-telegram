@@ -3,7 +3,12 @@ import { LanguageContext } from '../../../../utils/context/LanguageContext'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import color from '../../../../utils/style/color'
 
-function SearchSideBar({ setBorderColor, inputLetters, setInputLetters }) {
+function SearchSideBar({
+  setBorderColor,
+  inputLetters,
+  setInputLetters,
+  inputSearchMessageRef,
+}) {
   // DARK MODE
   const { theme } = useContext(ThemeContext)
   const bgColor = theme === 'light' ? 'white' : 'black'
@@ -20,6 +25,7 @@ function SearchSideBar({ setBorderColor, inputLetters, setInputLetters }) {
 
   return (
     <input
+      ref={inputSearchMessageRef}
       style={{
         backgroundColor: bgColor,
         border: 'none',

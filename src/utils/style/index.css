@@ -30,6 +30,10 @@
   background-color: #f0f2f5;
 }
 
+.scrollbar-none ::-webkit-scrollbar {
+  display: none;
+}
+
 /* 
 
 black 1 : #212121;

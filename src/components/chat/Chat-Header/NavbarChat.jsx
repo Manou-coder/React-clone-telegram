@@ -25,7 +25,7 @@ export default function NavbarChat() {
   }
 
   // DARK MODE
-  const { theme } = useContext(ThemeContext)
+  const { theme, inputSearchMessageRef } = useContext(ThemeContext)
   const bgColor = theme === 'light' ? 'bg-light' : 'bg-dark'
 
   const colorName = theme === 'light' ? '' : 'text-white'
@@ -224,6 +224,11 @@ export default function NavbarChat() {
       <div className="d-none d-lg-flex col-lg-1">
         <span
           className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasRight"
+          // onClick={() => {
+          //   inputSearchMessageRef.current.focus()
+          // }}
         >
           {/* <i className="fa-solid fa-magnifying-glass fa-lg"></i> */}
           <svg

@@ -117,7 +117,10 @@ export default function Message({
   return (
     <div>
       {isBadgeTime ? (
-        <div className={`w-100 d-flex justify-content-center my-4`}>
+        <div
+          className={`w-100 d-flex justify-content-center my-4`}
+          id={messageId}
+        >
           <div
             className="rounded px-1"
             style={{
@@ -139,6 +142,7 @@ export default function Message({
       ) : (
         <div
           className={`w-100 d-flex justify-content-${justifyContentMsg} mb-1`}
+          id={messageId}
         >
           <div
             ref={refButton}

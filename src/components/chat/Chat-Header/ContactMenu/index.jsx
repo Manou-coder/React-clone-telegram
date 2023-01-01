@@ -45,6 +45,12 @@ export default function ContactMenu({ contact }) {
     il: 'אתה לא יכול להתקשר לחשבון שנמחק.',
   }
 
+  const _messageSearch = {
+    en: 'Message search',
+    fr: 'Recherche de messages ',
+    il: 'חיפוש הודעות',
+  }
+
   const rightPosition = language === 'il' ? '-125px' : '35px'
 
   return (
@@ -63,22 +69,21 @@ export default function ContactMenu({ contact }) {
       <ul
         style={{ listStyleType: 'none', marginBottom: '0px', padding: '8px' }}
       >
-        <li>
+        <li className="d-lg-none">
           <div>
             <div
               className={`row ${listItemMenuBgColor} py-2 m-0`}
               type="button"
-              data-bs-toggle="modal"
-              data-bs-target="#staticBackdrop"
-              onClick={() => setModalName('delete chat')}
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvasRight"
             >
               <div className="col-2 d-flex justify-content-center align-items-center">
                 <span className="d-flex">
-                  <i className="fa-solid fa-trash-can"></i>
+                  <i className="fa-solid fa-magnifying-glass"></i>
                 </span>
               </div>
               <div className="col ps-2">
-                <span>{_deleteChat[language]}</span>
+                <span>{_messageSearch[language]}</span>
               </div>
             </div>
           </div>
@@ -125,6 +130,26 @@ export default function ContactMenu({ contact }) {
               </div>
               <div className="col ps-2">
                 <span>{_videoCall[language]}</span>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div
+              className={`row ${listItemMenuBgColor} py-2 m-0`}
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#staticBackdrop"
+              onClick={() => setModalName('delete chat')}
+            >
+              <div className="col-2 d-flex justify-content-center align-items-center">
+                <span className="d-flex">
+                  <i className="fa-solid fa-trash-can"></i>
+                </span>
+              </div>
+              <div className="col ps-2">
+                <span>{_deleteChat[language]}</span>
               </div>
             </div>
           </div>

@@ -25,12 +25,12 @@ import React from 'react'
 
 export class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
-    alert(
-      'An error has occurred! \nPlease press OK to refresh the page. \nError code: \n\n' +
-        JSON.stringify(errorInfo)
-    )
     console.log(error, errorInfo)
-    window.location.reload()
+    // alert(
+    //   'An error has occurred! \nPlease press OK to refresh the page. \nError code: \n\n' +
+    //     JSON.stringify(errorInfo)
+    // )
+    // window.location.reload()
   }
 
   render() {

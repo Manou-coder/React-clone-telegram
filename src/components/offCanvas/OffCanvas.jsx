@@ -20,7 +20,7 @@ const Arrow = styled.span`
 
 export default function OffCanvas({ offCanvas, setOffCanvas }) {
   const { language } = useContext(LanguageContext)
-  const { theme } = useContext(ThemeContext)
+  const { theme, offCanvasName, setOffCanvasName } = useContext(ThemeContext)
   const offCanvasRef = useRef()
 
   function autosizeSideBar() {
