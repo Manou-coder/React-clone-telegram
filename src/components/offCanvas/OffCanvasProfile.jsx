@@ -16,6 +16,7 @@ import Check from '../../assets/img/check.svg'
 import { imgError } from '../../utils/functions/returnAvatarIsImgError'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 import { LanguageContext } from '../../utils/context/LanguageContext'
+import { resizeFile } from '../../utils/functions/resizeImage'
 
 export default function OffCanvasProfile({ offCanvas, setOffCanvas }) {
   const { user, userRef } = UserAuth()
@@ -57,9 +58,20 @@ export default function OffCanvasProfile({ offCanvas, setOffCanvas }) {
 
   const uploadAvatar = async (e) => {
     e.preventDefault()
-    // console.log('AVATAR', inputAvatar.current.files[0])
+    console.log('AVATAR', inputAvatar.current.files[0])
     setLoadingAvatar(true)
-    await uploadImage(`profile/${user.uid}`, inputAvatar.current.files[0])
+    // ----------------------------------------------
+    try {
+      const file = inputAvatar.current.files[0]
+      // sets the image quality to 80%
+      const fileResizing = await resizeFile(file)
+      console.log(fileResizing)
+      await uploadImage(`profile/${user.uid}`, fileResizing)
+    } catch (err) {
+      console.log(err)
+      return
+    }
+    // ----------------------------------------
     // it's important to download the image because without it we can't get the full url of firebase
     const urlAvatar = await downloadImage(`profile/${user.uid}`)
     // update in my DB

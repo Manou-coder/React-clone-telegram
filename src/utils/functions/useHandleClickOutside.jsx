@@ -50,13 +50,16 @@ export default function useComponentVisible(initialIsVisible) {
 
   const handleClickOutside = (event) => {
     if (
-      refComponent.current &&
-      !refComponent.current.contains(event.target) &&
-      !refButton.current.contains(event.target)
+      refComponent?.current &&
+      !refComponent?.current?.contains(event.target) &&
+      !refButton?.current?.contains(event.target)
     ) {
       //   console.log('Clicked Outside...')
       setIsComponentVisible(false)
-    } else if (refButton.current && refButton.current.contains(event.target)) {
+    } else if (
+      refButton?.current &&
+      refButton?.current?.contains(event.target)
+    ) {
       //   console.log('Clicked refButton..')
     } else {
       //   console.log('Clicked refComponent..')

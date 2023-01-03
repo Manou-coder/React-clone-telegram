@@ -90,6 +90,8 @@ export default function SettingsMenu({ offCanvas, setOffCanvas }) {
 
   const paddingIcon = !showIconsList ? '5px 0px' : '8px 0px'
 
+  // FLAG
+
   const objFlag = {
     fr: FranceFlag,
     en: EnglandFlag,

@@ -67,7 +67,6 @@ export default function OffCanvasRight() {
     }
     try {
       const regex = new RegExp(inputLetters, 'i')
-      console.log('regex', regex)
       const searchedMessages = arrOfMessages.filter((msg) =>
         regex.test(msg.content)
       )

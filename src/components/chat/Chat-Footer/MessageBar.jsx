@@ -198,18 +198,18 @@ export default function MessageBar() {
 
   // resize message body
 
-  function resizeMessageBody() {
-    if (!messageBodyRef.current || !messageBarRef.current) {
-      return
-    }
-    console.log(
-      'messageBodyRef.current.style.height',
-      messageBodyRef.current.style.height
-    )
-    const messageOffsetTop = messageBarRef.current.offsetTop
-    console.log('messageOffsetTop', messageOffsetTop)
-    messageBodyRef.current.style.height = messageOffsetTop - 58 + 'px'
-  }
+  // function resizeMessageBody() {
+  //   if (!messageBodyRef.current || !messageBarRef.current) {
+  //     return
+  //   }
+  //   console.log(
+  //     'messageBodyRef.current.style.height',
+  //     messageBodyRef.current.style.height
+  //   )
+  //   const messageOffsetTop = messageBarRef.current.offsetTop
+  //   console.log('messageOffsetTop', messageOffsetTop)
+  //   messageBodyRef.current.style.height = messageOffsetTop - 58 + 'px'
+  // }
 
   return (
     <div
