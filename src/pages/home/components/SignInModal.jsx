@@ -4,10 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import { LanguageContext } from '../../../utils/context/LanguageContext'
 import { ThemeContext } from '../../../utils/context/ThemeContext'
 import '../Home.css'
+import { sendPasswordResetEmail } from 'firebase/auth'
+import { auth } from '../../../firebase-config'
 
 export default function SignInModal() {
   const navigate = useNavigate()
-  const { signIn } = UserAuth()
+  const { user } = UserAuth()
+  const { signIn, sendEmailWhenForgot } = UserAuth()
   const { language } = useContext(LanguageContext)
   const { theme } = useContext(ThemeContext)
   const [validation, setValidation] = useState('')
@@ -38,6 +41,31 @@ export default function SignInModal() {
     }
   }
 
+  const handleClickForgot = () => {
+    setLoadingForm(true)
+    sendPasswordResetEmail(auth, inputs?.current[0]?.value)
+      .then(() => {
+        setValidation(_emailSent[language])
+        setLoadingForm(false)
+        // Password reset email sent!
+        console.log('email sent!')
+        // ..
+      })
+      .catch((error) => {
+        const errorCode = error.code
+        const errorMessage = error.message
+        console.log(errorCode)
+        if (error.code === 'auth/invalid-email') {
+          setValidation(_invalidFormat[language])
+          setLoadingForm(false)
+        }
+
+        if (error.code === 'auth/user-not-found') {
+          setValidation(_userNotFound[language])
+          setLoadingForm(false)
+        }
+      })
+  }
   const bgColor2 = theme === 'light' ? 'bg-white' : 'bg-black'
   const textColor = theme === 'light' ? 'text-dark' : 'text-light'
 
@@ -70,7 +98,17 @@ export default function SignInModal() {
             className={`form-control ${bgColor2} ${textColor}`}
             id="signInPwd"
           />
-          <p className="text-danger mt-1">{validation}</p>
+          <span
+            onClick={() => handleClickForgot()}
+            className={'mt-1 fs-small forgot ' + textColor}
+            style={{
+              cursor: 'pointer',
+              fontStyle: 'italic',
+            }}
+          >
+            {_iForgot[language]}
+          </span>
+          <p className="text-danger mt-2">{validation}</p>
         </div>
 
         <button className="btn btn-primary w-100">{_submit[language]}</button>
@@ -112,4 +150,28 @@ const _tryAgain = {
   en: 'Try Again',
   fr: 'Envoyer',
   il: 'שלח',
+}
+
+const _userNotFound = {
+  en: 'Utilisateur introuvable!',
+  fr: 'Utilisateur introuvable!',
+  il: 'המשתמש לא נמצא!',
+}
+
+const _invalidFormat = {
+  en: 'Email format invalid!',
+  fr: "Format d'e-mail invalide !",
+  il: 'פורמט tאימייל לא חוקי!',
+}
+
+const _emailSent = {
+  en: 'Email sent! (Check your spam!)',
+  fr: 'Email envoyé! (Vérifiez vos spams!)',
+  il: 'הדוא"ל נשלח! (בדוק את הספאם שלך!)',
+}
+
+const _iForgot = {
+  en: 'I forgot my password',
+  fr: "J'ai oublié mon mot de passe",
+  il: 'שכחתי את הסיסמא שלי',
 }

@@ -14,6 +14,7 @@ import {
   reauthenticateWithPopup,
   updatePassword,
   EmailAuthProvider,
+  sendPasswordResetEmail,
 } from 'firebase/auth'
 import {
   auth,
@@ -118,6 +119,21 @@ export const AuthContextProvider = ({ children }) => {
     }
   }, [])
 
+  const sendEmailWhenForgot = (email) =>
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        // Password reset email sent!
+        console.log('email sent!')
+        // ..
+      })
+      .catch((error) => {
+        const errorCode = error.code
+        const errorMessage = error.message
+        // ..
+        alert(errorMessage)
+        console.log(errorCode)
+      })
+
   return (
     <AuthContext.Provider
       value={{
@@ -130,6 +146,7 @@ export const AuthContextProvider = ({ children }) => {
         signIn,
         userRef,
         deleteMyAccountFromFirebaseAuth,
+        sendEmailWhenForgot,
       }}
     >
       {!loadingData && children}
