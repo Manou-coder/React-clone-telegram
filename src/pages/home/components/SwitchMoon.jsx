@@ -6,7 +6,6 @@ export default function SwitchMoon() {
   const { toggleTheme, theme } = useContext(ThemeContext)
   const { language } = useContext(LanguageContext)
   const inputDarkMode = useRef()
-  console.log(theme)
   useEffect(() => {
     darkMode()
   }, [theme])

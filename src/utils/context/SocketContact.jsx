@@ -247,6 +247,9 @@ function startSocket(userName) {
 function setContactIsDisconnectInAllUsers(contactId, setAllUsers) {
   setAllUsers((curr) => {
     const contactOffline = curr.find((user) => user.userId === contactId)
+    if (!contactOffline) {
+      return curr
+    }
     contactOffline.isConnect = Date.now()
     console.log('contactOffline', contactOffline)
     curr = JSON.parse(JSON.stringify(curr))

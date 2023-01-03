@@ -32,7 +32,26 @@ export const AuthContextProvider = ({ children }) => {
   const navigate = useNavigate()
 
   const [user, setUser] = useState(null)
+  const [isUserCreated, setIsUserCreated] = useState(null)
   const [userRef, setUserRef] = useState(null)
+
+  useEffect(() => {
+    if (!user) {
+      return
+    }
+    setUserCreated(user.uid)
+  }, [user])
+
+  async function setUserCreated(myId) {
+    const myUser = await getMyProfileFromDB(myId)
+    console.log('myUser', myUser)
+    if (!myUser) {
+      console.log('not found my user!')
+      return
+    }
+    console.log('myUser.isProfileCreated', myUser.isProfileCreated)
+    setIsUserCreated(myUser.isProfileCreated)
+  }
 
   function setUser2() {
     if (user !== null) {
@@ -147,6 +166,7 @@ export const AuthContextProvider = ({ children }) => {
         userRef,
         deleteMyAccountFromFirebaseAuth,
         sendEmailWhenForgot,
+        isUserCreated,
       }}
     >
       {!loadingData && children}

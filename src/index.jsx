@@ -8,7 +8,7 @@ import ReactDOM from 'react-dom/client'
 import App from './pages/chat/App'
 import Home from './pages/home/Home'
 import Profile from './pages/profile/Profile'
-import Protected from './utils/Protected'
+import Protected from './utils/context/Protected'
 import { AuthContextProvider } from './utils/context/AuthContext'
 import './utils/style/index.css'
 import { ThemeProvider } from './utils/context/ThemeContext'
@@ -20,6 +20,7 @@ import Error from './pages/error/Error'
 import './utils/peerjs/peer'
 import { PeerProvider } from './utils/context/PeerContext'
 import { ErrorBoundary } from './ErrorBoundary'
+import ProtectedUserCreated from './utils/context/ProtectedUserCreated'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
@@ -45,7 +46,9 @@ root.render(
                       path="chat"
                       element={
                         <Protected>
-                          <App />
+                          <ProtectedUserCreated>
+                            <App />
+                          </ProtectedUserCreated>
                         </Protected>
                       }
                     >
@@ -53,7 +56,9 @@ root.render(
                         path=":username"
                         element={
                           <Protected>
-                            <App />
+                            <ProtectedUserCreated>
+                              <App />
+                            </ProtectedUserCreated>
                           </Protected>
                         }
                       />

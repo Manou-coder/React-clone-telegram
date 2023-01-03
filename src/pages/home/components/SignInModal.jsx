@@ -34,7 +34,7 @@ export default function SignInModal() {
       )
       setValidation('')
       console.log('cred', cred)
-      navigate(`/chat`)
+      navigate(`/profile`)
     } catch {
       setValidation(_incorrectEmail[language])
       setLoadingForm(false)

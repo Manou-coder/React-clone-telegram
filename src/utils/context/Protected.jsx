@@ -1,14 +1,15 @@
 import React from 'react'
 import { Navigate } from 'react-router-dom'
-import { UserAuth } from '../utils/context/AuthContext'
+import { UserAuth } from './AuthContext'
 
 const Protected = ({ children }) => {
-  const { user } = UserAuth()
-  // console.log('userProtected', user)
+  const { user, isUserCreated } = UserAuth()
   if (!user) {
     return <Navigate to="/" />
   }
-
+  if (isUserCreated) {
+    return <Navigate to="/chat" />
+  }
   return children
 }
 

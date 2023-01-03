@@ -1,10 +1,12 @@
 import React, { useContext, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { createUserInDB } from '../../../firebase-config'
 import { UserAuth } from '../../../utils/context/AuthContext'
 import { LanguageContext } from '../../../utils/context/LanguageContext'
 import { ThemeContext } from '../../../utils/context/ThemeContext'
 
 export default function SignUpModal() {
+  const navigate = useNavigate()
   const { signUp } = UserAuth()
   const { language } = useContext(LanguageContext)
   const { theme } = useContext(ThemeContext)
@@ -42,6 +44,7 @@ export default function SignUpModal() {
       setValidation('')
       console.log(cred, 'cred')
       createUserInDB(cred.user)
+      navigate('/profile')
     } catch (err) {
       if (err.code === 'auth/invalid-email') {
         setValidation(_invalidFormat[language])

@@ -18,10 +18,10 @@ import { getCanvasFont, getTextWidth } from '../../utils/functions/getTextWidth'
 
 export default function Home() {
   // eslint-disable-next-line no-unused-vars
-  const { googleSignIn, user, signInWithCredential } = UserAuth()
+  const { googleSignIn, user, signInWithCredential, isUserCreated } = UserAuth()
   const { theme } = useContext(ThemeContext)
   const { language } = useContext(LanguageContext)
-  const [showHome, setShowHome] = useState(false)
+  const [showHome, setShowHome] = useState(true)
   const [signInShow, setSignInShow] = useState(true)
   const [blueBarWidth, setBlueBarWidth] = useState({
     signIn: 0,
@@ -33,25 +33,10 @@ export default function Home() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (user) {
-      getMyProfileFromDB(user.uid)
-        .then((res) => {
-          console.log('res', res)
-          if (res) {
-            if (res.isProfileCreated) {
-              navigate(`/chat`)
-            } else {
-              navigate('/profile')
-            }
-          } else {
-            navigate('/profile')
-          }
-        })
-        .catch((err) => console.dir(err))
-    } else {
-      setShowHome(true)
+    if (isUserCreated) {
+      navigate('/profile')
+      return
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   useEffect(() => {
