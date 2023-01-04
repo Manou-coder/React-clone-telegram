@@ -21,7 +21,7 @@ export const SocketContactContext = createContext()
 export const SocketContactProvider = ({ children }) => {
   const navigate = useNavigate()
   // --------------------------------------------------------------------------------
-  const { user } = UserAuth()
+  const { user, isProfileCreated } = UserAuth()
   const { setArrOfMessages } = useContext(MessagesContext)
   const [actuallyContactId, setActuallyContactId] = useState('')
   const [allUsers, setAllUsers] = useState(getFromStorage('allUsers', []))
@@ -35,11 +35,16 @@ export const SocketContactProvider = ({ children }) => {
 
   // set 'allUsers' whith allUsers in app from DB
   useEffect(() => {
-    if (user !== null && actuallyContactId === '') {
+    // console.log('isProfileCreated', isProfileCreated)
+    if (user && isProfileCreated && actuallyContactId === '') {
       // navigate to / (its good for mobile)
-      navigate('/chat/')
+      // *******************************************************
+      // **********************************************************
+      // ************************************************************
+      // IMPORTANT REGLER CA POUR LA NAVIGATION MOBILE
+      // navigate('/')
     }
-  }, [])
+  }, [user])
 
   // ----------------------------- ALL USERS --------------------
 
@@ -48,7 +53,7 @@ export const SocketContactProvider = ({ children }) => {
     if (user !== null) {
       setAllUsersFromDB()
     }
-  }, [])
+  }, [user])
 
   // ----------------------------- MY CONTACTS --------------------
 

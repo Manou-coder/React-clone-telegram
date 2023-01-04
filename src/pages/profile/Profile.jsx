@@ -25,7 +25,7 @@ import { ThemeContext } from '../../utils/context/ThemeContext'
 
 export default function Profile() {
   const navigate = useNavigate()
-  const { user, userRef, isUserCreated } = UserAuth()
+  const { user, userRef, setIsProfileCreated } = UserAuth()
   const { theme } = useContext(ThemeContext)
   const { language } = useContext(LanguageContext)
   //states
@@ -40,21 +40,6 @@ export default function Profile() {
   const profileName = useRef(null)
   const profileUserName = useRef(null)
   const inputAvatar = useRef(null)
-
-  // console.log('isProfileAvatar', isProfileAvatar)
-
-  //check if the user has already created a profile and if so, direct referral to the chat page
-  useEffect(() => {
-    // if (!user) {
-    //   navigate(`/`)
-    //   return
-    // }
-    // if (isUserCreated) {
-    //   navigate('/chat')
-    //   return
-    // }
-    // setShowProfile(true)
-  }, [user])
 
   //if the user has logged in with a google account then the form will be automatically filled with their account information
   useEffect(() => {
@@ -139,6 +124,7 @@ export default function Profile() {
       photoURL: isProfileAvatar.src,
     })
     console.log('oui')
+    setIsProfileCreated(true)
     navigate('/chat')
   }
 

@@ -24,6 +24,7 @@ import {
   unsub,
 } from '../../firebase-config'
 import { useNavigate } from 'react-router-dom'
+import { set } from 'date-fns'
 
 const AuthContext = createContext()
 
@@ -32,25 +33,20 @@ export const AuthContextProvider = ({ children }) => {
   const navigate = useNavigate()
 
   const [user, setUser] = useState(null)
-  const [isUserCreated, setIsUserCreated] = useState(null)
+  const [isProfileCreated, setIsProfileCreated] = useState(null)
   const [userRef, setUserRef] = useState(null)
 
-  useEffect(() => {
+  async function getIsMyProfileCreated(user) {
     if (!user) {
-      return
+      return false
     }
-    setUserCreated(user.uid)
-  }, [user])
-
-  async function setUserCreated(myId) {
-    const myUser = await getMyProfileFromDB(myId)
-    console.log('myUser', myUser)
-    if (!myUser) {
-      console.log('not found my user!')
-      return
+    const myProfile = await getMyProfileFromDB(user.uid)
+    // console.log('myProfile', myProfile)
+    // console.log('myProfile.isProfileCreated', myProfile.isProfileCreated)
+    if (myProfile && myProfile.isProfileCreated) {
+      return true
     }
-    console.log('myUser.isProfileCreated', myUser.isProfileCreated)
-    setIsUserCreated(myUser.isProfileCreated)
+    return false
   }
 
   function setUser2() {
@@ -128,8 +124,11 @@ export const AuthContextProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser)
+      const isMyProfileCreated = await getIsMyProfileCreated(currentUser)
+      console.log('isMyProfileCreated', isMyProfileCreated)
+      setIsProfileCreated(isMyProfileCreated)
       setLoadingData(false)
       console.log('User', currentUser)
     })
@@ -166,7 +165,9 @@ export const AuthContextProvider = ({ children }) => {
         userRef,
         deleteMyAccountFromFirebaseAuth,
         sendEmailWhenForgot,
-        isUserCreated,
+        isProfileCreated,
+        setIsProfileCreated,
+        getIsMyProfileCreated,
       }}
     >
       {!loadingData && children}

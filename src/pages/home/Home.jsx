@@ -18,7 +18,8 @@ import { getCanvasFont, getTextWidth } from '../../utils/functions/getTextWidth'
 
 export default function Home() {
   // eslint-disable-next-line no-unused-vars
-  const { googleSignIn, user, signInWithCredential, isUserCreated } = UserAuth()
+  const { googleSignIn, user, signInWithCredential, isProfileCreated } =
+    UserAuth()
   const { theme } = useContext(ThemeContext)
   const { language } = useContext(LanguageContext)
   const [showHome, setShowHome] = useState(true)
@@ -32,12 +33,12 @@ export default function Home() {
   const divRef = useRef(null)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if (isUserCreated) {
-      navigate('/profile')
-      return
-    }
-  }, [user])
+  // useEffect(() => {
+  //   if (isProfileCreated) {
+  //     navigate('/profile')
+  //     return
+  //   }
+  // }, [user])
 
   useEffect(() => {
     if (user === null) {
@@ -85,6 +86,7 @@ export default function Home() {
       .then((res) => {
         console.log('res', res)
         createUserInDB(res.user)
+
         navigate('/profile')
       })
       .catch((error) => {

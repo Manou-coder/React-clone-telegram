@@ -5,7 +5,7 @@ import { LanguageContext } from '../../../utils/context/LanguageContext'
 import { ThemeContext } from '../../../utils/context/ThemeContext'
 import '../Home.css'
 import { sendPasswordResetEmail } from 'firebase/auth'
-import { auth } from '../../../firebase-config'
+import { auth, getMyProfileFromDB } from '../../../firebase-config'
 
 export default function SignInModal() {
   const navigate = useNavigate()
@@ -34,7 +34,13 @@ export default function SignInModal() {
       )
       setValidation('')
       console.log('cred', cred)
-      navigate(`/profile`)
+      const isProfileCreated = await getMyProfileFromDB(cred.uid)
+      console.log('isProfileCreated', isProfileCreated)
+      if (isProfileCreated) {
+        navigate(`/`)
+      } else {
+        navigate(`/profile`)
+      }
     } catch {
       setValidation(_incorrectEmail[language])
       setLoadingForm(false)
