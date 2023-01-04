@@ -1,4 +1,9 @@
-import React, { useState, createContext, useContext } from 'react'
+import React, {
+  useState,
+  createContext,
+  useContext,
+  useLayoutEffect,
+} from 'react'
 import { useEffect } from 'react'
 import {
   getAllUsersFromUsersListDB,
@@ -21,7 +26,7 @@ export const SocketContactContext = createContext()
 export const SocketContactProvider = ({ children }) => {
   const navigate = useNavigate()
   // --------------------------------------------------------------------------------
-  const { user, isProfileCreated } = UserAuth()
+  const { user, isProfileCreated, setUser } = UserAuth()
   const { setArrOfMessages } = useContext(MessagesContext)
   const [actuallyContactId, setActuallyContactId] = useState('')
   const [allUsers, setAllUsers] = useState(getFromStorage('allUsers', []))
@@ -30,6 +35,19 @@ export const SocketContactProvider = ({ children }) => {
   )
   const [myContacts, setMyContacts] = useState(getFromStorage('myContacts', []))
   const [myCalls, setMyCalls] = useState(getFromStorage('myCalls', []))
+
+  // ----------------------------- ALL USERS --------------------
+
+  useEffect(() => {
+    if (!user) return
+    const myIdInStorage = getFromStorage('myId')
+    console.log('myIdInStorage', myIdInStorage)
+    if (!myIdInStorage) return setInStorage('myId', user.uid)
+    if (myIdInStorage !== user.uid) {
+      localStorage.clear()
+      setUser((curr) => JSON.parse(JSON.stringify(curr)))
+    }
+  }, [user])
 
   // ----------------------------- ALL USERS --------------------
 

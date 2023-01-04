@@ -6,7 +6,7 @@ export const MessagesContext = createContext()
 export const MessagesContextProvider = ({ children }) => {
   const [arrOfMessages, setArrOfMessages] = useState([])
   const [messageSend, setMessageSend] = useState([])
-  const [updateMessageStorage, setUpdateMessageStorage] = useState({})
+  const [updateMessageStorage, setUpdateMessageStorage] = useState(null)
 
   return (
     <MessagesContext.Provider

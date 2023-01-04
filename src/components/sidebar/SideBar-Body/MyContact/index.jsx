@@ -31,24 +31,22 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
   const { setArrOfMessages, updateMessageStorage, setUpdateMessageStorage } =
     useContext(MessagesContext)
   const { setIsChatOpen } = useContext(ThemeContext)
-  const [lastMessage, setLastMessage] = useState({})
+  const [lastMessage, setLastMessage] = useState(null)
 
   // console.log('contact', contact)
   // console.log('description', description)
 
   useEffect(() => {
-    if (!updateMessageStorage) {
-      return
-    }
+    if (!contact || !updateMessageStorage) return
     if (updateMessageStorage.contactId === contact.userId) {
-      // console.log('recu message de la part de ' + contact.displayName)
       const allMessagesWithThisContact = getFromStorage(contact.userId)
-      // console.log('lastMessage', lastMessage)
       if (
-        !allMessagesWithThisContact &&
+        !allMessagesWithThisContact ||
         allMessagesWithThisContact.length <= 0
       ) {
-        console.log('error: no found message in storage with this contact!')
+        // no panic !! for a short time he will not find a message because with each click on a different contact the local storage is updated
+        // console.log('no found message in storage with : ' + contact.userId)
+        return
       }
       setLastMessage((curr) => {
         if (
@@ -61,7 +59,6 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
             allMessagesWithThisContact[allMessagesWithThisContact.length - 1]
           )
         )
-        // console.log('curr', curr)
         return curr
       })
     }
