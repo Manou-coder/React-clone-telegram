@@ -44,7 +44,7 @@ export default function SignUpModal() {
       setValidation('')
       console.log(cred, 'cred')
       createUserInDB(cred.user)
-      navigate('/profile')
+      // navigate('/profile')
     } catch (err) {
       if (err.code === 'auth/invalid-email') {
         setValidation(_invalidFormat[language])

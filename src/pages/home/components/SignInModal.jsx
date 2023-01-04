@@ -34,14 +34,9 @@ export default function SignInModal() {
       )
       setValidation('')
       console.log('cred', cred)
-      const isProfileCreated = await getMyProfileFromDB(cred.uid)
-      console.log('isProfileCreated', isProfileCreated)
-      if (isProfileCreated) {
-        navigate(`/`)
-      } else {
-        navigate(`/profile`)
-      }
-    } catch {
+    } catch (error) {
+      const errorCode = error.code
+      console.log(errorCode)
       setValidation(_incorrectEmail[language])
       setLoadingForm(false)
     }

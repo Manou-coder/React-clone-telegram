@@ -79,19 +79,9 @@ export const AuthContextProvider = ({ children }) => {
       .catch((err) => console.log(err))
   }
 
-  // const googleSignIn = async () => {
-  //   const provider = new GoogleAuthProvider()
-  //   try {
-  //     const res = await signInWithPopup(auth, provider)
-  //     console.log('manou', res)
-  //     const baba = getMyProfileFromDB(res.user.uid)
-  //     console.log('baba', baba)
-  //   } catch (error) {
-  //     console.dir(error)
-  //   }
-
   const logOut = async () => {
     await signOut(auth)
+    // very important to navigate '/' if not navigate app crash
     navigate('/')
   }
 
@@ -125,10 +115,10 @@ export const AuthContextProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser)
       const isMyProfileCreated = await getIsMyProfileCreated(currentUser)
       console.log('isMyProfileCreated', isMyProfileCreated)
       setIsProfileCreated(isMyProfileCreated)
+      setUser(currentUser)
       setLoadingData(false)
       console.log('User', currentUser)
     })

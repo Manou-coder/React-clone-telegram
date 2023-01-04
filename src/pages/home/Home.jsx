@@ -83,11 +83,17 @@ export default function Home() {
 
     // Sign in with credential from the Google user.
     signInWithCredential(auth, credential)
-      .then((res) => {
-        console.log('res', res)
-        createUserInDB(res.user)
-
-        navigate('/profile')
+      .then(async (res) => {
+        const cred = res.user
+        console.log('cred', cred)
+        createUserInDB(cred)
+        // const isProfileCreated = await getMyProfileFromDB(cred.uid)
+        console.log('isProfileCreated', isProfileCreated)
+        // if (cred && isProfileCreated) {
+        //   navigate(`/chat`)
+        // } else {
+        //   navigate(`/profile`)
+        // }
       })
       .catch((error) => {
         console.dir(error)
