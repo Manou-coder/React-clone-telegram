@@ -87,13 +87,7 @@ export default function Home() {
         const cred = res.user
         console.log('cred', cred)
         createUserInDB(cred)
-        // const isProfileCreated = await getMyProfileFromDB(cred.uid)
-        console.log('isProfileCreated', isProfileCreated)
-        // if (cred && isProfileCreated) {
-        //   navigate(`/chat`)
-        // } else {
-        //   navigate(`/profile`)
-        // }
+        /* Here the user is redirected but navigation is managed in protected routes (because when a user is identified by firebase the 'user' and protected routes is rerender and  they takes him where he needs to be)*/
       })
       .catch((error) => {
         console.dir(error)

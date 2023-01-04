@@ -1,5 +1,5 @@
 import { useContext, createContext, useEffect, useState } from 'react'
-import { doc, onSnapshot } from 'firebase/firestore'
+import { doc } from 'firebase/firestore'
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -9,10 +9,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   deleteUser,
-  getAuth,
-  reauthenticateWithCredential,
-  reauthenticateWithPopup,
-  updatePassword,
   EmailAuthProvider,
   sendPasswordResetEmail,
 } from 'firebase/auth'
@@ -21,68 +17,77 @@ import {
   createUserInDB,
   db,
   getMyProfileFromDB,
-  unsub,
 } from '../../firebase-config'
 import { useNavigate } from 'react-router-dom'
-import { set } from 'date-fns'
 
 const AuthContext = createContext()
 
 export const AuthContextProvider = ({ children }) => {
-  const [loadingData, setLoadingData] = useState(true)
   const navigate = useNavigate()
-
+  const [loadingData, setLoadingData] = useState(true)
   const [user, setUser] = useState(null)
   const [isProfileCreated, setIsProfileCreated] = useState(null)
   const [userRef, setUserRef] = useState(null)
+
+  // listen for every change in 'user' of firebase and change 'user' as well as 'isProfileCreated'
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      const isMyProfileCreated = await getIsMyProfileCreated(currentUser)
+      console.log('isMyProfileCreated', isMyProfileCreated)
+      console.log('User', currentUser)
+      setIsProfileCreated(isMyProfileCreated)
+      setUser(currentUser)
+      setLoadingData(false)
+    })
+    return () => {
+      unsubscribe()
+    }
+  }, [])
+
+  // set reference of my profile in DB
+  useEffect(() => {
+    setUserRefInDB()
+  }, [user])
+
+  // ----------------------- FUNCTIONS ---------------------------
 
   async function getIsMyProfileCreated(user) {
     if (!user) {
       return false
     }
     const myProfile = await getMyProfileFromDB(user.uid)
-    // console.log('myProfile', myProfile)
-    // console.log('myProfile.isProfileCreated', myProfile.isProfileCreated)
     if (myProfile && myProfile.isProfileCreated) {
       return true
     }
     return false
   }
 
-  function setUser2() {
+  function setUserRefInDB() {
     if (user !== null) {
       setUserRef(doc(db, 'users', user.uid))
       sessionStorage.setItem('userID', user.uid)
     }
   }
 
-  useEffect(() => {
-    setUser2()
-  }, [user])
-
-  // console.log(userRef)
-
   const signUp = (email, pwd) =>
     createUserWithEmailAndPassword(auth, email, pwd)
 
   const signIn = (email, pwd) => signInWithEmailAndPassword(auth, email, pwd)
 
-  const googleSignIn = () => {
-    const provider = new GoogleAuthProvider()
-    signInWithPopup(auth, provider)
-      .then((res) => {
-        console.log('userDB', res)
-        createUserInDB(res.user)
-          .then()
-          .catch((err) => console.dir(err))
-      })
-      .catch((err) => console.log(err))
-  }
-
   const logOut = async () => {
     await signOut(auth)
     // very important to navigate '/' if not navigate app crash
     navigate('/')
+  }
+
+  const googleSignIn = () => {
+    const provider = new GoogleAuthProvider()
+    signInWithPopup(auth, provider)
+      .then((res) => {
+        /* Here the user is redirected but navigation is managed in protected routes (because when a user is identified by firebase the 'user' and protected routes is rerender and  they takes him where he needs to be)*/
+        createUserInDB(res.user)
+      })
+      .catch((err) => console.log(err))
   }
 
   // const googleProvider = new GoogleAuthProvider()
@@ -112,20 +117,6 @@ export const AuthContextProvider = ({ children }) => {
         })
     }
   }
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      const isMyProfileCreated = await getIsMyProfileCreated(currentUser)
-      console.log('isMyProfileCreated', isMyProfileCreated)
-      setIsProfileCreated(isMyProfileCreated)
-      setUser(currentUser)
-      setLoadingData(false)
-      console.log('User', currentUser)
-    })
-    return () => {
-      unsubscribe()
-    }
-  }, [])
 
   const sendEmailWhenForgot = (email) =>
     sendPasswordResetEmail(auth, email)

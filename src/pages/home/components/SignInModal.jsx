@@ -34,6 +34,7 @@ export default function SignInModal() {
       )
       setValidation('')
       console.log('cred', cred)
+      /* Here the user is redirected but navigation is managed in protected routes (because when a user is identified by firebase the 'user' and protected routes is rerender and  they takes him where he needs to be)*/
     } catch (error) {
       const errorCode = error.code
       console.log(errorCode)

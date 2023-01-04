@@ -44,7 +44,7 @@ export default function SignUpModal() {
       setValidation('')
       console.log(cred, 'cred')
       createUserInDB(cred.user)
-      // navigate('/profile')
+      /* Here the user is redirected but navigation is managed in protected routes (because when a user is identified by firebase the 'user' and protected routes is rerender and  they takes him where he needs to be)*/
     } catch (err) {
       if (err.code === 'auth/invalid-email') {
         setValidation(_invalidFormat[language])
