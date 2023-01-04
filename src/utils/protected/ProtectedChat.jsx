@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Loading from '../../components/loading/Loading'
 import { UserAuth } from '../context/AuthContext'
 
 const ProtectedChat = ({ children }) => {
@@ -21,7 +22,7 @@ const ProtectedChat = ({ children }) => {
     setShowChildren(true)
   }, [user, isProfileCreated])
 
-  return <>{showChildren && children}</>
+  return <>{showChildren ? children : <Loading />}</>
 }
 
 export default ProtectedChat
