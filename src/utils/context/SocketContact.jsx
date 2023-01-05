@@ -6,6 +6,7 @@ import React, {
 } from 'react'
 import { useEffect } from 'react'
 import {
+  getAllMessagesWhithThisContactFromDB,
   getAllUsersFromUsersListDB,
   getHasNewMessagesFromDB,
   getMyCallsFromDB,
@@ -115,30 +116,6 @@ export const SocketContactProvider = ({ children }) => {
     addContactInMyContactsIfHasNewMessages(user.uid)
   }, [allUsers, newMessages])
 
-  async function addContactInMyContactsIfHasNewMessages(myId) {
-    // console.log('newMessages', newMessages)
-    // const newMessages = await getHasNewMessagesFromDB(myId)
-    for (const userId in newMessages) {
-      // console.log(`${userId}: ${newMessages[userId]}`)
-      if (newMessages[userId]) {
-        // console.log(`${userId} 2: ${newMessages[userId]}`)
-        // console.log(myContacts.includes(userId))
-        // check if this contact has not yet in myContacts and if not so add this to myContacts (in DB and in 'myContacts)
-        if (myContacts.includes(userId)) {
-          // console.log(userId + ' est inclus')
-          return
-        } else {
-          addThisContactIdInMyContactsDB(user.uid, userId, myContacts)
-          setMyContacts((curr) => {
-            curr.push(userId)
-            return curr
-          })
-        }
-      }
-    }
-    // console.log('newMessages', newMessages)
-  }
-
   // --------------------- SOCKET --------------------------------------------
 
   // create socket.io client side and send 'user.uid' as 'userName'
@@ -187,6 +164,18 @@ export const SocketContactProvider = ({ children }) => {
       socket.off('new user')
     }
   })
+
+  // ----------------- DOWNLOAD ALL USERS MESSAGES
+
+  useEffect(() => {
+    if (!user || !myContacts) return
+    if (myContacts.length <= 0) return
+    console.log(
+      'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
+    )
+    console.log('myContacts', myContacts)
+    getAllUsersMessagesAndSetInStorage()
+  }, [user, myContacts])
 
   // ---------------------- SOCKETS MESSAGE BODY -----------------------------------------
 
@@ -351,7 +340,37 @@ export const SocketContactProvider = ({ children }) => {
     })
   }
 
-  // --------------------------- FUNCTIONS INTERNES -------------------
+  async function addContactInMyContactsIfHasNewMessages(myId) {
+    for (const userId in newMessages) {
+      if (newMessages[userId]) {
+        // check if this contact has not yet in myContacts and if not so add this to myContacts (in DB and in 'myContacts)
+        if (myContacts.includes(userId)) {
+          return
+        } else {
+          addThisContactIdInMyContactsDB(user.uid, userId, myContacts)
+          setMyContacts((curr) => {
+            curr.push(userId)
+            return curr
+          })
+        }
+      }
+    }
+  }
+
+  async function getAllUsersMessagesAndSetInStorage() {
+    for (const contactId of myContacts) {
+      // console.log('contactId', contactId)
+      const allMessagesWhithThisContact =
+        await getAllMessagesWhithThisContactFromDB(user.uid, contactId)
+      // console.log('allMessagesWhithThisContact', allMessagesWhithThisContact)
+      setInStorage(contactId, allMessagesWhithThisContact)
+      setUpdateMessageStorage((curr) => {
+        return { ...curr, contactId: contactId }
+      })
+    }
+  }
+
+  // --------------------------- FUNCTIONS INTERNES MESSAGE BODY -------------------
 
   function setReceived(msg) {
     msg.status = 'received'

@@ -235,9 +235,9 @@ export default function MesssageBody() {
 
 // function qui ajoute des badges de dates au tableau des messages
 export function addBadgeDateToArr(arr) {
-  if (!arr) {
+  if (!arr || arr === 'undefined') {
     console.log('no arr!')
-    return
+    return []
   }
   // console.log('arr1', arr)
   arr = arr.filter((e) => !e.badgeTime)
