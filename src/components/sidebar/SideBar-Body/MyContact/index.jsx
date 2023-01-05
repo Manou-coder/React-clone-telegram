@@ -85,6 +85,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
     if (contact.userId !== actuallyContactId) {
       setArrOfMessages([])
     }
+    console.log('contact.userId', contact.userId)
     setActuallyContactId(contact.userId)
     setActuallyContactIdInStorage(contact.userId)
     setIsChatOpen(true)

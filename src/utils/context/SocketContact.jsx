@@ -182,15 +182,25 @@ export const SocketContactProvider = ({ children }) => {
   // SOCKET - receives the message sent by the contact and sends back to the server my status about this message (if I have read it or just received it)
   useEffect(() => {
     socket.on('private message', ({ msg }) => {
+      console.log('actuallyContactId', actuallyContactId)
       console.log('msg', msg)
 
       function checkMyStatus() {
-        if (actuallyContactId === msg.from && isChatOpen) {
+        console.log('isChatOpen', isChatOpen)
+        console.log('actuallyContactId', actuallyContactId)
+        console.log('msg.from', msg.from)
+        console.log(
+          'actuallyContactId === msg.from',
+          actuallyContactId === msg.from
+        )
+        if (isChatOpen && actuallyContactId === msg.from) {
           console.log('read')
           setRead(msg)
-        } else if (actuallyContactId === msg.from || !isChatOpen) {
+          addMessageToChat(msg)
+        } else if (!isChatOpen && actuallyContactId === msg.from) {
           console.log('received whith chat is closed')
           setReceived(msg)
+          addMessageToChat(msg)
         } else {
           console.log('different user')
           setReceived(msg)
@@ -214,7 +224,7 @@ export const SocketContactProvider = ({ children }) => {
     return () => {
       socket.off('private message')
     }
-  }, [user])
+  })
 
   // SOCKET - update status all messages that I send on CHAT to 'read' when status contact read my messages (but the change in the db is done in the backend)
   useEffect(() => {
@@ -340,7 +350,7 @@ export const SocketContactProvider = ({ children }) => {
     })
   }
 
-  async function addContactInMyContactsIfHasNewMessages(myId) {
+  async function addContactInMyContactsIfHasNewMessages() {
     for (const userId in newMessages) {
       if (newMessages[userId]) {
         // check if this contact has not yet in myContacts and if not so add this to myContacts (in DB and in 'myContacts)
@@ -372,6 +382,11 @@ export const SocketContactProvider = ({ children }) => {
 
   // --------------------------- FUNCTIONS INTERNES MESSAGE BODY -------------------
 
+  function addMessageToChat(msg) {
+    const newArr = addBadgeDateToArr([...arrOfMessages, msg])
+    setArrOfMessages(newArr)
+  }
+
   function setReceived(msg) {
     msg.status = 'received'
     socket.emit('message read or received', { msg: msg })
@@ -387,8 +402,6 @@ export const SocketContactProvider = ({ children }) => {
   function setRead(msg) {
     msg.status = 'read'
     socket.emit('message read or received', { msg: msg })
-    // TO DO§!!! add badge time
-    setArrOfMessages([...arrOfMessages, ...[msg]])
   }
 
   function updateAllMessagesToReadStatusInChat() {
