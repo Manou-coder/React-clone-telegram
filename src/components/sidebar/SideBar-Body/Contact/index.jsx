@@ -140,7 +140,11 @@ function Contact({ name1, name2, name3, contact, description, photoURL }) {
 
 export default Contact
 
-async function addThisContactIdInMyContactsDB(myId, contactId, myContacts) {
+export async function addThisContactIdInMyContactsDB(
+  myId,
+  contactId,
+  myContacts
+) {
   // const myContactsInDB = await getMyContactsFromDB(myId)
   console.log(' myContacts ', myContacts)
   // if this contact is already existing no need to update

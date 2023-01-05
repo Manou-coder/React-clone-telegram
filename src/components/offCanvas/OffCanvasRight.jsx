@@ -59,9 +59,9 @@ export default function OffCanvasRight() {
   }, [inputLetters])
 
   const searchMessageList = () => {
-    console.log('inputLetters', inputLetters)
+    // console.log('inputLetters', inputLetters)
     if (!inputLetters) {
-      console.log('aucune lettre')
+      // console.log('aucune lettre')
       setArrOfSearchedMessages([])
       return
     }

@@ -37,6 +37,8 @@ export const AuthContextProvider = ({ children }) => {
       console.log('User', currentUser)
       setIsProfileCreated(isMyProfileCreated)
       setUser(currentUser)
+      if (currentUser) {
+      }
       setLoadingData(false)
     })
     return () => {

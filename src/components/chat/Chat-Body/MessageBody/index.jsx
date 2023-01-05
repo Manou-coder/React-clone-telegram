@@ -118,131 +118,6 @@ export default function MesssageBody() {
     getAllMessagesFromDB()
   }, [actuallyContactId])
 
-  // ---------------------- SOCKETS -----------------------------------------
-
-  // SOCKET - receives the message sent by the contact and sends back to the server my status about this message (if I have read it or just received it)
-  useEffect(() => {
-    socket.on('private message', ({ msg }) => {
-      console.log('msg', msg)
-
-      function checkMyStatus() {
-        if (actuallyContactId === msg.from && isChatOpen) {
-          console.log('read')
-          setRead(msg)
-        } else if (actuallyContactId === msg.from || !isChatOpen) {
-          console.log('received whith chat is closed')
-          setReceived(msg)
-        } else {
-          console.log('different user')
-          setReceived(msg)
-        }
-      }
-      checkMyStatus()
-
-      // update in localStorage
-      const allMessagesWhithThisContactFromStorage = getFromStorage(msg.from)
-      if (allMessagesWhithThisContactFromStorage) {
-        allMessagesWhithThisContactFromStorage.push(msg)
-      }
-      setInStorage(msg.from, allMessagesWhithThisContactFromStorage)
-      // update for lastMessage in myContact
-      setUpdateMessageStorage((curr) => {
-        return { ...curr, contactId: msg.from }
-      })
-
-      firstTime = false
-    })
-    return () => {
-      socket.off('private message')
-    }
-  })
-
-  // SOCKET - update status all messages that I send on CHAT to 'read' when status contact read my messages (but the change in the db is done in the backend)
-  useEffect(() => {
-    socket.on('update receiver status is read', (contact) => {
-      // check if the actually contact is the same of the contact was send 'update receiver status is read'
-      // and if not the same return (and the next time I will chat with this contact the change will have already been made in the db )
-      if (contact.from !== actuallyContactId) {
-        console.log(
-          "the contact who updated their status to 'read' is not the same as actually contact"
-        )
-        return
-      }
-      // update status all messages that I send on CHAT to 'read'
-      updateAllMessagesToReadStatusInChat()
-    })
-    return () => {
-      socket.off('update receiver status is read')
-    }
-  })
-
-  // SOCKET - update status of each message (if the message has been sent to the server or if the contact has read or received the message )
-  useEffect(() => {
-    socket.on('update this message status', ({ msg }) => {
-      console.log('msg', msg)
-      const copyOfArrOfMessages = JSON.parse(JSON.stringify(arrOfMessages))
-      const messageToUpdate = copyOfArrOfMessages.find(
-        (message) => message.id === msg.id
-      )
-      messageToUpdate.status = msg.status
-      const copyOfArrOfMessagesWithBadge =
-        addBadgeDateToArr(copyOfArrOfMessages)
-      setArrOfMessages(copyOfArrOfMessagesWithBadge)
-    })
-    return () => {
-      socket.off('update this message status')
-    }
-  })
-
-  // --------------------------- FUNCTIONS INTERNES -------------------
-
-  function setReceived(msg) {
-    msg.status = 'received'
-    socket.emit('message read or received', { msg: msg })
-    // if message is recived and not read update has new messages to contact id 'msg.from'
-    updateHasNewMessagesInDB(user.uid, msg.from, 'add')
-    setNewMessages((curr) => {
-      curr[msg.from] += 1
-      curr = JSON.parse(JSON.stringify(curr))
-      return curr
-    })
-  }
-
-  function setRead(msg) {
-    msg.status = 'read'
-    socket.emit('message read or received', { msg: msg })
-    // TO DO§!!! add badge time
-    setArrOfMessages([...arrOfMessages, ...[msg]])
-  }
-
-  function updateAllMessagesToReadStatusInChat() {
-    // console.log('arrOfMessages', arrOfMessages)
-    // remove all badges from 'arrOfMessages' and return arr with only messages
-    const arrWhitinBadge = arrOfMessages.filter((mesage) => mesage.status)
-    // console.log('arrWhitinBadge', arrWhitinBadge)
-    // return arr whith only my messages
-    const arrOfMyMessages = arrWhitinBadge.filter(
-      (mesage) => mesage.from === user.uid
-    )
-    // console.log('arrOfMyMessages', arrOfMyMessages)
-    // verify if all messages that I send was read by the contact
-    const isAllMessagesRead = arrOfMyMessages.every(
-      (message) => message.status === 'read'
-    )
-    // console.log('isAllMessagesRead', isAllMessagesRead)
-    // if all messages was not read by the contact then update a new arr of messages whith status read for each message that I send
-    if (!isAllMessagesRead) {
-      arrWhitinBadge.forEach((message) => {
-        if (message.from === user.uid) {
-          message.status = 'read'
-        }
-      })
-    }
-    // add badge to this arr of messages and set the 'arrOfMessages' whith this arr
-    const arrWhithBadge = addBadgeDateToArr(arrWhitinBadge)
-    setArrOfMessages(arrWhithBadge)
-  }
-
   // --------------------------- SET MESSAGES IN STORAGE AND UPDATE MESSAGE STORAGE--------------------------
   useEffect(() => {
     const arrOfMessagesWithinBadge = arrOfMessages.filter(
@@ -257,6 +132,7 @@ export default function MesssageBody() {
 
   // --------------------------- SROLL EFFECT --------------------------
   useEffect(() => {
+    // console.log('messagesDiv.current', messagesDiv.current)
     if (firstTime && messagesDiv.current) {
       // 👇️ scroll to bottom QUICKLY first time to download all messages
       messagesDiv.current.style.visibility = 'hidden'
