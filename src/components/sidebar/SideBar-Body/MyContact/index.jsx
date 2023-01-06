@@ -113,6 +113,10 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
   }
 
   function readableDate(timeInMs) {
+    if (!timeInMs) {
+      // console.log('nul')
+      return null
+    }
     const date = new Date(timeInMs)
     const hoursAndMinutes = date.getHours() + ':' + addZero(date.getMinutes())
     return hoursAndMinutes
