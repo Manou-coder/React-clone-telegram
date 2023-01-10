@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useContext } from 'react'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import { useComponentVisibleRightClickMessage } from '../../../../utils/functions/useHandleClickOutside'
 import MessageMenu from '../MessageMenu'
+import 'react-lazy-load-image-component/src/effects/blur.css'
 
 let offsetX = 0
 let offsetY = 0
@@ -22,6 +24,7 @@ export default function Message({
 }) {
   const { language } = useContext(LanguageContext)
   const { theme } = useContext(ThemeContext)
+  const [isLoaderVisible, setIsLoaderVisible] = useState(true)
 
   // STYLE OF MESSAGES
   const bgColorMsg = () => {
@@ -141,7 +144,7 @@ export default function Message({
         </div>
       ) : (
         <div
-          className={`w-100 d-flex justify-content-${justifyContentMsg} mb-1`}
+          className={`w-100 d-flex justify-content-${justifyContentMsg} mb-1 position-relative`}
           id={messageId}
         >
           <div
@@ -186,14 +189,43 @@ export default function Message({
                   whiteSpace: 'pre-wrap',
                 }}
               >
-                {type === 'deleted message' ? (
+                {type === 'image' && (
+                  <div style={{ width: '225px', height: '225px' }}>
+                    <div
+                      style={{
+                        height: '200px',
+                        width: '200px',
+                        borderRadius: '5px',
+                        position: 'absolute',
+                        top: '50%',
+                        right: '50%',
+                        transform: 'translate(50%, -50%)',
+                        objectFit: 'cover',
+                      }}
+                    >
+                      <LazyLoadImage
+                        height={200}
+                        width={200}
+                        src={content}
+                        placeholderSrc=""
+                        effect="blur"
+                        alt="img"
+                      />
+                    </div>
+                    {isLoaderVisible ? <Loader messageId={messageId} /> : null}
+                  </div>
+                )}
+                {type === 'deleted message' && (
                   <span
                     className="px-1"
                     style={{ fontStyle: 'italic', color: 'GrayText' }}
                   >
                     {_thisMessageWasDeleted[language]}
                   </span>
-                ) : (
+                )}
+                {type !== 'deleted message' &&
+                type !== 'image' &&
+                type !== 'video' ? (
                   <p
                     className="pb-0 px-1 mb-0 text-start"
                     style={{
@@ -202,11 +234,12 @@ export default function Message({
                   >
                     {content}
                   </p>
-                )}
+                ) : null}
               </div>
               <div
                 style={{
                   padding: '7px 0px',
+                  // padding: type !== 'video' ? '7px 0px', : '2px 0px'
                 }}
               >
                 <div
@@ -363,4 +396,68 @@ const _thisMessageWasDeleted = {
   en: 'This message was deleted by the contact',
   fr: 'Ce message a été supprimé par le contact',
   il: 'הודעה זו נמחקה על ידי איש הקשר',
+}
+
+function Loader({ messageId }) {
+  const [isLoaderVisible, setIsLoaderVisible] = useState(false)
+  const { progress, setProgress, uploadTask, setUploadTask } =
+    useContext(ThemeContext)
+  const elementsToTransform = useRef([])
+  const addElements = (el) => {
+    if (el && !elementsToTransform.current.includes(el)) {
+      elementsToTransform.current.push(el)
+    }
+  }
+
+  if (progress.id === messageId) {
+    elementsToTransform?.current?.forEach(function (element) {
+      element.style.transform = `rotate(${progress.percent * (180 / 100)}deg)`
+    })
+  }
+
+  useEffect(() => {
+    if (progress.id === messageId && progress.percent !== 0) {
+      setIsLoaderVisible(true)
+    }
+    if (progress.id === messageId && progress.percent === 100) {
+      setIsLoaderVisible(false)
+    }
+  }, [progress])
+
+  return (
+    <>
+      {isLoaderVisible ? (
+        <div className="circle-wrap" style={{ pointerEvents: 'all' }}>
+          <div className="circle">
+            <div className="mask full" ref={addElements}>
+              <div className="fill" ref={addElements}></div>
+            </div>
+            <div className="mask half">
+              <div className="fill" ref={addElements}></div>
+            </div>
+            {/* <div className="inside-circle"> {Math.round(progress) + ' %'} </div> */}
+            <div
+              style={{ cursor: 'pointer' }}
+              className="inside-circle"
+              onClick={() => {
+                console.log('uploadTask', uploadTask)
+                uploadTask?.cancel()
+                setIsLoaderVisible(false)
+                // il faut ici supprimer le message
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 320 512"
+                height={40}
+                fill="black"
+              >
+                <path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  )
 }

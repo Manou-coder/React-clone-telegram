@@ -15,6 +15,8 @@ export const ThemeProvider = ({ children }) => {
   const [isToastOpen, setIsToastOpen] = useState(false)
   const [modalName, setModalName] = useState(null)
   const [inputLetters, setInputLetters] = useState('')
+  const [progress, setProgress] = useState({ percent: 0, id: '' })
+  const [uploadTask, setUploadTask] = useState(null)
   const inputSearchMessageRef = useRef(null)
 
   useEffect(() => {
@@ -71,6 +73,10 @@ export const ThemeProvider = ({ children }) => {
         inputLetters,
         setInputLetters,
         inputSearchMessageRef,
+        progress,
+        setProgress,
+        uploadTask,
+        setUploadTask,
       }}
     >
       {children}

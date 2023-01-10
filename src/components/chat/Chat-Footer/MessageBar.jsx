@@ -15,6 +15,7 @@ import { useEffect } from 'react'
 import { addBadgeDateToArr } from '../Chat-Body/MessageBody'
 import Emojis from './Emojis'
 import useComponentVisible from '../../../utils/functions/useHandleClickOutside'
+import UploadFiles from '../../upload-files/UploadFiles'
 
 export default function MessageBar() {
   const { user } = UserAuth()
@@ -72,6 +73,7 @@ export default function MessageBar() {
       time: Date.now(),
       id: uuidv4(),
       status: 'waiting',
+      type: 'message',
     }
     socket.emit('private message', message)
     // console.log('message', message)
@@ -244,19 +246,7 @@ export default function MessageBar() {
             </span>
           </div>
           <div className="d-none d-lg-block col-1 d-flex justify-content-start">
-            <span
-              className={`icon-bars ${iconBars} d-flex justify-content-center align-items-center`}
-            >
-              {/* <i className="fa-solid fa-paperclip fa-lg"></i> */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-                style={{ fill: iconColor, position: 'relative' }}
-                height="1.25em"
-              >
-                <path d="M396.2 83.8c-24.4-24.4-64-24.4-88.4 0l-184 184c-42.1 42.1-42.1 110.3 0 152.4s110.3 42.1 152.4 0l152-152c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-152 152c-64 64-167.6 64-231.6 0s-64-167.6 0-231.6l184-184c46.3-46.3 121.3-46.3 167.6 0s46.3 121.3 0 167.6l-176 176c-28.6 28.6-75 28.6-103.6 0s-28.6-75 0-103.6l144-144c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-144 144c-6.7 6.7-6.7 17.7 0 24.4s17.7 6.7 24.4 0l176-176c24.4-24.4 24.4-64 0-88.4z" />
-              </svg>
-            </span>
+            <UploadFiles />
           </div>
           <div className="col">
             <textarea

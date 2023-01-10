@@ -68,3 +68,140 @@ black 3: #000000;
     width: 33%;
   }
 }
+
+/* loader uplosd files */
+/* 
+.circle-wrap {
+  margin: 75px auto;
+  width: 75px;
+  height: 75px;
+  background: #fefcff;
+  border-radius: 50%;
+}
+
+.circle-wrap .circle .mask,
+.circle-wrap .circle .fill {
+  width: 75px;
+  height: 75px;
+  position: absolute;
+  border-radius: 50%;
+}
+
+.mask .fill {
+  clip: rect(0px, 37.5px, 75px, 0px);
+  background-color: #227ded;
+}
+
+.circle-wrap .circle .mask {
+  clip: rect(0px, 75px, 75px, 37.5px);
+}
+
+.mask.full,
+.circle .fill {
+  animation: fill ease-in-out 3s;
+  transform: rotate(135deg);
+}
+
+@keyframes fill {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(135deg);
+  }
+}
+
+@keyframes fill {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(135deg);
+  }
+}
+
+.circle-wrap .inside-circle {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: #d2eaf1;
+  line-height: 60px;
+  text-align: center;
+  margin-top: 4.5px;
+  margin-left: 5.5px;
+  color: #1e51dc;
+  position: absolute;
+  z-index: 100;
+  font-weight: 350;
+  font-size: 1em;
+} */
+
+.circle-wrap {
+  /* margin: 75px auto; */
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+  width: 75px;
+  height: 75px;
+  background: #fefcff;
+  border-radius: 50%;
+  border: 0.5px solid #cdcbd0;
+}
+
+.circle-wrap .circle .mask,
+.circle-wrap .circle .fill {
+  width: 75px;
+  height: 75px;
+  position: absolute;
+  border-radius: 50%;
+}
+
+.circle-wrap .circle .mask {
+  clip: rect(0px, 75px, 75px, 37.5px);
+}
+
+.circle-wrap .inside-circle {
+  width: 61px;
+  height: 61px;
+  border-radius: 50%;
+  background: #d2eaf1;
+  line-height: 60px;
+  text-align: center;
+  margin-top: 7px;
+  margin-left: 7px;
+  color: #1e51dc;
+  position: absolute;
+  z-index: 100;
+  /* font-weight: 1000;
+  font-size: 3em; */
+}
+
+/* color animation */
+
+/* 3rd progress bar */
+.mask .fill {
+  clip: rect(0px, 37.5px, 75px, 0px);
+  background-color: #227ded;
+}
+
+/* .mask.full,
+.circle .fill {
+  animation: fill ease-in-out 3s;
+  transform: rotate(135deg); 
+} */
+
+/* @keyframes fill {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(135deg);
+  }
+} */
+
+.lazy-load-image-background.blur.lazy-load-image-loaded > img {
+  opacity: 1;
+  transition: opacity 0.3s;
+  object-fit: cover;
+}
