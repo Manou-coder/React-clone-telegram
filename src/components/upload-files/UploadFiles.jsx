@@ -3,7 +3,7 @@ import { set } from 'date-fns'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import React, { useContext, useState } from 'react'
 import { useRef } from 'react'
-import { storage, uploadImage } from '../../firebase-config'
+import { storage } from '../../firebase-config'
 import { UserAuth } from '../../utils/context/AuthContext'
 import { MessagesContext } from '../../utils/context/MessagesContext'
 import { SocketContactContext } from '../../utils/context/SocketContact'
@@ -40,38 +40,16 @@ export default function UploadFiles() {
     }
 
     if (file.type.startsWith('image/')) {
-      console.log("it's an image")
-      // try resizing image
-      const fileResizing = await resizeImage(file)
-      if (fileResizing) {
-        file = fileResizing
-      }
-      console.log('file', file)
-      // create message object
-      const message = {
-        content: URL.createObjectURL(file),
-        to: actuallyContactId,
-        from: user.uid,
-        type: 'image',
-        time: Date.now(),
-        id: uuidv4(),
-        status: 'waiting',
-      }
-      // show this message in chat whith objectURL
-      showFileInChat(message)
-      // try upload this file
-      const fileUploaded = await uploadImage(file, message.id).catch((error) =>
-        console.log(error)
-      )
-      console.log('fileUploaded: ', fileUploaded)
-      if (!fileUploaded) {
-        return
-      }
-      // if file is uploaded
-      message.content = fileUploaded
-      // emit private message
-      emitSocket(message)
+      uploadImage(file)
+      return
     }
+
+    if (file.type.startsWith('video/')) {
+      uploadVideo(file)
+      return
+    }
+
+    alert('You can only send photos and videos!')
   }
 
   function showFileInChat(message) {
@@ -96,24 +74,16 @@ export default function UploadFiles() {
     socket.emit('private message', message)
   }
 
-  /**
-   * upload file in Firebase
-   *
-   * @param {Object} file File image/video
-   * @param {string} messageId The id of this message
-   *
-   */
-  function uploadImage(file, messageId) {
+  function uploadFileInDB(file, messageId, type) {
     return new Promise((resolve, reject) => {
       if (!file) return null
       console.log('file.type', file.type)
       const metadata = {
-        // contentType: 'image/jpeg',
         contentType: file.type,
       }
 
       // Upload file and metadata to the object 'images/mountains.jpg'
-      const storageRef = ref(storage, 'images/' + messageId)
+      const storageRef = ref(storage, `${type}/${messageId}`)
       const uploadTask = uploadBytesResumable(storageRef, file, metadata)
 
       // setUploadTask
@@ -153,6 +123,74 @@ export default function UploadFiles() {
         }
       )
     })
+  }
+
+  async function uploadImage(file) {
+    console.log("it's an image")
+    // try resizing image
+    const fileResizing = await resizeImage(file)
+    if (fileResizing) {
+      file = fileResizing
+    }
+    console.log('file', file)
+    // create message object
+    const message = {
+      content: URL.createObjectURL(file),
+      to: actuallyContactId,
+      from: user.uid,
+      type: 'image',
+      time: Date.now(),
+      id: uuidv4(),
+      status: 'waiting',
+    }
+    // show this message in chat whith objectURL
+    showFileInChat(message)
+    // try upload this file
+    const fileUploaded = await uploadFileInDB(file, message.id, 'images').catch(
+      (error) => console.log(error)
+    )
+    console.log('fileUploaded: ', fileUploaded)
+    if (!fileUploaded) {
+      return
+    }
+    // if file is uploaded
+    message.content = fileUploaded
+    // emit private message
+    emitSocket(message)
+  }
+
+  async function uploadVideo(file) {
+    console.log("it's an image")
+    // try resizing image
+    // const fileResizing = await resizeImage(file)
+    // if (fileResizing) {
+    //   file = fileResizing
+    // }
+    console.log('file', file)
+    // create message object
+    const message = {
+      content: URL.createObjectURL(file),
+      to: actuallyContactId,
+      from: user.uid,
+      type: 'video',
+      time: Date.now(),
+      id: uuidv4(),
+      status: 'waiting',
+    }
+    // show this message in chat whith objectURL
+    showFileInChat(message)
+    // try upload this file
+    const fileUploaded = await uploadFileInDB(file, message.id, 'videos').catch(
+      (error) => console.log(error)
+    )
+    console.log('fileUploaded: ', fileUploaded)
+    if (!fileUploaded) {
+      return
+    }
+    // if file is uploaded
+    message.content = fileUploaded
+    // emit private message
+    emitSocket(message)
   }
 
   return (
