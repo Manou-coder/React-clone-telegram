@@ -161,6 +161,7 @@ export default function UploadFiles() {
         ref={inputForm}
         type="file"
         onChange={handleFileChange}
+        onClick={(e) => (e.target.value = null)}
         style={{ display: 'none' }}
       />
       <span

@@ -1,12 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react'
 import { useContext } from 'react'
-import { LazyLoadImage } from 'react-lazy-load-image-component'
+import {
+  LazyLoadComponent,
+  LazyLoadImage,
+} from 'react-lazy-load-image-component'
 import { LanguageContext } from '../../../../utils/context/LanguageContext'
 import { ThemeContext } from '../../../../utils/context/ThemeContext'
 import { useComponentVisibleRightClickMessage } from '../../../../utils/functions/useHandleClickOutside'
 import MessageMenu from '../MessageMenu'
 import 'react-lazy-load-image-component/src/effects/blur.css'
+import { MessagesContext } from '../../../../utils/context/MessagesContext'
+import React from 'react'
 
 let offsetX = 0
 let offsetY = 0
@@ -117,6 +122,12 @@ export default function Message({
     })
   }
 
+  // const { refComponentInScroll, isVisible } = useComponentVisibleInScroll()
+
+  // useEffect(() => {
+  //   console.log('isVisible: ', isVisible)
+  // }, [isVisible])
+
   return (
     <div>
       {isBadgeTime ? (
@@ -191,7 +202,9 @@ export default function Message({
               >
                 {type === 'image' && (
                   <div style={{ width: '225px', height: '225px' }}>
+                    {/* <MyComponent> */}
                     <div
+                      className="on-image"
                       style={{
                         height: '200px',
                         width: '200px',
@@ -213,6 +226,52 @@ export default function Message({
                       />
                     </div>
                     {isLoaderVisible ? <Loader messageId={messageId} /> : null}
+                    {/* </MyComponent> */}
+                  </div>
+                )}
+                {type === 'video' && (
+                  <div style={{ width: '225px', height: '225px' }}>
+                    <MyComponent>
+                      {/* {console.log(MyComponent.prototype)} */}
+                      <div
+                        className="on-image"
+                        style={{
+                          height: '200px',
+                          width: '200px',
+                          borderRadius: '5px',
+                          position: 'absolute',
+                          top: '50%',
+                          right: '50%',
+                          transform: 'translate(50%, -50%)',
+                          objectFit: 'cover',
+                        }}
+                      >
+                        <figure
+                          style={{
+                            position: 'relative',
+                            pointerEvents: 'all',
+                          }}
+                        >
+                          <video
+                            onMouseEnter={(e) => (e.target.controls = true)}
+                            onMouseLeave={(e) => (e.target.controls = false)}
+                            // controls
+                            // autoPlay
+                            loop
+                            style={{
+                              height: '200px',
+                              width: '200px',
+                              objectFit: 'cover',
+                              pointerEvents: 'all',
+                            }}
+                            src={content}
+                          ></video>
+                        </figure>
+                      </div>
+                      {isLoaderVisible ? (
+                        <Loader messageId={messageId} />
+                      ) : null}
+                    </MyComponent>
                   </div>
                 )}
                 {type === 'deleted message' && (
@@ -402,6 +461,7 @@ function Loader({ messageId }) {
   const [isLoaderVisible, setIsLoaderVisible] = useState(false)
   const { progress, setProgress, uploadTask, setUploadTask } =
     useContext(ThemeContext)
+  const { arrOfMessages, setArrOfMessages } = useContext(MessagesContext)
   const elementsToTransform = useRef([])
   const addElements = (el) => {
     if (el && !elementsToTransform.current.includes(el)) {
@@ -416,10 +476,22 @@ function Loader({ messageId }) {
   }
 
   useEffect(() => {
+    const sameId = progress.id === messageId ? progress.id : null
+    // console.log('sameId: ', sameId)
+    if (!sameId) return
+    const divMessageId = document.getElementById(progress.id)
+    console.log('divMessageId: ', divMessageId)
+    if (!divMessageId) return
+    const onImage = divMessageId.querySelector('.on-image')
+    console.log('onImage: ', onImage)
+    if (!onImage) return
+    onImage.classList.add('on-image-blur')
+
     if (progress.id === messageId && progress.percent !== 0) {
       setIsLoaderVisible(true)
     }
     if (progress.id === messageId && progress.percent === 100) {
+      onImage?.classList.remove('on-image-blur')
       setIsLoaderVisible(false)
     }
   }, [progress])
@@ -443,6 +515,7 @@ function Loader({ messageId }) {
                 console.log('uploadTask', uploadTask)
                 uploadTask?.cancel()
                 setIsLoaderVisible(false)
+                setArrOfMessages((curr) => curr.slice(0, -1))
                 // il faut ici supprimer le message
               }}
             >
@@ -461,3 +534,95 @@ function Loader({ messageId }) {
     </>
   )
 }
+
+function MyComponent({ children }) {
+  const { messageBodyRef } = useContext(ThemeContext)
+  const [isVisible, setIsVisible] = useState(false)
+
+  const elementRef = useRef(null)
+
+  useEffect(() => {
+    function handleScroll() {
+      const element = elementRef.current
+      if (!element) {
+        return
+      }
+      const rect = element.getBoundingClientRect()
+      // console.log('rect: ', rect)
+      const viewHeight = Math.max(
+        document.documentElement.clientHeight,
+        window.innerHeight
+      )
+      const messagBodyRect = messageBodyRef?.current?.getBoundingClientRect()
+      // console.log('messagBodyRect: ', messagBodyRect)
+      const messagBodyHeight = messagBodyRect?.height
+      console.log(' messagBodyHeight: ', messagBodyHeight)
+      console.log('rect.top: ', rect.top)
+      console.log('rect.bottom: ', rect.bottom)
+      // console.log('viewHeight: ', viewHeight)
+      // const viewHeight2 = viewHeight * 0.8
+      const messagBodyHeight2 = messagBodyHeight * 0.8
+      // console.log('viewHeight2: ', viewHeight2)
+      const isVisible = !(
+        rect.bottom < 200 || rect.top - messagBodyHeight2 >= 0
+      )
+      setIsVisible(isVisible)
+      // console.log('isVisible', isVisible)
+    }
+
+    messageBodyRef?.current?.addEventListener('scroll', handleScroll)
+    return () => {
+      messageBodyRef?.current?.removeEventListener('scroll', handleScroll)
+    }
+  }, [elementRef, messageBodyRef])
+
+  useEffect(() => {
+    if (!elementRef.current) {
+      return
+    }
+    const element = elementRef.current
+    const video = element.querySelector('video')
+    // console.log('video: ', video)
+    if (isVisible) {
+      console.log('isVisible', isVisible)
+      video.play()
+    } else {
+      console.log('isVisible', isVisible)
+      video.pause()
+    }
+  }, [isVisible, elementRef])
+
+  // children = React.Children.map(children, (el) => {
+  //   return React.cloneElement(el, { isVisible: isVisible })
+  // })
+
+  return (
+    <div style={{ height: '200px', width: '200px' }} ref={elementRef}>
+      {/* {React.cloneElement(children, { isVisible: isVisible })} */}
+      {children}
+      {/* <VideoMessage isVisible={isVisible} children={children} /> */}
+    </div>
+  )
+}
+
+// function VideoMessage({ isVisible }) {
+//   console.log('this', this)
+//   return <div>{isVisible ? 'visible' : 'non visible'}</div>
+// }
+
+function VideoMessage(props) {
+  console.log('props', props)
+  return <div>{props.children}</div>
+}
+
+// function App() {
+//   return (
+//     <div>
+//       <Parent>{console.log(children)}</Parent>
+//     </div>
+//   )
+// }
+// function Parent({ children }) {
+
+//   return <div>{children}</div>
+// }

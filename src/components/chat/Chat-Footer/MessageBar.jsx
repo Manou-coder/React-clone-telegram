@@ -228,7 +228,7 @@ export default function MessageBar() {
           className={`row rounded-5 py-1 w-100 w-lg-75 align-items-baseline ${bgColor2}`}
           style={{ position: 'relative' }}
         >
-          <div className="col-1 d-flex justify-content-start">
+          <div className="d-none d-lg-flex col-1 justify-content-start">
             <span
               ref={refButton}
               onClick={() => handleClickRefButton()}
@@ -245,7 +245,7 @@ export default function MessageBar() {
               </svg>
             </span>
           </div>
-          <div className="d-none d-lg-block col-1 d-flex justify-content-start">
+          <div className="col-1 d-flex justify-content-start">
             <UploadFiles />
           </div>
           <div className="col">
