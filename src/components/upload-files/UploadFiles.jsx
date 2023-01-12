@@ -13,6 +13,8 @@ import './style.css'
 import { startsWith } from 'lodash'
 import { resizeFile } from '../../utils/functions/resizeImage'
 import socket from '../../utils/socket.io'
+import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg'
+import { useEffect } from 'react'
 
 export default function UploadFiles() {
   const { user } = UserAuth()
@@ -20,7 +22,6 @@ export default function UploadFiles() {
     useContext(ThemeContext)
   const { setArrOfMessages, arrOfMessages } = useContext(MessagesContext)
   const { actuallyContactId } = useContext(SocketContactContext)
-  const [file, setFile] = useState(null)
   const inputForm = useRef()
   const iconBars = theme === 'light' ? 'icon-bars-light' : ' icon-bars-dark'
   const iconColor = theme === 'light' ? 'black' : '#909294'
@@ -160,12 +161,7 @@ export default function UploadFiles() {
   }
 
   async function uploadVideo(file) {
-    console.log("it's an image")
-    // try resizing image
-    // const fileResizing = await resizeImage(file)
-    // if (fileResizing) {
-    //   file = fileResizing
-    // }
+    console.log("it's an video")
     console.log('file', file)
     // create message object
     const message = {

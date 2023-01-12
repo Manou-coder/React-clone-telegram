@@ -17,6 +17,7 @@ export const ThemeProvider = ({ children }) => {
   const [inputLetters, setInputLetters] = useState('')
   const [progress, setProgress] = useState({ percent: 0, id: '' })
   const [uploadTask, setUploadTask] = useState(null)
+  const [firstTime, setFirstTime] = useState(true)
   const inputSearchMessageRef = useRef(null)
 
   useEffect(() => {
@@ -77,6 +78,8 @@ export const ThemeProvider = ({ children }) => {
         setProgress,
         uploadTask,
         setUploadTask,
+        firstTime,
+        setFirstTime,
       }}
     >
       {children}

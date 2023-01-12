@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useContext, useEffect, useRef } from 'react'
 import Message from '../Message'
 import socket from '../../../../utils/socket.io'
@@ -20,11 +21,12 @@ import {
 import { MessagesContext } from '../../../../utils/context/MessagesContext'
 import ScrollButton from '../../ScrollButton'
 
-let firstTime
+// let firstTime
 
 export default function MesssageBody() {
   const { user } = UserAuth()
-  const { isChatOpen, messageBarRef, messageBodyRef } = useContext(ThemeContext)
+  const { isChatOpen, messageBarRef, messageBodyRef, firstTime, setFirstTime } =
+    useContext(ThemeContext)
   const { setNewMessages, actuallyContactId } = useContext(SocketContactContext)
   const {
     arrOfMessages,
@@ -66,7 +68,7 @@ export default function MesssageBody() {
       setisLoading(true)
     }
     // set it's downloaded for the first time (that the scroll is auto and not 'smooth')
-    firstTime = true
+    // firstTime = true
 
     // ----------------------------
     // get all messages with this contact from DB
@@ -131,37 +133,45 @@ export default function MesssageBody() {
   }, [arrOfMessages])
 
   // --------------------------- SROLL EFFECT --------------------------
-  useEffect(() => {
-    // console.log('messagesDiv.current', messagesDiv.current)
-    if (firstTime && messagesDiv.current) {
-      // 👇️ scroll to bottom QUICKLY first time to download all messages
-      messagesDiv.current.style.visibility = 'hidden'
-      lastMessageRef.current?.scrollIntoView(false)
-      setTimeout(() => {
-        messagesDiv.current.style.visibility = 'visible'
-        firstTime = false
-      }, 250)
-    } else if (!firstTime && messagesDiv.current) {
-      // 👇️ scroll to bottom SLOWLY every time messages change
-      lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }
-  }, [arrOfMessages, messagesDiv.current])
+  // useEffect(() => {
+  //   // console.log('messagesDiv.current', messagesDiv.current)
+  //   if (firstTime && messagesDiv.current) {
+  //     // 👇️ scroll to bottom QUICKLY first time to download all messages
+  //     messagesDiv.current.style.visibility = 'hidden'
+  //     lastMessageRef.current?.scrollIntoView(false)
+  //     setTimeout(() => {
+  //       messagesDiv.current.style.visibility = 'visible'
+  //       firstTime = false
+  //     }, 250)
+  //   } else if (!firstTime && messagesDiv.current) {
+  //     // 👇️ scroll to bottom SLOWLY every time messages change
+  //     lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
+  //   }
+  // }, [arrOfMessages, messagesDiv.current])
 
   // --------------------------- MESSAGE MOBILE EFFECT --------------------------
+  //
+
   useEffect(() => {
-    if (firstTime && messagesDiv.current) {
-      // 👇️ scroll to bottom QUICKLY first time to download all messages
+    if (
+      !messageBodyRef.current ||
+      !lastMessageRef.current ||
+      !messagesDiv.current
+    )
+      return
+    if (firstTime) {
+      messageBodyRef.current.scrollTop = messageBodyRef.current.scrollHeight
       messagesDiv.current.style.visibility = 'hidden'
-      lastMessageRef.current?.scrollIntoView(false)
       setTimeout(() => {
         messagesDiv.current.style.visibility = 'visible'
-        firstTime = false
+        setFirstTime(false)
       }, 250)
-    } else if (!firstTime && messagesDiv.current) {
+    } else {
       // 👇️ scroll to bottom SLOWLY every time messages change
       lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [arrOfMessages, messagesDiv.current])
+    console.log('firstTime: ', firstTime)
+  }, [arrOfMessages, messageBodyRef, lastMessageRef, messagesDiv, firstTime])
 
   return (
     <div

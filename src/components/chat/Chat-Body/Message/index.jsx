@@ -255,9 +255,8 @@ export default function Message({
                           <video
                             onMouseEnter={(e) => (e.target.controls = true)}
                             onMouseLeave={(e) => (e.target.controls = false)}
-                            // controls
-                            // autoPlay
                             loop
+                            muted
                             style={{
                               height: '200px',
                               width: '200px',
@@ -297,8 +296,10 @@ export default function Message({
               </div>
               <div
                 style={{
-                  padding: '7px 0px',
-                  // padding: type !== 'video' ? '7px 0px', : '2px 0px'
+                  padding:
+                    type === 'video' || type === 'image'
+                      ? '4px 0px'
+                      : '7px 0px',
                 }}
               >
                 <div
@@ -309,6 +310,8 @@ export default function Message({
                     height: '24px',
                   }}
                 >
+                  {type === 'image' && <LogoImage />}
+                  {type === 'video' && <LogoVideo />}
                   <span
                     className="me-1"
                     style={{
@@ -626,3 +629,49 @@ function VideoMessage(props) {
 
 //   return <div>{children}</div>
 // }
+
+function LogoImage() {
+  return (
+    <span
+      style={{
+        color: 'gray',
+        fontSize: '0.8em',
+        position: 'absolute',
+        top: '2px',
+        left: '11.5px',
+      }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 512 512"
+        height={'15px'}
+        fill="gray"
+      >
+        <path d="M0 96C0 60.7 28.7 32 64 32H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM323.8 202.5c-4.5-6.6-11.9-10.5-19.8-10.5s-15.4 3.9-19.8 10.5l-87 127.6L170.7 297c-4.6-5.7-11.5-9-18.7-9s-14.2 3.3-18.7 9l-64 80c-5.8 7.2-6.9 17.1-2.9 25.4s12.4 13.6 21.6 13.6h96 32H424c8.9 0 17.1-4.9 21.2-12.8s3.6-17.4-1.4-24.7l-120-176zM112 192c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48z" />
+      </svg>
+    </span>
+  )
+}
+
+function LogoVideo() {
+  return (
+    <span
+      style={{
+        color: 'gray',
+        fontSize: '0.8em',
+        position: 'absolute',
+        top: '2px',
+        left: '11.5px',
+      }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 512 512"
+        height={'15px'}
+        fill="gray"
+      >
+        <path d="M0 96C0 60.7 28.7 32 64 32H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM48 368v32c0 8.8 7.2 16 16 16H96c8.8 0 16-7.2 16-16V368c0-8.8-7.2-16-16-16H64c-8.8 0-16 7.2-16 16zm368-16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V368c0-8.8-7.2-16-16-16H416zM48 240v32c0 8.8 7.2 16 16 16H96c8.8 0 16-7.2 16-16V240c0-8.8-7.2-16-16-16H64c-8.8 0-16 7.2-16 16zm368-16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V240c0-8.8-7.2-16-16-16H416zM48 112v32c0 8.8 7.2 16 16 16H96c8.8 0 16-7.2 16-16V112c0-8.8-7.2-16-16-16H64c-8.8 0-16 7.2-16 16zM416 96c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V112c0-8.8-7.2-16-16-16H416zM160 128v64c0 17.7 14.3 32 32 32H320c17.7 0 32-14.3 32-32V128c0-17.7-14.3-32-32-32H192c-17.7 0-32 14.3-32 32zm32 160c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32H320c17.7 0 32-14.3 32-32V320c0-17.7-14.3-32-32-32H192z" />
+      </svg>
+    </span>
+  )
+}

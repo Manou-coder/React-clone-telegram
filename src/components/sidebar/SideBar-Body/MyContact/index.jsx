@@ -30,7 +30,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
   } = useContext(SocketContactContext)
   const { setArrOfMessages, updateMessageStorage, setUpdateMessageStorage } =
     useContext(MessagesContext)
-  const { setIsChatOpen } = useContext(ThemeContext)
+  const { setIsChatOpen, setFirstTime } = useContext(ThemeContext)
   const [lastMessage, setLastMessage] = useState(null)
 
   // console.log('contact', contact)
@@ -84,6 +84,7 @@ function MyContact({ name1, name2, name3, contact, description, photoURL }) {
     // empty the arrOfMessages if it's differnent contact
     if (contact.userId !== actuallyContactId) {
       setArrOfMessages([])
+      setFirstTime(true)
     }
     console.log('contact.userId', contact.userId)
     setActuallyContactId(contact.userId)
