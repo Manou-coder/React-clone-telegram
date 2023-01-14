@@ -1,5 +1,4 @@
 import React, { useState, createContext } from 'react'
-// import { useEffect } from 'react'
 
 export const MessagesContext = createContext()
 
@@ -7,6 +6,7 @@ export const MessagesContextProvider = ({ children }) => {
   const [arrOfMessages, setArrOfMessages] = useState([])
   const [messageSend, setMessageSend] = useState([])
   const [updateMessageStorage, setUpdateMessageStorage] = useState(null)
+  const [imageToDisplay, setImageToDisplay] = useState({ name: '', src: '' })
 
   return (
     <MessagesContext.Provider
@@ -17,6 +17,8 @@ export const MessagesContextProvider = ({ children }) => {
         setMessageSend,
         updateMessageStorage,
         setUpdateMessageStorage,
+        imageToDisplay,
+        setImageToDisplay,
       }}
     >
       {children}

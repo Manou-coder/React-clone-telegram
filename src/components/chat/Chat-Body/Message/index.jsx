@@ -30,6 +30,7 @@ export default function Message({
   const { language } = useContext(LanguageContext)
   const { theme } = useContext(ThemeContext)
   const [isLoaderVisible, setIsLoaderVisible] = useState(true)
+  const { imageToDisplay, setImageToDisplay } = useContext(MessagesContext)
 
   // STYLE OF MESSAGES
   const bgColorMsg = () => {
@@ -202,9 +203,15 @@ export default function Message({
               >
                 {type === 'image' && (
                   <div style={{ width: '225px', height: '225px' }}>
-                    {/* <MyComponent> */}
                     <div
                       className="on-image"
+                      onClick={() =>
+                        setImageToDisplay((imageToDisplay) => {
+                          return { imageToDisplay, name: '', src: content }
+                        })
+                      }
+                      data-bs-toggle="offcanvas"
+                      data-bs-target="#offcanvasBottom"
                       style={{
                         height: '200px',
                         width: '200px',
@@ -214,6 +221,8 @@ export default function Message({
                         right: '50%',
                         transform: 'translate(50%, -50%)',
                         objectFit: 'cover',
+                        pointerEvents: 'all',
+                        cursor: 'pointer',
                       }}
                     >
                       <LazyLoadImage
@@ -226,13 +235,11 @@ export default function Message({
                       />
                     </div>
                     {isLoaderVisible ? <Loader messageId={messageId} /> : null}
-                    {/* </MyComponent> */}
                   </div>
                 )}
                 {type === 'video' && (
                   <div style={{ width: '225px', height: '225px' }}>
                     <MyComponent>
-                      {/* {console.log(MyComponent.prototype)} */}
                       <div
                         className="on-image"
                         style={{
@@ -516,10 +523,11 @@ function Loader({ messageId }) {
               className="inside-circle"
               onClick={() => {
                 console.log('uploadTask', uploadTask)
+                // cancel upload
                 uploadTask?.cancel()
                 setIsLoaderVisible(false)
+                // delete this message from arrOfMessages
                 setArrOfMessages((curr) => curr.slice(0, -1))
-                // il faut ici supprimer le message
               }}
             >
               <svg
@@ -551,26 +559,13 @@ function MyComponent({ children }) {
         return
       }
       const rect = element.getBoundingClientRect()
-      // console.log('rect: ', rect)
-      const viewHeight = Math.max(
-        document.documentElement.clientHeight,
-        window.innerHeight
-      )
       const messagBodyRect = messageBodyRef?.current?.getBoundingClientRect()
-      // console.log('messagBodyRect: ', messagBodyRect)
       const messagBodyHeight = messagBodyRect?.height
-      console.log(' messagBodyHeight: ', messagBodyHeight)
-      console.log('rect.top: ', rect.top)
-      console.log('rect.bottom: ', rect.bottom)
-      // console.log('viewHeight: ', viewHeight)
-      // const viewHeight2 = viewHeight * 0.8
-      const messagBodyHeight2 = messagBodyHeight * 0.8
-      // console.log('viewHeight2: ', viewHeight2)
+      const messagBodyHeightModified = messagBodyHeight * 0.8
       const isVisible = !(
-        rect.bottom < 200 || rect.top - messagBodyHeight2 >= 0
+        rect.bottom < 200 || rect.top - messagBodyHeightModified >= 0
       )
       setIsVisible(isVisible)
-      // console.log('isVisible', isVisible)
     }
 
     messageBodyRef?.current?.addEventListener('scroll', handleScroll)
@@ -585,7 +580,6 @@ function MyComponent({ children }) {
     }
     const element = elementRef.current
     const video = element.querySelector('video')
-    // console.log('video: ', video)
     if (isVisible) {
       console.log('isVisible', isVisible)
       video.play()
@@ -595,40 +589,12 @@ function MyComponent({ children }) {
     }
   }, [isVisible, elementRef])
 
-  // children = React.Children.map(children, (el) => {
-  //   return React.cloneElement(el, { isVisible: isVisible })
-  // })
-
   return (
     <div style={{ height: '200px', width: '200px' }} ref={elementRef}>
-      {/* {React.cloneElement(children, { isVisible: isVisible })} */}
       {children}
-      {/* <VideoMessage isVisible={isVisible} children={children} /> */}
     </div>
   )
 }
-
-// function VideoMessage({ isVisible }) {
-//   console.log('this', this)
-//   return <div>{isVisible ? 'visible' : 'non visible'}</div>
-// }
-
-function VideoMessage(props) {
-  console.log('props', props)
-  return <div>{props.children}</div>
-}
-
-// function App() {
-//   return (
-//     <div>
-//       <Parent>{console.log(children)}</Parent>
-//     </div>
-//   )
-// }
-// function Parent({ children }) {
-
-//   return <div>{children}</div>
-// }
 
 function LogoImage() {
   return (
