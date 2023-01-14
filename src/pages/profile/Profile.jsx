@@ -153,7 +153,7 @@ export default function Profile() {
     await setMyProfileInDB(user.uid, {
       displayName: profileName.current.value,
       userName: profileUserName.current.value,
-      photoURL: isProfileAvatar.src,
+      photoURL: profileAvatar.src,
       isProfileCreated: true,
     })
 
