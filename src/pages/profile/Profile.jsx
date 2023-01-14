@@ -11,6 +11,7 @@ import {
   getMyProfileFromDB,
   saveMyProfileInUsersListDB,
   setMyProfileInDB,
+  updateMyProfileInUsersListDB,
 } from '../../firebase-config'
 import { updateDoc } from 'firebase/firestore'
 import { useNavigate } from 'react-router-dom'
@@ -22,6 +23,8 @@ import { LanguageContext } from '../../utils/context/LanguageContext'
 import SwitchMoon from '../home/components/SwitchMoon'
 import Flags from '../home/components/Flags'
 import { ThemeContext } from '../../utils/context/ThemeContext'
+import { resizeFile } from '../../utils/functions/resizeImage'
+import { imgError } from '../../utils/functions/returnAvatarIsImgError'
 
 export default function Profile() {
   const navigate = useNavigate()
@@ -40,27 +43,28 @@ export default function Profile() {
   const profileName = useRef(null)
   const profileUserName = useRef(null)
   const inputAvatar = useRef(null)
+  const profileAvatar = useRef(null)
 
   //if the user has logged in with a google account then the form will be automatically filled with their account information
-  useEffect(() => {
-    if (user !== null && profileName.current !== null) {
-      try {
-        const { displayName, photoURL } = user
-        profileName.current.value = displayName
-        createUserName(displayName)
-        //  !!!!!!!!!!!!!!!! PROBLEME AVEC USER SANS GOOGLE ACCOUNT !!!!!!!!!!!!!!!!!!!!!!!!
-        // probleme peut etre resolum
-        // console.log('photoURL', photoURL)
-        if (photoURL !== '' && photoURL !== null) {
-          isProfileAvatar.src = photoURL
-        } else {
-          isProfileAvatar.src = Avatar
-        }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  }, [profileName.current])
+  // useEffect(() => {
+  //   if (user !== null && profileName.current !== null) {
+  //     try {
+  //       const { displayName, photoURL } = user
+  //       profileName.current.value = displayName
+  //       createUserName(displayName)
+  //       //  !!!!!!!!!!!!!!!! PROBLEME AVEC USER SANS GOOGLE ACCOUNT !!!!!!!!!!!!!!!!!!!!!!!!
+  //       // probleme peut etre resolum
+  //       // console.log('photoURL', photoURL)
+  //       if (photoURL !== '' && photoURL !== null) {
+  //         isProfileAvatar.src = photoURL
+  //       } else {
+  //         isProfileAvatar.src = Avatar
+  //       }
+  //     } catch (error) {
+  //       console.log(error)
+  //     }
+  //   }
+  // }, [profileName.current])
 
   //waits for the DOM to be fully downloaded and displays the new profile picture
   useEffect(() => {
@@ -80,16 +84,52 @@ export default function Profile() {
   }
 
   //upload a profile picture to the db
+  // const uploadAvatar = async (e) => {
+  //   let file = inputAvatar.current.files[0]
+  //   e.preventDefault()
+  //   setLoadingAvatar(true)
+  //   const fileResizing = await resizeImage(file)
+  //   if (fileResizing) {
+  //     file = fileResizing
+  //   }
+  //   console.log('file', file)
+  //   await uploadImage(`profile/${user.uid}`, inputAvatar.current.files[0])
+  //   const urlAvatar = await downloadImage(`profile/${user.uid}`)
+  //   await updateDoc(userRef, {
+  //     photoURL: urlAvatar,
+  //   })
+  //   const userDB = await getMyProfileFromDB(user.uid)
+  //   isProfileAvatar.src = userDB.photoURL
+  //   setLoadingAvatar(false)
+  // }
+
   const uploadAvatar = async (e) => {
     e.preventDefault()
+    console.log('AVATAR', inputAvatar.current.files[0])
     setLoadingAvatar(true)
-    await uploadImage(`profile/${user.uid}`, inputAvatar.current.files[0])
+    // ----------------------------------------------
+    try {
+      const file = inputAvatar.current.files[0]
+      // sets the image quality to 80%
+      const fileResizing = await resizeFile(file)
+      console.log(fileResizing)
+      await uploadImage(`profile/${user.uid}`, fileResizing)
+    } catch (err) {
+      console.log(err)
+      return
+    }
+    // ----------------------------------------
+    // it's important to download the image because without it we can't get the full url of firebase
     const urlAvatar = await downloadImage(`profile/${user.uid}`)
+    // update in my DB
     await updateDoc(userRef, {
       photoURL: urlAvatar,
     })
-    const userDB = await getMyProfileFromDB(user.uid)
-    isProfileAvatar.src = userDB.photoURL
+    await setMyProfileInDB(user.uid, { photoURL: urlAvatar })
+    // update in usersList in DB
+    await updateMyProfileInUsersListDB(user.uid, { photoURL: urlAvatar })
+    // change the profile avatar with the new url avatar
+    profileAvatar.current.src = urlAvatar
     setLoadingAvatar(false)
   }
 
@@ -237,7 +277,8 @@ export default function Profile() {
                           </div>
                           <img
                             onClick={() => addFile()}
-                            ref={(e) => setisProfileAvatar(e)}
+                            // onError={(e) => imgError(e.target)}
+                            ref={profileAvatar}
                             style={{
                               height: '175px',
                               width: '175px',
@@ -488,4 +529,16 @@ const _thisUsername = {
   en: 'This username is already used. Please enter a new username to continue.',
   fr: "Ce nom d'utilisateur est déjà utilisé. Veuillez entrer un nouveau nom d'utilisateur pour continuer.",
   il: 'שם המשתמש הזה כבר בשימוש. אנא הזן שם משתמש חדש כדי להמשיך.',
+}
+
+async function resizeImage(file) {
+  try {
+    // sets the image quality to 80%
+    const fileResizing = await resizeFile(file)
+    console.log(fileResizing)
+    return fileResizing
+  } catch (err) {
+    console.log(err)
+    return null
+  }
 }

@@ -31,11 +31,6 @@ export const SocketContactContext = createContext()
 // eslint-disable-next-line no-unused-vars
 let firstTime
 
-let manou = 'hello Word'
-function logVariable(variable) {
-  console.log(variable, ...variable)
-}
-logVariable(manou)
 export const SocketContactProvider = ({ children }) => {
   const navigate = useNavigate()
   // --------------------------------------------------------------------------------
