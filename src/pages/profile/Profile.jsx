@@ -23,7 +23,11 @@ import { LanguageContext } from '../../utils/context/LanguageContext'
 import SwitchMoon from '../home/components/SwitchMoon'
 import Flags from '../home/components/Flags'
 import { ThemeContext } from '../../utils/context/ThemeContext'
-import { resizeFile } from '../../utils/functions/resizeImage'
+import {
+  resizeFile,
+  resizeFile10,
+  resizeFile30,
+} from '../../utils/functions/resizeImage'
 import { imgError } from '../../utils/functions/returnAvatarIsImgError'
 
 export default function Profile() {
@@ -34,6 +38,7 @@ export default function Profile() {
   //states
   const [userDB, setUserDB] = useState({})
   const [isProfileAvatar, setisProfileAvatar] = useState(null)
+  const [imageProfile, setImageProfile] = useState('')
   const [validation, setValidation] = useState('')
   const [loadingForm, setLoadingForm] = useState(false)
   const [loadingAvatar, setLoadingAvatar] = useState(false)
@@ -68,10 +73,9 @@ export default function Profile() {
 
   //waits for the DOM to be fully downloaded and displays the new profile picture
   useEffect(() => {
-    if (isProfileAvatar !== null) {
-      getProfilePictureInDB()
-    }
-  }, [isProfileAvatar])
+    if (!profileAvatar.current) return
+    getProfilePictureInDB()
+  }, [profileAvatar])
 
   // retrieve the profile picture that was uploaded into the db
   async function getProfilePictureInDB() {
@@ -79,7 +83,7 @@ export default function Profile() {
     setUserDB(userDB)
     console.log('userDB', userDB)
     if (userDB && userDB.photoURL !== '') {
-      isProfileAvatar.src = userDB.photoURL
+      profileAvatar.current.src = userDB.photoURL
     }
   }
 
@@ -111,7 +115,7 @@ export default function Profile() {
     try {
       const file = inputAvatar.current.files[0]
       // sets the image quality to 80%
-      const fileResizing = await resizeFile(file)
+      const fileResizing = await resizeFile10(file)
       console.log(fileResizing)
       await uploadImage(`profile/${user.uid}`, fileResizing)
     } catch (err) {
@@ -121,14 +125,15 @@ export default function Profile() {
     // ----------------------------------------
     // it's important to download the image because without it we can't get the full url of firebase
     const urlAvatar = await downloadImage(`profile/${user.uid}`)
+    setImageProfile(urlAvatar)
     // update in my DB
-    await updateDoc(userRef, {
-      photoURL: urlAvatar,
-    })
-    await setMyProfileInDB(user.uid, { photoURL: urlAvatar })
-    // update in usersList in DB
-    await updateMyProfileInUsersListDB(user.uid, { photoURL: urlAvatar })
-    // change the profile avatar with the new url avatar
+    // await updateDoc(userRef, {
+    //   photoURL: urlAvatar,
+    // })
+    // await setMyProfileInDB(user.uid, { photoURL: urlAvatar })
+    // // update in usersList in DB
+    // await updateMyProfileInUsersListDB(user.uid, { photoURL: urlAvatar })
+    // // change the profile avatar with the new url avatar
     profileAvatar.current.src = urlAvatar
     setLoadingAvatar(false)
   }
@@ -136,6 +141,7 @@ export default function Profile() {
   //create a profile user in the db
   async function createProfile(e) {
     // console.log(userDB)
+    console.log('profileAvatar.current.src', profileAvatar.current.src)
     e.preventDefault()
     setLoadingForm(true)
     const allUsers = await getAllUsersFromUsersListDB()
@@ -153,7 +159,7 @@ export default function Profile() {
     await setMyProfileInDB(user.uid, {
       displayName: profileName.current.value,
       userName: profileUserName.current.value,
-      photoURL: profileAvatar.src,
+      photoURL: profileAvatar.current.src,
       isProfileCreated: true,
     })
 
@@ -161,7 +167,7 @@ export default function Profile() {
       displayName: profileName.current.value,
       userName: profileUserName.current.value,
       userId: user.uid,
-      photoURL: isProfileAvatar.src,
+      photoURL: profileAvatar.current.src,
     })
     console.log('oui')
     setIsProfileCreated(true)

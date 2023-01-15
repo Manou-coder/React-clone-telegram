@@ -2,16 +2,21 @@ import { UserAuth } from '../../../../utils/context/AuthContext'
 import { useContext } from 'react'
 import { SocketContactContext } from '../../../../utils/context/SocketContact'
 import MyCall from '../MyCall'
+import { LanguageContext } from '../../../../utils/context/LanguageContext'
+import { ThemeContext } from '../../../../utils/context/ThemeContext'
 
 function MyCalls() {
   const { user } = UserAuth()
   const { myCalls } = useContext(SocketContactContext)
+  const { language } = useContext(LanguageContext)
+  const { theme } = useContext(ThemeContext)
 
   // console.log('myCalls', myCalls)
+  const textColor = theme === 'light' ? 'black' : 'white'
 
   return (
     <ul className="p-0 mt-2" style={{ listStyleType: 'none' }}>
-      {myCalls &&
+      {myCalls && myCalls.length > 0 ? (
         myCalls.map((e, i) => (
           <MyCall
             contactId={
@@ -23,12 +28,23 @@ function MyCalls() {
             callId={myCalls[i].id}
             key={myCalls[i].id}
           />
-        ))}
+        ))
+      ) : (
+        <span>
+          <h2 style={{ color: textColor }}>{_notCallsYet[language]}</h2>
+        </span>
+      )}
     </ul>
   )
 }
 
 export default MyCalls
+
+const _notCallsYet = {
+  en: 'You have not calls yet!',
+  fr: "Vous n'avez pas encore d'appels!",
+  il: 'אין לך שיחות עדיין!',
+}
 
 // const myCallsList = [
 //   {
