@@ -84,6 +84,11 @@ export default function Profile() {
     console.log('userDB', userDB)
     if (userDB && userDB.photoURL !== '') {
       profileAvatar.current.src = userDB.photoURL
+      return
+    }
+    if (user.photoURL) {
+      profileAvatar.current.src = user.photoURL
+      return
     }
   }
 
@@ -238,7 +243,14 @@ export default function Profile() {
                   <form onSubmit={(e) => uploadAvatar(e)}>
                     <div className="position-relative">
                       <div className="picture d-flex justify-content-center mb-4">
-                        <div className="position-relative">
+                        <div
+                          className="position-relative"
+                          style={{
+                            height: '175px',
+                            width: '175px',
+                            cursor: 'pointer',
+                          }}
+                        >
                           <div className="tooltip2 position-absolute">
                             <span
                               className="tooltiptext2"
@@ -283,7 +295,7 @@ export default function Profile() {
                           </div>
                           <img
                             onClick={() => addFile()}
-                            // onError={(e) => imgError(e.target)}
+                            onError={(e) => imgError(e.target)}
                             ref={profileAvatar}
                             style={{
                               height: '175px',

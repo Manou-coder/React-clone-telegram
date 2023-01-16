@@ -7,7 +7,7 @@ import {
 } from 'firebase/firestore'
 import React, { useContext, useRef } from 'react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import {
   db,
   getMyContactsFromDB,
@@ -20,6 +20,7 @@ import { SocketContactContext } from '../../utils/context/SocketContact'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 
 export default function ModalDeleteChat() {
+  const navigate = useNavigate()
   const { user } = UserAuth()
   const { setMyContacts, actuallyContactId, allUsers, setActuallyContactId } =
     useContext(SocketContactContext)
@@ -44,6 +45,7 @@ export default function ModalDeleteChat() {
     deleteThisContactIdFromMyContacts()
     // close the modal and navigate to '/chat'
     closeModal.current.click()
+    navigate('/')
     setIsChatOpen(false)
     setActuallyContactId(null)
     setIsLoading(false)

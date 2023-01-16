@@ -204,7 +204,13 @@ export default function OffCanvasProfile({ offCanvas, setOffCanvas }) {
         <form className="mt-2" onSubmit={(e) => uploadAvatar(e)}>
           <div className="position-relative">
             <div className="picture d-flex justify-content-center mb-4">
-              <div className="position-relative">
+              <div
+                className="position-relative"
+                style={{
+                  height: '175px',
+                  width: '175px',
+                }}
+              >
                 <div className="tooltip2 position-absolute">
                   <span
                     className="tooltiptext2"

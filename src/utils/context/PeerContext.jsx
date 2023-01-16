@@ -400,6 +400,11 @@ function emitSocketCallContact(myId, contactId, setCallObj) {
 }
 
 function emitSocketHangUp(callObj, setCallObj) {
+  // console.log('voila la j emet in statut finished')
+  // VERY IMPORTANT!!!
+  if (callObj && callObj.callStatus === 'finished') {
+    return
+  }
   const newCallObj = {
     ...callObj,
     callStatus: 'finished',
