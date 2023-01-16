@@ -17,35 +17,14 @@ import {
   uploadBytes,
 } from 'firebase/storage'
 
-// const firebaseConfig = {
-//   apiKey: process.env.REACT_APP_FIREBASE_APP_API_KEY,
-//   authDomain: process.env.REACT_APP_FIREBASE_APP_AUTH_DOMAIN,
-//   projectId: process.env.REACT_APP_FIREBASE_APP_PROJECT_ID,
-//   storageBucket: process.env.REACT_APP_FIREBASE_APP_STORAGE_BUCKET,
-//   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGE_SENDER_ID,
-//   appId: process.env.REACT_APP_FIREBASE_MESSAGE_APP_ID,
-// }
-
-// V6
-
 const firebaseConfig = {
-  apiKey: 'AIzaSyCdfAoe1Xcsm11iokwHN2uQVDG_JALKGxU',
-  authDomain: 'react-auth-rrv6-954c0.firebaseapp.com',
-  projectId: 'react-auth-rrv6-954c0',
-  storageBucket: 'react-auth-rrv6-954c0.appspot.com',
-  messagingSenderId: '1089001112233',
-  appId: '1:1089001112233:web:40b883ac4e0c8079849fb8',
+  apiKey: process.env.REACT_APP_FIREBASE_APP_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_APP_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_APP_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_APP_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGE_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_MESSAGE_APP_ID,
 }
-
-// React-clone-telegram
-// const firebaseConfig = {
-//   apiKey: 'AIzaSyCHQD1NqBVQdQ_auXM2yoLQsXRV_sHPd-U',
-//   authDomain: 'react-clone-telegram.firebaseapp.com',
-//   projectId: 'react-clone-telegram',
-//   storageBucket: 'react-clone-telegram.appspot.com',
-//   messagingSenderId: '34430176565',
-//   appId: '1:34430176565:web:35d130742ab59760e8907c',
-// }
 
 const app = initializeApp(firebaseConfig)
 
@@ -128,7 +107,7 @@ export const getMyProfileFromDB = async (userId) => {
   const docSnap = await getDoc(docRef)
 
   if (docSnap.exists()) {
-    // console.log('Document data:', docSnap.data())
+    console.log('Document data:', docSnap.data())
     return docSnap.data()
   } else {
     console.log('No such document!')

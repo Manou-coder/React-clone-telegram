@@ -73,6 +73,15 @@ export default function Profile() {
 
   //waits for the DOM to be fully downloaded and displays the new profile picture
   useEffect(() => {
+    if (!user || !profileName.current || !profileName.current) return
+    if (user.displayName) {
+      profileName.current.value = user.displayName
+      profileUserName.current.value = '@' + user.displayName
+    }
+  }, [profileName, profileUserName])
+
+  //waits for the DOM to be fully downloaded and displays the new profile picture
+  useEffect(() => {
     if (!profileAvatar.current) return
     getProfilePictureInDB()
   }, [profileAvatar])
@@ -91,26 +100,6 @@ export default function Profile() {
       return
     }
   }
-
-  //upload a profile picture to the db
-  // const uploadAvatar = async (e) => {
-  //   let file = inputAvatar.current.files[0]
-  //   e.preventDefault()
-  //   setLoadingAvatar(true)
-  //   const fileResizing = await resizeImage(file)
-  //   if (fileResizing) {
-  //     file = fileResizing
-  //   }
-  //   console.log('file', file)
-  //   await uploadImage(`profile/${user.uid}`, inputAvatar.current.files[0])
-  //   const urlAvatar = await downloadImage(`profile/${user.uid}`)
-  //   await updateDoc(userRef, {
-  //     photoURL: urlAvatar,
-  //   })
-  //   const userDB = await getMyProfileFromDB(user.uid)
-  //   isProfileAvatar.src = userDB.photoURL
-  //   setLoadingAvatar(false)
-  // }
 
   const uploadAvatar = async (e) => {
     e.preventDefault()
@@ -131,14 +120,6 @@ export default function Profile() {
     // it's important to download the image because without it we can't get the full url of firebase
     const urlAvatar = await downloadImage(`profile/${user.uid}`)
     setImageProfile(urlAvatar)
-    // update in my DB
-    // await updateDoc(userRef, {
-    //   photoURL: urlAvatar,
-    // })
-    // await setMyProfileInDB(user.uid, { photoURL: urlAvatar })
-    // // update in usersList in DB
-    // await updateMyProfileInUsersListDB(user.uid, { photoURL: urlAvatar })
-    // // change the profile avatar with the new url avatar
     profileAvatar.current.src = urlAvatar
     setLoadingAvatar(false)
   }
