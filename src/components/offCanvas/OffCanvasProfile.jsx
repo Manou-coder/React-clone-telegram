@@ -16,7 +16,7 @@ import Check from '../../assets/img/check.svg'
 import { imgError } from '../../utils/functions/returnAvatarIsImgError'
 import { ThemeContext } from '../../utils/context/ThemeContext'
 import { LanguageContext } from '../../utils/context/LanguageContext'
-import { resizeFile } from '../../utils/functions/resizeImage'
+import { resizeFile, resizeFile10 } from '../../utils/functions/resizeImage'
 
 export default function OffCanvasProfile({ offCanvas, setOffCanvas }) {
   const { user, userRef } = UserAuth()
@@ -64,7 +64,7 @@ export default function OffCanvasProfile({ offCanvas, setOffCanvas }) {
     try {
       const file = inputAvatar.current.files[0]
       // sets the image quality to 80%
-      const fileResizing = await resizeFile(file)
+      const fileResizing = await resizeFile10(file)
       console.log(fileResizing)
       await uploadImage(`profile/${user.uid}`, fileResizing)
     } catch (err) {
@@ -300,6 +300,7 @@ export default function OffCanvasProfile({ offCanvas, setOffCanvas }) {
             onChange={(e) => uploadAvatar(e)}
             name="picture"
             type="file"
+            accept=".png, .jpg , .jpeg"
             className="form-control"
             id="avatar"
             style={{ display: 'none' }}

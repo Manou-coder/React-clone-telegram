@@ -194,6 +194,7 @@ export default function UploadFiles() {
       <input
         ref={inputForm}
         type="file"
+        accept=".png, .jpg , .jpeg,  video/*"
         onChange={handleFileChange}
         onClick={(e) => (e.target.value = null)}
         style={{ display: 'none' }}

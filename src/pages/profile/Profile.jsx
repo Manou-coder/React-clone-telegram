@@ -346,6 +346,7 @@ export default function Profile() {
                       onChange={(e) => uploadAvatar(e)}
                       name="picture"
                       type="file"
+                      accept=".png, .jpg , .jpeg"
                       className="form-control"
                       id="inputAvatar"
                       style={{ display: 'none' }}
